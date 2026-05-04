@@ -587,7 +587,7 @@ Thin orchestrator. Spawns fresh subagents per phase; holds only `STATE.yaml`, th
 2. Refuse to run `greenfield` mode if STATE.yaml exists and `mode != greenfield`.
 3. Refuse to run `feature` or `debug` mode if STATE.yaml does not exist or `mode == greenfield` and phase != 11.
 4. Acquire lock via `bash scripts/lock.sh acquire`.
-5. Load LEARNINGS digest from `bundle/larv/LEARNINGS.md` (or fall back to repo-local `LEARNINGS.md` for first-run dev).
+5. Load LEARNINGS digest from the plugin repo's `LEARNINGS.md` at the plugin root.
 6. Determine next phase from STATE.yaml.
 7. Spawn the next phase subagent (skill named `larv-<phase-name>`) with the contract from spec §8.
 

@@ -24,11 +24,11 @@ SKILLS=(
     done
 }
 
-@test "every phase-skill stub flags itself as a stub deferring to sub-project B" {
+@test "every skill stub flags itself as a stub deferring to sub-project B" {
     for skill in larv-discuss larv-domain larv-architecture larv-design \
                  larv-tests larv-premortem larv-plan larv-provision \
                  larv-implement larv-verify larv-deploy larv-learn \
-                 larv-handoff; do
+                 larv-handoff larv-adopt; do
         run grep -F "STUB" "skills/${skill}/SKILL.md"
         [ "$status" -eq 0 ] || { echo "${skill} not marked STUB"; return 1; }
     done
