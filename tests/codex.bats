@@ -50,3 +50,11 @@ load helpers
     [ "$target" = "$PROJECT_ROOT" ]
     [ -f plugins/larv/.codex-plugin/plugin.json ]
 }
+
+@test "Codex skill namespace exposes larv slash command equivalents" {
+    for skill in full status resume adopt brainstorm feature debug learn; do
+        [ -f "codex-skills/${skill}/SKILL.md" ] || { echo "missing codex-skills/${skill}/SKILL.md"; return 1; }
+    done
+    run grep -F "/larv:full" codex-skills/full/SKILL.md
+    [ "$status" -eq 0 ]
+}
