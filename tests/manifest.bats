@@ -34,3 +34,13 @@ load helpers
     [ -n "$output" ]
     [ "$output" != "null" ]
 }
+
+@test "Claude marketplace manifest exposes larv plugin" {
+    [ -f .claude-plugin/marketplace.json ]
+    run jq empty .claude-plugin/marketplace.json
+    [ "$status" -eq 0 ]
+    run jq -r '.name' .claude-plugin/marketplace.json
+    [ "$output" = "larv-local" ]
+    run jq -r '.plugins[] | select(.name == "larv") | .source' .claude-plugin/marketplace.json
+    [ "$output" = "./" ]
+}
