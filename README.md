@@ -34,6 +34,18 @@ claude plugin install <your-org>/larv
 
 After install, `/larv:status` works in any directory. New projects default to `docs/larv/` for artifacts.
 
+## Codex CLI compatibility
+
+`larv` also ships Codex plugin metadata in `.codex-plugin/plugin.json` and a local marketplace file at `.agents/plugins/marketplace.json`.
+
+For local Codex testing from this repository root:
+
+```
+codex plugin marketplace add .
+```
+
+Codex reads the marketplace entry for `larv`, which points to `./plugins/larv`. In this repository that path is a symlink back to the plugin root so the plugin is not duplicated. See `docs/CODEX.md` for details.
+
 ## The 8 commands at a glance
 
 | Command | When to use |

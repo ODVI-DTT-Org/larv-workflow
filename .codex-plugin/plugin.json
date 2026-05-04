@@ -1,0 +1,44 @@
+{
+  "name": "larv",
+  "version": "0.2.0",
+  "description": "AI-driven Laravel app development plugin orchestrating masterplan, superpowers-laravel, domain-driven-design, and huashu-design into an end-to-end workflow.",
+  "author": {
+    "name": "your-org",
+    "email": "itranario@oakdriveventures.com",
+    "url": "https://github.com/your-org/larv"
+  },
+  "homepage": "https://github.com/your-org/larv",
+  "repository": "https://github.com/your-org/larv",
+  "license": "UNLICENSED",
+  "keywords": [
+    "laravel",
+    "codex",
+    "claude-code",
+    "domain-driven-design",
+    "workflow",
+    "plugin"
+  ],
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "interface": {
+    "displayName": "larv",
+    "shortDescription": "End-to-end Laravel app workflow for Codex and Claude Code.",
+    "longDescription": "larv orchestrates brainstorm, domain modeling, architecture, design, tests, premortem, implementation slices, sandbox deployment, final verification, and learning loops for Laravel applications.",
+    "developerName": "your-org",
+    "category": "Coding",
+    "capabilities": [
+      "Code",
+      "Plan",
+      "Verify"
+    ],
+    "websiteURL": "https://github.com/your-org/larv",
+    "privacyPolicyURL": "https://github.com/your-org/larv",
+    "termsOfServiceURL": "https://github.com/your-org/larv",
+    "defaultPrompt": [
+      "Use larv to plan a new Laravel app.",
+      "Run larv status for this project.",
+      "Resume the current larv workflow."
+    ],
+    "brandColor": "#2563EB"
+  }
+}

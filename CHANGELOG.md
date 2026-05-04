@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-05-04
+
+### Added
+- Codex CLI compatibility metadata via `.codex-plugin/plugin.json`.
+- Local Codex marketplace entry via `.agents/plugins/marketplace.json`.
+- `docs/CODEX.md` with local Codex install and verification notes.
+
 ## [0.1.0] — 2026-05-04
 
 ### Added
