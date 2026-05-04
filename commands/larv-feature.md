@@ -1,6 +1,6 @@
 ---
 name: larv:feature
-description: Add a feature to a managed Laravel app. Mini-flow: brief, deltas, mini-premortem, slice plan, implementation loop.
+description: Add a feature to a managed Laravel app. Mini-flow — brief, deltas, mini-premortem, slice plan, implementation loop.
 ---
 
 Argument: `<feature-name>` — short slug for the feature.
