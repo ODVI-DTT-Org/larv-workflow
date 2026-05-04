@@ -144,24 +144,30 @@ load helpers
     [ "$output" = "larv" ]
 }
 
-@test "plugin.json lists exactly 8 commands" {
-    run jq '.commands | length' .claude-plugin/plugin.json
-    [ "$status" -eq 0 ]
-    [ "$output" = "8" ]
-}
-
-@test "plugin.json lists exactly 15 skills" {
-    run jq '.skills | length' .claude-plugin/plugin.json
-    [ "$status" -eq 0 ]
-    [ "$output" = "15" ]
-}
-
 @test "plugin.json declares semantic version" {
     run jq -r '.version' .claude-plugin/plugin.json
     [ "$status" -eq 0 ]
     [[ "$output" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
 }
+
+@test "plugin.json declares author as an object with a name" {
+    run jq -r '.author | type' .claude-plugin/plugin.json
+    [ "$output" = "object" ]
+    run jq -r '.author.name' .claude-plugin/plugin.json
+    [ "$status" -eq 0 ]
+    [ -n "$output" ]
+    [ "$output" != "null" ]
+}
+
+@test "plugin.json declares a description" {
+    run jq -r '.description' .claude-plugin/plugin.json
+    [ "$status" -eq 0 ]
+    [ -n "$output" ]
+    [ "$output" != "null" ]
+}
 ```
+
+> Note: per Claude Code's auto-discovery convention (verified against superpowers, superpowers-laravel, dev-skills, dev-workflows, antigravity-awesome-skills, laravel-cloud), the manifest does NOT enumerate commands or skills. Auto-discovery picks them up from the `commands/` and `skills/` directories. Counts are verified in Tasks 2 and 3.
 
 `tests/helpers.bash`:
 ```bash
@@ -215,39 +221,26 @@ Expected: All tests fail with "no such file" or similar.
 ```json
 {
   "name": "larv",
-  "version": "0.1.0",
   "description": "AI-driven Laravel app development plugin orchestrating masterplan, superpowers-laravel, domain-driven-design, and huashu-design into an end-to-end workflow.",
-  "author": "your-org",
+  "version": "0.1.0",
+  "author": {
+    "name": "your-org",
+    "url": "https://github.com/your-org/larv"
+  },
+  "homepage": "https://github.com/your-org/larv",
+  "repository": "https://github.com/your-org/larv",
   "license": "UNLICENSED",
-  "commands": [
-    { "name": "larv:full", "file": "commands/larv-full.md" },
-    { "name": "larv:adopt", "file": "commands/larv-adopt.md" },
-    { "name": "larv:feature", "file": "commands/larv-feature.md" },
-    { "name": "larv:debug", "file": "commands/larv-debug.md" },
-    { "name": "larv:brainstorm", "file": "commands/larv-brainstorm.md" },
-    { "name": "larv:learn", "file": "commands/larv-learn.md" },
-    { "name": "larv:status", "file": "commands/larv-status.md" },
-    { "name": "larv:resume", "file": "commands/larv-resume.md" }
-  ],
-  "skills": [
-    { "name": "larv-orchestrator", "path": "skills/larv-orchestrator" },
-    { "name": "larv-discuss", "path": "skills/larv-discuss" },
-    { "name": "larv-domain", "path": "skills/larv-domain" },
-    { "name": "larv-architecture", "path": "skills/larv-architecture" },
-    { "name": "larv-design", "path": "skills/larv-design" },
-    { "name": "larv-tests", "path": "skills/larv-tests" },
-    { "name": "larv-premortem", "path": "skills/larv-premortem" },
-    { "name": "larv-plan", "path": "skills/larv-plan" },
-    { "name": "larv-provision", "path": "skills/larv-provision" },
-    { "name": "larv-implement", "path": "skills/larv-implement" },
-    { "name": "larv-verify", "path": "skills/larv-verify" },
-    { "name": "larv-deploy", "path": "skills/larv-deploy" },
-    { "name": "larv-learn", "path": "skills/larv-learn" },
-    { "name": "larv-handoff", "path": "skills/larv-handoff" },
-    { "name": "larv-adopt", "path": "skills/larv-adopt" }
+  "keywords": [
+    "laravel",
+    "claude-code",
+    "domain-driven-design",
+    "workflow",
+    "plugin"
   ]
 }
 ```
+
+> Schema follows the convention used by superpowers, superpowers-laravel, dev-skills, dev-workflows, antigravity-awesome-skills, and laravel-cloud (the canonical Claude Code plugins). Commands and skills are NOT enumerated — Claude Code auto-discovers from `commands/*.md` and `skills/*/SKILL.md`.
 
 - [ ] **Step 4: Copy usage guide as README.md**
 

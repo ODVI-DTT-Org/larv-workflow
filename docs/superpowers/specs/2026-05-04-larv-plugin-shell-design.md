@@ -464,7 +464,7 @@ These were called out during brainstorm but don't block the spec:
 The implementation of this spec is "done" when:
 
 1. The plugin repo is initialized with the structure in §5
-2. `.claude-plugin/plugin.json` is valid and lists all 8 commands + 15 skills
+2. `.claude-plugin/plugin.json` is valid JSON with `name`, `version` (SemVer), object-form `author`, and `description`. Per Claude Code's auto-discovery convention, the manifest does NOT enumerate commands or skills; instead `commands/` contains 8 `.md` files (verified by Task 2's tests) and `skills/` contains 15 subdirectories each with `SKILL.md` (verified by Task 3's tests).
 3. The four upstream sources are vendored into `bundle/` at pinned versions (versions chosen in implementation plan)
 4. `/larv:status` works against an empty `STATE.yaml`
 5. `/larv:resume` correctly handles the empty-state, gate-pending, and errors-unresolved branches of the decision tree
