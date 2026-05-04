@@ -1,0 +1,5 @@
+# Pinned versions for bundled upstream sources.
+masterplan: "4.2.0"
+superpowers-laravel: "0.1.5"
+domain-driven-design: "10.5.0"
+huashu-design: "1.2.0"

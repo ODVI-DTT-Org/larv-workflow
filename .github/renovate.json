@@ -1,0 +1,31 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "schedule": ["before 6am on Monday"],
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "description": "Auto-merge patch versions for bundled upstream if CI passes",
+      "matchManagers": ["regex"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true,
+      "automergeType": "pr",
+      "platformAutomerge": true
+    },
+    {
+      "description": "Open PR for review on minor/major bundled updates",
+      "matchManagers": ["regex"],
+      "matchUpdateTypes": ["minor", "major"],
+      "automerge": false,
+      "reviewers": ["@your-org/larv-maintainers"]
+    }
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": ["^bundle/VERSIONS\\.yaml$"],
+      "matchStrings": ["(?<depName>[a-z-]+):\\s+\"(?<currentValue>[0-9.]+)\""],
+      "datasourceTemplate": "github-releases",
+      "lookupNameTemplate": "your-org/{{depName}}"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+schema_version: 1
+project:
+  name: my-app
+  slug: my-app-2026-05
+  greenfield: true
+  mode: greenfield
+  started_at: "2026-05-04T10:00:00Z"
+  last_updated_at: "2026-05-04T11:00:00Z"
+plugin:
+  name: larv
+  version: 0.1.0
+  bundle_versions:
+    masterplan: "0.0.0"
+    superpowers-laravel: "0.0.0"
+    domain-driven-design: "0.0.0"
+    huashu-design: "0.0.0"
+  learnings_digest_hash: "abc1234"
+phase:
+  current: 0
+  last_completed: -1
+  gates_pending: [0]
+gates:
+  - { phase: -1, passed_at: "2026-05-04T10:05:00Z", approved_by: itranario@oakdriveventures.com }
+slices:
+  total: 0
+  status: {}
+sandbox:
+  vm_host: null
+  app_url: null
+  status: not_provisioned
+  last_deploy_at: null
+  last_test_run_at: null
+  last_test_result: null
+budget:
+  estimated_total: { tokens: 4500000, minutes: 480, cost_usd: 42.00 }
+  consumed: { tokens: 142000, minutes: 38, cost_usd: 1.20 }
+  cap_policy: pause_at_120pct
+learn:
+  last_quick_at: null
+  last_quick_pr: null
+  last_full_at: null
+  pending_notes_count: 0
+errors_unresolved: []
+policies:
+  slice_failure:
+    max_attempts: 3
+    default_action: halt_and_ask

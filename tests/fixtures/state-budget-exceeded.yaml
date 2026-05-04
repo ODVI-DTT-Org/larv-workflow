@@ -1,0 +1,50 @@
+schema_version: 1
+project:
+  name: my-app
+  slug: my-app-2026-05
+  greenfield: true
+  mode: greenfield
+  started_at: "2026-05-04T10:00:00Z"
+  last_updated_at: "2026-05-04T16:00:00Z"
+plugin:
+  name: larv
+  version: 0.1.0
+  bundle_versions:
+    masterplan: "0.0.0"
+    superpowers-laravel: "0.0.0"
+    domain-driven-design: "0.0.0"
+    huashu-design: "0.0.0"
+  learnings_digest_hash: "abc1234"
+phase:
+  current: 8
+  last_completed: 7
+  gates_pending: []
+gates: []
+slices:
+  total: 4
+  status:
+    "01": { state: completed }
+    "02": { state: completed }
+    "03": { state: in_progress, attempts: 1 }
+    "04": { state: pending }
+sandbox:
+  vm_host: vm.example.com
+  app_url: "https://my-app-2026-05.vm.example"
+  status: running
+  last_deploy_at: "2026-05-04T15:30:00Z"
+  last_test_run_at: "2026-05-04T15:35:00Z"
+  last_test_result: passing
+budget:
+  estimated_total: { tokens: 4500000, minutes: 480, cost_usd: 42.00 }
+  consumed: { tokens: 5500000, minutes: 580, cost_usd: 60.00 }
+  cap_policy: pause_at_120pct
+learn:
+  last_quick_at: null
+  last_quick_pr: null
+  last_full_at: null
+  pending_notes_count: 0
+errors_unresolved: []
+policies:
+  slice_failure:
+    max_attempts: 3
+    default_action: halt_and_ask
