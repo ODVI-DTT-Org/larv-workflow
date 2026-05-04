@@ -1,0 +1,34 @@
+{
+  "name": "larv",
+  "version": "0.1.0",
+  "description": "AI-driven Laravel app development plugin orchestrating masterplan, superpowers-laravel, domain-driven-design, and huashu-design into an end-to-end workflow.",
+  "author": "your-org",
+  "license": "UNLICENSED",
+  "commands": [
+    { "name": "larv:full", "file": "commands/larv-full.md" },
+    { "name": "larv:adopt", "file": "commands/larv-adopt.md" },
+    { "name": "larv:feature", "file": "commands/larv-feature.md" },
+    { "name": "larv:debug", "file": "commands/larv-debug.md" },
+    { "name": "larv:brainstorm", "file": "commands/larv-brainstorm.md" },
+    { "name": "larv:learn", "file": "commands/larv-learn.md" },
+    { "name": "larv:status", "file": "commands/larv-status.md" },
+    { "name": "larv:resume", "file": "commands/larv-resume.md" }
+  ],
+  "skills": [
+    { "name": "larv-orchestrator", "path": "skills/larv-orchestrator" },
+    { "name": "larv-discuss", "path": "skills/larv-discuss" },
+    { "name": "larv-domain", "path": "skills/larv-domain" },
+    { "name": "larv-architecture", "path": "skills/larv-architecture" },
+    { "name": "larv-design", "path": "skills/larv-design" },
+    { "name": "larv-tests", "path": "skills/larv-tests" },
+    { "name": "larv-premortem", "path": "skills/larv-premortem" },
+    { "name": "larv-plan", "path": "skills/larv-plan" },
+    { "name": "larv-provision", "path": "skills/larv-provision" },
+    { "name": "larv-implement", "path": "skills/larv-implement" },
+    { "name": "larv-verify", "path": "skills/larv-verify" },
+    { "name": "larv-deploy", "path": "skills/larv-deploy" },
+    { "name": "larv-learn", "path": "skills/larv-learn" },
+    { "name": "larv-handoff", "path": "skills/larv-handoff" },
+    { "name": "larv-adopt", "path": "skills/larv-adopt" }
+  ]
+}
