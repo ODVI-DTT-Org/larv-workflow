@@ -26,9 +26,9 @@ SKILLS=(
 
 @test "every skill stub flags itself as a stub deferring to sub-project B" {
     for skill in larv-discuss larv-domain larv-architecture larv-design \
-                 larv-tests larv-premortem larv-plan larv-provision \
-                 larv-implement larv-verify larv-deploy larv-learn \
-                 larv-handoff larv-adopt; do
+                 larv-tests larv-premortem larv-plan \
+                 larv-verify larv-deploy larv-learn \
+                 larv-adopt; do
         run grep -F "STUB" "skills/${skill}/SKILL.md"
         [ "$status" -eq 0 ] || { echo "${skill} not marked STUB"; return 1; }
     done
@@ -46,4 +46,43 @@ yaml.safe_load(parts[1])
 " 2>&1
         [ "$status" -eq 0 ] || { echo "invalid YAML frontmatter in skills/${skill}/SKILL.md: $output"; return 1; }
     done
+}
+
+@test "larv-handoff SKILL.md is no longer a stub" {
+    ! grep -q "STUB — sub-project A scaffolding only" skills/larv-handoff/SKILL.md
+    grep -q "handsoff_render_index" skills/larv-handoff/SKILL.md
+    grep -q "handsoff_render_starting_points" skills/larv-handoff/SKILL.md
+}
+
+@test "larv-provision SKILL.md is no longer a stub" {
+    ! grep -q "STUB — sub-project A scaffolding only" skills/larv-provision/SKILL.md
+    grep -q "allocate_port" skills/larv-provision/SKILL.md
+    grep -q "probe_with_retries" skills/larv-provision/SKILL.md
+}
+
+@test "larv-implement SKILL.md is no longer a stub" {
+    ! grep -q "STUB — sub-project A scaffolding only" skills/larv-implement/SKILL.md
+    grep -q "Handsoff/slice-NN" skills/larv-implement/SKILL.md
+    grep -q "self-contained" skills/larv-implement/SKILL.md
+}
+
+@test "larv-implement does not reference plugin lib scripts" {
+    # spec discipline §3.2: implement reads handsoff, which is self-contained
+    if grep -E 'scripts/lib/[a-z_]+\.sh' skills/larv-implement/SKILL.md; then
+        echo "FAIL: larv-implement references plugin lib scripts" >&2
+        return 1
+    fi
+}
+
+@test "larv-orchestrator SKILL.md describes hybrid gates" {
+    grep -q "soft_gate" skills/larv-orchestrator/SKILL.md
+    grep -q "hard_gate" skills/larv-orchestrator/SKILL.md
+    grep -q "routing_menu" skills/larv-orchestrator/SKILL.md
+    grep -q "Hard gates" skills/larv-orchestrator/SKILL.md
+}
+
+@test "larv-orchestrator handles all three execution modes" {
+    grep -q "executing-same-session" skills/larv-orchestrator/SKILL.md
+    grep -q "executing-subagents" skills/larv-orchestrator/SKILL.md
+    grep -q "handed-off-external" skills/larv-orchestrator/SKILL.md
 }

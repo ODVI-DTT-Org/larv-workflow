@@ -1,0 +1,15 @@
+[Phase 7 complete]
+
+Handsoff documents written:
+  docs/Handsoff.md                  (index)
+  docs/Handsoff/slice-NN-<name>.md  (one per slice)
+
+Where do you want to execute these slices?
+
+  same-session  — this Claude Code session runs Phase 8 slice-by-slice
+  subagents     — fresh subagents per slice, parallel where deps allow
+  handoff       — stop here; you'll point another AI at docs/Handsoff.md
+
+Recommendation: subagents
+Why: keeps your conversation buffer clean while preserving Claude Code's tool access.
+Tradeoffs: subagent failures are slightly harder to debug.

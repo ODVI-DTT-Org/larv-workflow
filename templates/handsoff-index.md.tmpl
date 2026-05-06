@@ -1,0 +1,95 @@
+# Handsoff — {{project_name}}
+
+> This is the universal execution contract for {{project_slug}}. Any AI session — Claude Code, Codex CLI, Cursor, Gemini, or another tool — can execute the plan from this document plus the per-slice handsoffs in `docs/Handsoff/`. **Do not skip steps.**
+
+## 1. Project identity
+
+| | |
+|---|---|
+| Name | {{project_name}} |
+| Slug | {{project_slug}} |
+| Plugin version | {{plugin_version}} |
+| Generated at | {{generated_at}} |
+| Git SHA | {{git_sha}} |
+| Default branch | {{git_default_branch}} |
+
+## 2. Mission
+
+{{mission_paragraph}}
+
+## 3. Decisions log
+
+{{adr_aggregator_inlined}}
+
+## 4. DDD model
+
+{{ddd_model_inlined_or_flat_model}}
+
+## 5. Architecture (C4)
+
+{{c4_diagrams_inlined}}
+
+## 6. Data model
+
+{{data_model_inlined}}
+
+## 7. API surface
+
+{{api_surface_inlined}}
+
+## 8. UI / Brand
+
+Chosen design pick: {{design_pick_slug}}
+Brand spec: `docs/larv/03-design/brand-spec.md`
+
+## 9. Test strategy
+
+{{test_strategy_inlined}}
+
+## 10. Slice plan
+
+{{slice_plan_inlined}}
+
+For each slice, see the per-slice handsoff at `docs/Handsoff/slice-NN-<name>.md`.
+
+## 11. Sandbox info
+
+| | |
+|---|---|
+| VM host | {{vm_host}} |
+| App port | {{app_port}} |
+| Mockup port | {{mockup_port}} |
+| Database | {{db_name}} |
+| DB user | {{db_user}} |
+| Project root | {{project_root}} |
+| Redis prefix | {{redis_prefix}} |
+| SSH key | {{ssh_key_path}} |
+
+Verify the sandbox is alive:
+
+```bash
+ssh {{ssh_user}}@{{vm_host}} "cd {{project_root}} && docker compose ps"
+```
+
+## 12. Verification commands
+
+```bash
+# Run from {{project_root}} on the VM
+docker compose exec app vendor/bin/pest
+docker compose exec app vendor/bin/pint --test
+docker compose exec app vendor/bin/phpstan analyse
+```
+
+Smoke-test URL (after each slice): `http://{{vm_host}}:{{app_port}}/{{smoke_path}}`
+
+## 13. Constraints for the implementer
+
+- Do not change schema without consulting the slice handsoff's migration field.
+- Do not skip tests. If a test in DoD does not pass, mark `STATE.yaml.slices.NN.status: failed` and stop.
+- After each slice, append to `docs/larv/implementation-tracker.yaml` (snippet in slice handsoff).
+- Append discoveries worth saving to `docs/larv/local-learnings.md` (snippet in slice handsoff).
+- Identify yourself accurately when filling `created_by.tool` and `created_by.model`.
+
+## 14. Foreign-AI notes
+
+If you are not Claude Code: ignore any references to "superpowers" or "skills" outside this document. Treat this Handsoff and the per-slice files as a complete plain-language spec. You do not need to install the larv plugin; everything you need to do is encoded inline.

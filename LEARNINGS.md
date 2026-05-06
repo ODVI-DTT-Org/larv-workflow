@@ -33,3 +33,15 @@ Entries are indexed by topic, not chronology. Add to the matching section.
 ## Maintenance
 
 When this file approaches 500 lines, `/larv:learn` should propose a split into per-section files under `learnings/`.
+
+## 2026-05-06 — Discipline rules from MVP design
+
+[plugin] Three invariants hold all design choices together:
+
+1. **Venue parity**: same-session, subagents, and foreign-AI all read the same handsoff. No special internal-only Phase 8 logic.
+2. **Handsoff self-containment**: every action a foreign AI takes is inline bash inside the handsoff document. No `scripts/lib/*` references.
+3. **Probe-before-announce**: no URL is printed until both inside-VM and outside curl confirm the service responds.
+
+Bake these into every future skill prompt; they're easy to forget and load-bearing.
+
+[project] When asking the user a question, always pair it with `Recommendation / Why / Tradeoffs`. Strong norm, not enforced — easy for skills to drift.

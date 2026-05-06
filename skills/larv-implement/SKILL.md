@@ -1,29 +1,52 @@
 ---
 name: larv-implement
-description: Phase 8 wrapper - slice loop driver. Spawns fresh slice subagents, auto-fires /larv:learn --quick every 5 slices.
+description: Phase 8 thin loop — read each docs/Handsoff/slice-NN-*.md and execute its inline bash. Same code path for same-session, subagents, and external-AI execution.
 ---
 
 # larv-implement
 
-> **STUB — sub-project A scaffolding only. The full prompt for this skill is defined in sub-project B.**
+Execute slices by following their handsoff documents. Do not improvise. Do not call plugin scripts that are not referenced inside the handsoff. The handsoff is self-contained by spec rule §3.2.
 
-## Phase responsibility
+## Inputs
 
-Drive the slice loop:
-1. For each slice in `06-implementation/elephant-carpaccio.md`, spawn a fresh slice subagent.
-2. After every 5 completed slices, fire `/larv:learn --quick` (parallel, fire-and-forget).
-3. Update `STATE.yaml.slices.status[NN]` after each slice.
-4. Surface user feedback to slice-iterate subagents.
+- `docs/larv/STATE.yaml`
+- `docs/Handsoff.md`
+- `docs/Handsoff/slice-NN-<name>.md` (one per slice)
 
-## Upstream skills invoked (per slice)
+## Loop body — do this for every slice in dependency order
 
-- `superpowers-laravel:execute-plan`
-- Contextual `superpowers-laravel:laravel-*` skills
+For each `slice-NN-<name>.md`:
 
-## Required outputs (per slice)
+1. Read it from top to bottom.
+2. Execute every bash block in section 12 (Implementation commands).
+3. Run section 10's Definition of Done checklist.
+4. Run section 13's tracker append snippet.
+5. Run section 14's local-learnings append snippet if you discovered something.
+6. Run section 15's STATE.yaml update snippet.
+7. Write `IMPLEMENTATION-REPORT-<slice-id>.md` per section 16.
+8. Soft-gate to user: print one-line slice summary, list files changed.
 
-- `docs/larv/06-implementation/slice-NN/{plan,handoff,verification}.md`
+## Failure handling
+
+If any step fails:
+
+1. Mark `STATE.yaml.slices.NN.status: failed`.
+2. Write the failed `IMPLEMENTATION-REPORT-<slice-id>.md` describing what broke.
+3. Stop the loop. The orchestrator prompts the user: retry · skip · stop.
+
+## What you do not do
+
+- You do not consult elephant-carpaccio.md directly. The slice handsoff is the source of truth.
+- You do not call `scripts/lib/*` directly. Everything you need is inlined in the handsoff.
+- You do not change tests, ADRs, or design docs. If a slice requires a design change, stop and surface it.
 
 ## Subagent return contract
 
-See spec §8.
+```yaml
+status: complete | failed
+slices_completed: [<slice-id>, ...]
+slices_failed: [<slice-id>, ...]
+state_updates:
+  slices.status: { ... }
+plugin_improvement_notes: (none)
+```

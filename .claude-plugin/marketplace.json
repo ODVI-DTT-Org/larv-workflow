@@ -9,7 +9,7 @@
     {
       "name": "larv",
       "description": "AI-driven Laravel app development workflow for Claude Code and Codex CLI.",
-      "version": "0.2.2",
+      "version": "0.3.0",
       "source": "./",
       "author": {
         "name": "your-org",

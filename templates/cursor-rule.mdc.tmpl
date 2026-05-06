@@ -1,0 +1,11 @@
+---
+description: larv plugin context for {{project_name}}
+globs: ["**/*.php", "**/*.blade.php", "**/*.md"]
+alwaysApply: true
+---
+
+This project is managed by the larv plugin. See `docs/Handsoff.md` for the execution contract. Execute slices from `docs/Handsoff/slice-NN-*.md` only — never improvise.
+
+Probe-before-announce: never claim a service is running until curl confirms it. Append a tracker entry to `docs/larv/implementation-tracker.yaml` after every change.
+
+Code conventions: Pint formatting, Pest tests, Larastan static analysis. Use the canonical ubiquitous-language terms from `docs/larv/01-domain/ubiquitous-language.md`.

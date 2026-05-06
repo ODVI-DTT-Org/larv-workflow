@@ -26,6 +26,18 @@ Five things it does that nothing else does together:
 - A GitHub repo for the plugin (private or org-internal — this is where self-improvement PRs land)
 - The four bundled upstream plugins are included automatically — no separate install
 
+## How the MVP enforces venue parity
+
+larv produces docs in `docs/Handsoff.md` and `docs/Handsoff/slice-NN-*.md` that are self-contained: every action a foreign AI must take is encoded as inline bash, no plugin script references. Same-session, subagents, and external-AI execution all read these same files. There is no internal Phase 8 logic distinct from "what we tell a foreign AI to do."
+
+The routing menu (Phase 7 → 8) lets you choose where to execute:
+
+- `same-session` — this Claude Code session continues
+- `subagents` — fresh subagents per slice
+- `handoff` — stop here; you point another AI at `docs/Handsoff.md`
+
+All three options use the same handsoff documents. The plugin's job ends at the handoff for the third option; for the first two, it loops slices through `larv-implement`, which itself only reads handsoff content.
+
 ## Installation
 
 ```
