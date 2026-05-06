@@ -26,7 +26,7 @@ SKILLS=(
 
 @test "every skill stub flags itself as a stub deferring to sub-project B" {
     for skill in larv-discuss larv-domain larv-architecture larv-design \
-                 larv-tests larv-premortem larv-plan larv-provision \
+                 larv-tests larv-premortem larv-plan \
                  larv-implement larv-verify larv-deploy larv-learn \
                  larv-adopt; do
         run grep -F "STUB" "skills/${skill}/SKILL.md"
@@ -52,4 +52,10 @@ yaml.safe_load(parts[1])
     ! grep -q "STUB — sub-project A scaffolding only" skills/larv-handoff/SKILL.md
     grep -q "handsoff_render_index" skills/larv-handoff/SKILL.md
     grep -q "handsoff_render_starting_points" skills/larv-handoff/SKILL.md
+}
+
+@test "larv-provision SKILL.md is no longer a stub" {
+    ! grep -q "STUB — sub-project A scaffolding only" skills/larv-provision/SKILL.md
+    grep -q "allocate_port" skills/larv-provision/SKILL.md
+    grep -q "probe_with_retries" skills/larv-provision/SKILL.md
 }
