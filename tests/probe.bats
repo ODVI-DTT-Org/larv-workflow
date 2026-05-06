@@ -46,3 +46,27 @@ teardown() {
     [ "$status" -ne 0 ]
     echo "$output" | grep -qi "unknown.*profile"
 }
+
+@test "probe_url_inside succeeds through ssh curl from VM perspective" {
+    local bin="$BATS_TEST_TMPDIR/bin"
+    mkdir -p "$bin"
+    cat > "$bin/ssh" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+    chmod +x "$bin/ssh"
+    PATH="$bin:$PATH" run bash -c "source scripts/lib/probe.sh && probe_url_inside user@example.test 8000 static"
+    [ "$status" -eq 0 ]
+}
+
+@test "probe_url_inside fails after exhausting retries" {
+    local bin="$BATS_TEST_TMPDIR/bin"
+    mkdir -p "$bin"
+    cat > "$bin/ssh" <<'EOF'
+#!/usr/bin/env bash
+exit 1
+EOF
+    chmod +x "$bin/ssh"
+    PATH="$bin:$PATH" run bash -c "source scripts/lib/probe.sh && PROBE_STATIC_RETRIES=2 PROBE_STATIC_DELAY=0 probe_url_inside user@example.test 8000 static"
+    [ "$status" -ne 0 ]
+}

@@ -3,13 +3,13 @@
 load helpers
 
 SKILLS=(
-    larv-orchestrator larv-discuss larv-domain larv-architecture
+    larv-orchestrator larv-domain-interview larv-discuss larv-domain larv-architecture
     larv-design larv-tests larv-premortem larv-plan larv-provision
     larv-implement larv-verify larv-deploy larv-learn larv-handoff
-    larv-adopt
+    larv-adopt larv-docsite
 )
 
-@test "all 15 skill files exist" {
+@test "all 17 skill files exist" {
     for skill in "${SKILLS[@]}"; do
         [ -f "skills/${skill}/SKILL.md" ] || { echo "missing skills/${skill}/SKILL.md"; return 1; }
     done
@@ -25,7 +25,7 @@ SKILLS=(
 }
 
 @test "every skill stub flags itself as a stub deferring to sub-project B" {
-    for skill in larv-discuss larv-domain larv-architecture larv-design \
+    for skill in larv-architecture \
                  larv-tests larv-premortem larv-plan \
                  larv-verify larv-deploy larv-learn \
                  larv-adopt; do
@@ -85,4 +85,47 @@ yaml.safe_load(parts[1])
     grep -q "executing-same-session" skills/larv-orchestrator/SKILL.md
     grep -q "executing-subagents" skills/larv-orchestrator/SKILL.md
     grep -q "handed-off-external" skills/larv-orchestrator/SKILL.md
+}
+
+@test "larv-domain-interview SKILL.md exists with valid frontmatter" {
+    [ -f skills/larv-domain-interview/SKILL.md ]
+    grep -q "^name: larv-domain-interview" skills/larv-domain-interview/SKILL.md
+    grep -q "Phase 0a" skills/larv-domain-interview/SKILL.md
+    grep -qi "tech-leak guard" skills/larv-domain-interview/SKILL.md
+}
+
+@test "larv-discuss SKILL.md is no longer a stub" {
+    ! grep -q "STUB — sub-project A scaffolding only" skills/larv-discuss/SKILL.md
+    grep -q "Filament" skills/larv-discuss/SKILL.md
+    grep -q "Horizon" skills/larv-discuss/SKILL.md
+    grep -q "Pulse" skills/larv-discuss/SKILL.md
+    grep -q "Cashier" skills/larv-discuss/SKILL.md
+}
+
+@test "larv-domain SKILL.md is no longer a stub" {
+    ! grep -q "STUB — sub-project A scaffolding only" skills/larv-domain/SKILL.md
+    grep -q "medium.com/@harryespant" skills/larv-domain/SKILL.md
+    grep -qi "viability" skills/larv-domain/SKILL.md
+}
+
+@test "larv-design SKILL.md is no longer a stub" {
+    ! grep -q "STUB — sub-project A scaffolding only" skills/larv-design/SKILL.md
+    grep -q "getdesign.md" skills/larv-design/SKILL.md
+    grep -q "allocate_port mockup" skills/larv-design/SKILL.md
+    grep -qi "probe-before-announce" skills/larv-design/SKILL.md
+}
+
+@test "larv-docsite SKILL.md exists for Phase 6.5" {
+    [ -f skills/larv-docsite/SKILL.md ]
+    grep -q "^name: larv-docsite" skills/larv-docsite/SKILL.md
+    grep -q "Phase 6.5" skills/larv-docsite/SKILL.md
+    grep -q "allocate_port docsite" skills/larv-docsite/SKILL.md
+    grep -q "Docsify" skills/larv-docsite/SKILL.md
+}
+
+@test "larv-orchestrator describes Phase 0a and Phase 6.5 in greenfield sequence" {
+    grep -q "Phase 0a" skills/larv-orchestrator/SKILL.md
+    grep -q "Phase 6.5" skills/larv-orchestrator/SKILL.md
+    grep -q "larv-domain-interview" skills/larv-orchestrator/SKILL.md
+    grep -q "larv-docsite" skills/larv-orchestrator/SKILL.md
 }

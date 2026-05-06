@@ -2,9 +2,9 @@
 
 load helpers
 
-TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report)
+TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report ddd-interview-questions)
 
-@test "all 5 templates exist" {
+@test "all 6 templates exist" {
     for t in "${TEMPLATES[@]}"; do
         [ -f "templates/${t}.md" ] || { echo "missing templates/${t}.md"; return 1; }
     done
@@ -28,4 +28,10 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
 @test "adoption-report has confidence flags guidance" {
     run grep -F "confidence" templates/adoption-report.md
     [ "$status" -eq 0 ]
+}
+
+@test "ddd interview question bank documents all required output files" {
+    grep -q "business-purpose.md" templates/ddd-interview-questions.md
+    grep -q "ubiquitous-language.md" templates/ddd-interview-questions.md
+    grep -q "subdomain-candidates.md" templates/ddd-interview-questions.md
 }

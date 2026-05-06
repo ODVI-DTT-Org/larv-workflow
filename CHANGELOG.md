@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.0 (next) - Layer 2
+
+- **Phase 0a - DDD interview** (new skill `larv-domain-interview`): business-process-only interview before Discuss. 9 sections, about 15-20 questions, tech-leak guard, 8 output files in `docs/larv/ddd-interview/`.
+- **Phase 0 enrichment**: `larv-discuss` filled with the full Laravel ecosystem checklist (Filament/Nova, Sanctum/Passport/Fortify, Horizon, Reverb, Pulse, Telescope, Octane, Cashier, multi-tenancy options, Scout, MCPs, Pest/Pint/Larastan/Rector). Each ask is paired with a recommendation citing the DDD interview.
+- **Phase 1 - Laravel-DDD mapping** (`larv-domain` filled): WebFetches the linked medium article at runtime for current Laravel-DDD guidance; produces full DDD layout when viability passes, flat Eloquent model otherwise.
+- **Phase 3 - design picker + mockup server** (`larv-design` filled): recommendation memo, user browses getdesign.md in their own browser, agent fetches picks, huashu renders this app's screens in each picked style, comparison harness served on a verifier-allocated port; user converges on one design or hybrid.
+- **Phase 6.5 - doc-site review** (new skill `larv-docsite`): Docsify served on a docsite-range port (9500-9999), client-side rendering from CDN, no server-side build; allows browsing the entire plan before the Phase 7 hard gate.
+- **New shared lib `static_server.sh`**: shared lifecycle for any static server on the VM (mockups, doc-site).
+- **MVP follow-ups**: added bats coverage for `allocate_db`, `verify_allocation`, and `probe_url_inside`; fixed multi-line file inlining in `handsoff_collect_tokens`.
+
 ## 0.3.0 (2026-05-06) — MVP overhaul
 
 - **Workflow control**: hybrid gates added; soft gate after every approved phase, hard gate before Phase 7 and Phase 8.
@@ -20,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **/larv:feature** and **/larv:debug** preserve full discipline (gates, handsoff, tracker, starting-point regen).
 - **VM constant** `LARV_VM_HOST=31.220.79.31` isolated to `scripts/lib/vm.sh`.
 
-Layer 2 (DDD interview, design picker, mockup server, doc-site, Discuss enrichment) is a separate plan.
+Layer 2 shipped in 0.4.0.
 
 ## [0.2.2] — 2026-05-04
 

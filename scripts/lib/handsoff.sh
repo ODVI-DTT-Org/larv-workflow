@@ -28,33 +28,47 @@ handsoff_collect_tokens() {
     db_name="$(yq -r '.execution.allocations[] | select(.kind == "db-name") | .value' "$sp" 2>/dev/null | head -1)"
     project_root="$(yq -r '.execution.allocations[] | select(.kind == "project-root") | .value' "$sp" 2>/dev/null | head -1)"
 
-    cat <<EOF
-project_name=$(yq -r '.project.name' "$sp")
-project_slug=$(yq -r '.project.slug' "$sp")
-plugin_version=$plugin_version
-generated_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-git_sha=$git_sha
-git_default_branch=$git_default_branch
-vm_host=${LARV_VM_HOST:-31.220.79.31}
-ssh_user=${LARV_VM_HOST_SSH_USER:-larv}
-app_port=${app_port:-TBD}
-mockup_port=${mockup_port:-TBD}
-db_name=${db_name:-TBD}
-db_user=${db_name:-TBD}
-project_root=${project_root:-/srv/larv/$(yq -r '.project.slug' "$sp")}
-redis_prefix=larv:$(yq -r '.project.slug' "$sp"):
-ssh_key_path=~/.ssh/larv_$(yq -r '.project.slug' "$sp")_ed25519
-mission_paragraph=See docs/larv/00-discuss/product-brief.md
-adr_aggregator_inlined=$(test -f "$dir/docs/larv/decisions.md" && cat "$dir/docs/larv/decisions.md" || echo "_(no ADRs yet)_")
-ddd_model_inlined_or_flat_model=$(test -f "$dir/docs/larv/01-domain/domain-model.md" && cat "$dir/docs/larv/01-domain/domain-model.md" || echo "_(domain model TBD)_")
-c4_diagrams_inlined=$(test -f "$dir/docs/larv/02-architecture/c4-context.md" && cat "$dir/docs/larv/02-architecture/c4-context.md" || echo "_(C4 TBD)_")
-data_model_inlined=$(test -f "$dir/docs/larv/03-design/data-model.md" && cat "$dir/docs/larv/03-design/data-model.md" || echo "_(data model TBD)_")
-api_surface_inlined=$(test -f "$dir/docs/larv/03-design/api-surface.md" && cat "$dir/docs/larv/03-design/api-surface.md" || echo "_(API surface TBD)_")
-test_strategy_inlined=$(test -f "$dir/docs/larv/04-test-strategy/strategy.md" && cat "$dir/docs/larv/04-test-strategy/strategy.md" || echo "_(test strategy TBD)_")
-slice_plan_inlined=$(test -f "$dir/docs/larv/06-implementation/elephant-carpaccio.md" && cat "$dir/docs/larv/06-implementation/elephant-carpaccio.md" || echo "_(slice plan TBD)_")
-design_pick_slug=$(test -f "$dir/docs/larv/03-design/design-decision.md" && grep -m1 -oE 'pick: [A-Za-z0-9_-]+' "$dir/docs/larv/03-design/design-decision.md" | head -1 | sed 's/pick: //' || echo "TBD")
-smoke_path=$(yq -r '.sandbox.smoke_path // "health"' "$sp" 2>/dev/null || echo "health")
-EOF
+    __handsoff_token() {
+        local key="$1"
+        local value="$2"
+        printf "__LARV_TOKEN_START__%s\n%s\n__LARV_TOKEN_END__\n" "$key" "$value"
+    }
+
+    __handsoff_file_or_default() {
+        local file="$1"
+        local default="$2"
+        if [ -f "$file" ]; then
+            cat "$file"
+        else
+            printf "%s\n" "$default"
+        fi
+    }
+
+    __handsoff_token project_name "$(yq -r '.project.name' "$sp")"
+    __handsoff_token project_slug "$(yq -r '.project.slug' "$sp")"
+    __handsoff_token plugin_version "$plugin_version"
+    __handsoff_token generated_at "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+    __handsoff_token git_sha "$git_sha"
+    __handsoff_token git_default_branch "$git_default_branch"
+    __handsoff_token vm_host "${LARV_VM_HOST:-31.220.79.31}"
+    __handsoff_token ssh_user "${LARV_VM_HOST_SSH_USER:-larv}"
+    __handsoff_token app_port "${app_port:-TBD}"
+    __handsoff_token mockup_port "${mockup_port:-TBD}"
+    __handsoff_token db_name "${db_name:-TBD}"
+    __handsoff_token db_user "${db_name:-TBD}"
+    __handsoff_token project_root "${project_root:-/srv/larv/$(yq -r '.project.slug' "$sp")}"
+    __handsoff_token redis_prefix "larv:$(yq -r '.project.slug' "$sp"):"
+    __handsoff_token ssh_key_path "~/.ssh/larv_$(yq -r '.project.slug' "$sp")_ed25519"
+    __handsoff_token mission_paragraph "See docs/larv/00-discuss/product-brief.md"
+    __handsoff_token adr_aggregator_inlined "$(__handsoff_file_or_default "$dir/docs/larv/decisions.md" "_(no ADRs yet)_")"
+    __handsoff_token ddd_model_inlined_or_flat_model "$(__handsoff_file_or_default "$dir/docs/larv/01-domain/domain-model.md" "_(domain model TBD)_")"
+    __handsoff_token c4_diagrams_inlined "$(__handsoff_file_or_default "$dir/docs/larv/02-architecture/c4-context.md" "_(C4 TBD)_")"
+    __handsoff_token data_model_inlined "$(__handsoff_file_or_default "$dir/docs/larv/03-design/data-model.md" "_(data model TBD)_")"
+    __handsoff_token api_surface_inlined "$(__handsoff_file_or_default "$dir/docs/larv/03-design/api-surface.md" "_(API surface TBD)_")"
+    __handsoff_token test_strategy_inlined "$(__handsoff_file_or_default "$dir/docs/larv/04-test-strategy/strategy.md" "_(test strategy TBD)_")"
+    __handsoff_token slice_plan_inlined "$(__handsoff_file_or_default "$dir/docs/larv/06-implementation/elephant-carpaccio.md" "_(slice plan TBD)_")"
+    __handsoff_token design_pick_slug "$(test -f "$dir/docs/larv/03-design/design-decision.md" && grep -m1 -oE 'pick: [A-Za-z0-9_-]+' "$dir/docs/larv/03-design/design-decision.md" | head -1 | sed 's/pick: //' || echo "TBD")"
+    __handsoff_token smoke_path "$(yq -r '.sandbox.smoke_path // "health"' "$sp" 2>/dev/null || echo "health")"
 }
 
 # render_template <template_path> <tokens_file>
@@ -63,10 +77,37 @@ __handsoff_render_template() {
     local tokens_file="$2"
     local out
     out="$(cat "$tmpl")"
-    while IFS='=' read -r k v; do
-        [ -z "$k" ] && continue
-        out="${out//\{\{${k}\}\}/${v}}"
-    done < "$tokens_file"
+    if grep -q '^__LARV_TOKEN_START__' "$tokens_file"; then
+        local key value line
+        while IFS= read -r line; do
+            case "$line" in
+                __LARV_TOKEN_START__*)
+                    key="${line#__LARV_TOKEN_START__}"
+                    value=""
+                    while IFS= read -r line; do
+                        [ "$line" = "__LARV_TOKEN_END__" ] && break
+                        if [ -n "$value" ]; then
+                            value="${value}"$'\n'"${line}"
+                        else
+                            value="$line"
+                        fi
+                    done
+                    out="${out//\{\{${key}\}\}/${value}}"
+                    ;;
+                *=*)
+                    key="${line%%=*}"
+                    value="${line#*=}"
+                    [ -z "$key" ] && continue
+                    out="${out//\{\{${key}\}\}/${value}}"
+                    ;;
+            esac
+        done < "$tokens_file"
+    else
+        while IFS='=' read -r k v; do
+            [ -z "$k" ] && continue
+            out="${out//\{\{${k}\}\}/${v}}"
+        done < "$tokens_file"
+    fi
     printf "%s\n" "$out"
 }
 

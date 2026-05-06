@@ -38,6 +38,29 @@ For each phase `N`:
 5. **Soft gate** via `soft_gate "$dir" "$N" "$name" "$summary" "$changed_csv"`.
 6. **Loopback check.** If subagent's `state_updates.current_phase` points backward, jump there.
 
+## Phase sequence (greenfield)
+
+The greenfield mode dispatches phases in this exact order:
+
+1. **Phase -1**: pre-flight (script, not a skill)
+2. **Phase 0a**: dispatch `larv-domain-interview`
+3. **Phase 0**: dispatch `larv-discuss`
+4. **Phase 1**: dispatch `larv-domain`
+5. **Phase 2**: dispatch `larv-architecture`
+6. **Phase 3**: dispatch `larv-design`
+7. **Phase 4**: dispatch `larv-tests`
+8. **Phase 5**: dispatch `larv-premortem`
+9. **Phase 6**: dispatch `larv-plan`
+10. **Phase 6.5**: dispatch `larv-docsite` (writes nothing; serves the doc-site)
+11. **Phase 7 hard gate** (provisioning approval)
+12. **Phase 7**: dispatch `larv-provision`
+13. **larv-handoff** (mandatory)
+14. **Phase 8 hard gate** (routing menu)
+15. **Phase 8**: dispatch `larv-implement` (or stop, if `handoff` was chosen)
+16. **Phase 9**: dispatch `larv-verify`
+17. **Phase 10**: dispatch `larv-deploy`
+18. **Phase 11**: dispatch `larv-learn`
+
 ## Hard gates
 
 - **Before Phase 7**: `hard_gate "$dir" 7 "Provisioning will allocate VM ports/DB/project root and may write to the VM."` Refuse to advance without `approved`.

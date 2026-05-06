@@ -14,6 +14,7 @@ setup() {
 case "$*" in
     *"ss -tlnp"*)  printf "%s\n" "${LARV_TEST_SS_OUTPUT:-}" ;;
     *"ls /srv/larv"*) printf "%s\n" "${LARV_TEST_LS_OUTPUT:-}" ;;
+    *"SHOW DATABASES"*) printf "%s\n" "${LARV_TEST_DB_OUTPUT:-}" ;;
 esac
 EOF
     chmod +x "$BIN/ssh"
@@ -82,4 +83,30 @@ LISTEN 0 4096 0.0.0.0:9001 0.0.0.0:* users:((\"a\",pid=1,fd=1))" \
         run bash -c "source scripts/lib/vm.sh && source scripts/lib/verifier.sh && allocate_project_root my-app-2026-05"
     [ "$status" -ne 0 ]
     echo "$output" | grep -qi "taken"
+}
+
+@test "allocate_db returns normalized db name when free" {
+    LARV_TEST_DB_OUTPUT="mysql information_schema" \
+        run bash -c "source scripts/lib/vm.sh && source scripts/lib/verifier.sh && allocate_db my-app-2026-05"
+    [ "$status" -eq 0 ]
+    [ "$output" = "larv_my_app_2026_05" ]
+}
+
+@test "allocate_db rejects when database already exists" {
+    LARV_TEST_DB_OUTPUT="larv_my_app_2026_05" \
+        run bash -c "source scripts/lib/vm.sh && source scripts/lib/verifier.sh && allocate_db my-app-2026-05"
+    [ "$status" -ne 0 ]
+    echo "$output" | grep -qi "already exists"
+}
+
+@test "verify_allocation returns success when port is still free" {
+    LARV_TEST_SS_OUTPUT="LISTEN 0 4096 0.0.0.0:9000" \
+        run bash -c "source scripts/lib/vm.sh && source scripts/lib/verifier.sh && verify_allocation 9001 mockup"
+    [ "$status" -eq 0 ]
+}
+
+@test "verify_allocation returns non-zero when port is taken" {
+    LARV_TEST_SS_OUTPUT="LISTEN 0 4096 0.0.0.0:9001" \
+        run bash -c "source scripts/lib/vm.sh && source scripts/lib/verifier.sh && verify_allocation 9001 mockup"
+    [ "$status" -ne 0 ]
 }

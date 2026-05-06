@@ -45,3 +45,9 @@ When this file approaches 500 lines, `/larv:learn` should propose a split into p
 Bake these into every future skill prompt; they're easy to forget and load-bearing.
 
 [project] When asking the user a question, always pair it with `Recommendation / Why / Tradeoffs`. Strong norm, not enforced — easy for skills to drift.
+
+## 2026-05-06 - Article-driven mapping vs frozen baked-in mapping
+
+[plugin] When a skill's behavior depends on a third-party reference (Phase 1's Laravel-DDD mapping cites a medium article), prefer WebFetch at skill runtime over baking the article's specifics into the spec. The article evolves; our spec freezes the moment it's pasted in. Runtime fetch keeps the mapping current at the cost of needing internet during Phase 1.
+
+[plugin] When two phases need a static server (Phase 3 mockups, Phase 6.5 doc-site), share a lib (`static_server.sh`). Don't duplicate the start/probe/stop sequence per skill.

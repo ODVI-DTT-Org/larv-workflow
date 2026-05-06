@@ -38,6 +38,16 @@ The routing menu (Phase 7 → 8) lets you choose where to execute:
 
 All three options use the same handsoff documents. The plugin's job ends at the handoff for the third option; for the first two, it loops slices through `larv-implement`, which itself only reads handsoff content.
 
+## Layer 2 phases
+
+Layer 2 adds richer per-phase content:
+
+- **Phase 0a** runs a business-process DDD interview before tech is discussed. Tech mentions are politely tabled.
+- **Phase 0 (Discuss)** uses the DDD interview to ground every Laravel ecosystem question. Descriptions and recommendations cite your own answers.
+- **Phase 1 (Domain)** WebFetches a current Laravel-DDD reference and produces either a full DDD layout or a flat Eloquent model based on a viability gate.
+- **Phase 3 (Design)** asks you to browse https://getdesign.md/ in your own browser and pick >=3 designs. The agent then renders your app's screens in each picked style and serves a comparison harness at `http://31.220.79.31:<port>` so you can pick one or merge two.
+- **Phase 6.5 (Doc-site)** spins up a Docsify-rendered version of your entire plan at `http://31.220.79.31:<port>` for a final read-through before implementation begins.
+
 ## Installation
 
 ```

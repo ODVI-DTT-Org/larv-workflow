@@ -75,3 +75,15 @@ teardown() { teardown_tmp_project "$TMP"; }
         grep -q "Handsoff.md" "$f" || { echo "missing reference in $f"; return 1; }
     done
 }
+
+@test "handsoff_render_index preserves multi-line inlined files" {
+    cat > "$TMP/docs/larv/01-domain/domain-model.md" <<'EOF'
+# Domain model
+
+- User
+- Workspace
+EOF
+    bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_index '$TMP'"
+    grep -q -- "- User" "$TMP/docs/Handsoff.md"
+    grep -q -- "- Workspace" "$TMP/docs/Handsoff.md"
+}
