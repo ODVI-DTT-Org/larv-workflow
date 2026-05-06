@@ -73,3 +73,16 @@ yaml.safe_load(parts[1])
         return 1
     fi
 }
+
+@test "larv-orchestrator SKILL.md describes hybrid gates" {
+    grep -q "soft_gate" skills/larv-orchestrator/SKILL.md
+    grep -q "hard_gate" skills/larv-orchestrator/SKILL.md
+    grep -q "routing_menu" skills/larv-orchestrator/SKILL.md
+    grep -q "Hard gates" skills/larv-orchestrator/SKILL.md
+}
+
+@test "larv-orchestrator handles all three execution modes" {
+    grep -q "executing-same-session" skills/larv-orchestrator/SKILL.md
+    grep -q "executing-subagents" skills/larv-orchestrator/SKILL.md
+    grep -q "handed-off-external" skills/larv-orchestrator/SKILL.md
+}
