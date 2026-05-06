@@ -50,3 +50,10 @@ yaml.safe_load(parts[1])
         [ "$status" -eq 0 ] || { echo "invalid YAML frontmatter in commands/${cmd}.md: $output"; return 1; }
     done
 }
+
+@test "larv-feature command describes mini-flow with gates" {
+    grep -q "Mini DDD interview" commands/larv-feature.md
+    grep -q "Per-slice handsoff" commands/larv-feature.md
+    grep -q "Tracker entries" commands/larv-feature.md
+    grep -q "Routing-menu hard gate" commands/larv-feature.md
+}
