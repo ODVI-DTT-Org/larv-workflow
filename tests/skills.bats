@@ -27,7 +27,7 @@ SKILLS=(
 @test "every skill stub flags itself as a stub deferring to sub-project B" {
     for skill in larv-discuss larv-domain larv-architecture larv-design \
                  larv-tests larv-premortem larv-plan \
-                 larv-implement larv-verify larv-deploy larv-learn \
+                 larv-verify larv-deploy larv-learn \
                  larv-adopt; do
         run grep -F "STUB" "skills/${skill}/SKILL.md"
         [ "$status" -eq 0 ] || { echo "${skill} not marked STUB"; return 1; }
@@ -58,4 +58,18 @@ yaml.safe_load(parts[1])
     ! grep -q "STUB — sub-project A scaffolding only" skills/larv-provision/SKILL.md
     grep -q "allocate_port" skills/larv-provision/SKILL.md
     grep -q "probe_with_retries" skills/larv-provision/SKILL.md
+}
+
+@test "larv-implement SKILL.md is no longer a stub" {
+    ! grep -q "STUB — sub-project A scaffolding only" skills/larv-implement/SKILL.md
+    grep -q "Handsoff/slice-NN" skills/larv-implement/SKILL.md
+    grep -q "self-contained" skills/larv-implement/SKILL.md
+}
+
+@test "larv-implement does not reference plugin lib scripts" {
+    # spec discipline §3.2: implement reads handsoff, which is self-contained
+    if grep -E 'scripts/lib/[a-z_]+\.sh' skills/larv-implement/SKILL.md; then
+        echo "FAIL: larv-implement references plugin lib scripts" >&2
+        return 1
+    fi
 }
