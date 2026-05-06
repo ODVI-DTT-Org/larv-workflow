@@ -57,3 +57,10 @@ yaml.safe_load(parts[1])
     grep -q "Tracker entries" commands/larv-feature.md
     grep -q "Routing-menu hard gate" commands/larv-feature.md
 }
+
+@test "larv-debug command describes mini-flow with regression test" {
+    grep -q "Domain-context check" commands/larv-debug.md
+    grep -q "regression test" commands/larv-debug.md
+    grep -q "Tracker entry" commands/larv-debug.md
+    grep -q "Implementation hard gate" commands/larv-debug.md
+}
