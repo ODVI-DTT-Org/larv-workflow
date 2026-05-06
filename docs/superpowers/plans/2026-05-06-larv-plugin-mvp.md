@@ -88,7 +88,7 @@ load helpers
 }
 
 @test "vm.sh allows override via environment" {
-    run bash -c 'LARV_VM_HOST=10.0.0.1 source scripts/lib/vm.sh && echo "$LARV_VM_HOST"'
+    run bash -c 'export LARV_VM_HOST=10.0.0.1; source scripts/lib/vm.sh && echo "$LARV_VM_HOST"'
     [ "$status" -eq 0 ]
     [ "$output" = "10.0.0.1" ]
 }
