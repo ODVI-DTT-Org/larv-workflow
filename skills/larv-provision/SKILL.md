@@ -40,15 +40,17 @@ bash scripts/state.sh record-allocation . project-root "$project_root"
 ssh "${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}" "mkdir -p $project_root"
 # (deployment commands here)
 
-# 3. Probe-before-announce
-if probe_url_inside "${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}" "$app_port" laravel; then
-    if probe_with_retries "http://${LARV_VM_HOST}:${app_port}/" laravel; then
-        app_url="http://${LARV_VM_HOST}:${app_port}"
-    else
-        echo "ERROR: external probe failed at $app_url" >&2
-        return 1
-    fi
+# 3. Probe-before-announce — both inside and outside must succeed.
+# §3.3 hard rule: do NOT set app_url until both probes pass.
+if ! probe_url_inside "${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}" "$app_port" laravel; then
+    echo "ERROR: inside-VM probe failed for app port $app_port" >&2
+    return 1
 fi
+if ! probe_with_retries "http://${LARV_VM_HOST}:${app_port}/" laravel; then
+    echo "ERROR: external probe failed at http://${LARV_VM_HOST}:${app_port}/" >&2
+    return 1
+fi
+app_url="http://${LARV_VM_HOST}:${app_port}"
 
 # 4. Regenerate handsoff (now with allocated values inlined)
 handsoff_render_index .
