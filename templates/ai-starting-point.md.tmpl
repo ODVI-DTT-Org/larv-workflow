@@ -1,0 +1,49 @@
+# {{tool_friendly_name}} starting point — {{project_name}}
+
+This project is managed by the **larv** Laravel workflow plugin. The full plan and execution contract live in:
+
+- `docs/Handsoff.md` — index + project context (start here)
+- `docs/Handsoff/slice-NN-<name>.md` — per-slice execution contract
+- `docs/larv/implementation-tracker.yaml` — tracker (append on every change)
+- `docs/larv/local-learnings.md` — learnings staging (append when you discover something worth saving)
+- `adr/` — architecture decision records
+
+## How to work in this project
+
+1. Read `docs/Handsoff.md` end to end before changing anything.
+2. To implement a slice, open the matching `docs/Handsoff/slice-NN-<name>.md` and execute it top to bottom.
+3. Probe-before-announce: never tell the user a URL until you have curl-confirmed the service responds.
+4. Recommendation-with-every-question: when you ask the user a question, pair it with a recommendation block:
+   ```
+   Recommendation: <option>
+   Why: <one-sentence reason citing the plan>
+   Tradeoffs: <one-line counterpoint>
+   ```
+5. After every change:
+   - Append a tracker entry (snippet in the slice handsoff).
+   - Update `STATE.yaml.slices.<slice-id>.status` (snippet in the slice handsoff).
+   - Append to `docs/larv/local-learnings.md` if you discovered something.
+   - Run the slice's Definition of Done checklist before claiming completion.
+   - Identify yourself accurately when filling `created_by.tool` and `created_by.model` in the tracker.
+
+## Code conventions
+
+- Format: Pint (`vendor/bin/pint`)
+- Tests: Pest (`vendor/bin/pest`)
+- Static analysis: Larastan (`vendor/bin/phpstan analyse`)
+- Use the canonical ubiquitous-language terms from `docs/larv/01-domain/ubiquitous-language.md`. Do not invent new names for existing concepts.
+
+## Sandbox
+
+| | |
+|---|---|
+| VM host | {{vm_host}} |
+| App URL | http://{{vm_host}}:{{app_port}} |
+| Project root on VM | {{project_root}} |
+| Database | {{db_name}} |
+
+SSH: `ssh {{ssh_user}}@{{vm_host}}`
+
+## What to do if you are stuck
+
+If a slice handsoff seems incomplete or contradicts itself, stop and surface the inconsistency to the user. Do not improvise. The plan is the source of truth; if it's wrong, fix the plan first.

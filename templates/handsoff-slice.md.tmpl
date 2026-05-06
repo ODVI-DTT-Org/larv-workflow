@@ -1,0 +1,138 @@
+# Slice {{slice_id}} — {{slice_name}}
+
+> Per-slice execution contract. Read this file from top to bottom and execute every step. Update STATE.yaml and the implementation tracker on completion.
+
+## 1. Goal
+
+{{goal_one_line}}
+
+## 2. Why this slice
+
+{{why_user_visible_value}}
+
+## 3. Files to create
+
+{{files_to_create_list}}
+
+## 4. Files to modify
+
+{{files_to_modify_list}}
+
+## 5. Migrations
+
+{{migrations_list}}
+
+## 6. Tests to write
+
+{{tests_list_with_acceptance_criteria}}
+
+## 7. API endpoints
+
+{{api_endpoints_with_examples}}
+
+## 8. UI screens touched
+
+{{ui_screens_list}}
+
+## 9. Dependencies
+
+depends_on: {{depends_on_list}}
+parallel: {{parallel_flag}}
+
+## 10. Definition of Done
+
+- [ ] All tests in section 6 pass: `docker compose exec app vendor/bin/pest --filter='{{test_filter}}'`
+- [ ] Migration runs forward: `docker compose exec app php artisan migrate`
+- [ ] Migration runs backward: `docker compose exec app php artisan migrate:rollback`
+- [ ] No N+1 queries on listed endpoints (verified with Telescope or similar)
+- [ ] `IMPLEMENTATION-REPORT-{{slice_id}}.md` written
+- [ ] Tracker entry appended (see section 13)
+- [ ] Learnings appended if any (see section 14)
+
+## 11. Estimated effort
+
+Tokens: {{est_tokens}} · Minutes: {{est_minutes}}
+
+## 12. Implementation commands
+
+```bash
+cd {{project_root}}
+{{implementation_bash}}
+```
+
+## 13. Tracker append snippet (run on completion)
+
+```bash
+yq -i '.entries += [{
+  "id": "ENT-{{tracker_id_padding}}",
+  "title": "{{slice_name}}",
+  "description": "{{goal_one_line}}",
+  "type": "feature",
+  "created_by": { "tool": "{{your_tool_id}}", "model": "{{your_model_id}}" },
+  "created_at": "'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'",
+  "slices_touched": ["{{slice_id}}"],
+  "files_changed": [{{files_changed_yaml_array}}],
+  "status": "completed",
+  "related_adr": [{{related_adr_yaml_array}}],
+  "related_handsoff": "docs/Handsoff/{{slice_id}}-{{slice_slug}}.md",
+  "learnings_appended": {{learnings_appended_bool}}
+}]' docs/larv/implementation-tracker.yaml
+```
+
+Then regenerate the rendered view:
+
+```bash
+# Inline render — does not depend on plugin scripts
+yq -r '.entries[] | [.id, .type, .title, (.created_by.tool + " (" + .created_by.model + ")"), .status, .created_at] | @tsv' \
+    docs/larv/implementation-tracker.yaml \
+    | awk -F'\t' 'BEGIN{ print "# Implementation Tracker\n\n| ID | Type | Title | By | Status | When |\n|---|---|---|---|---|---|" }
+                  { printf "| %s | %s | %s | %s | %s | %s |\n", $1,$2,$3,$4,$5,$6 }' \
+    > docs/larv/implementation-tracker.md
+```
+
+## 14. Local learnings append snippet (run if you discover something worth saving)
+
+```bash
+cat >> docs/larv/local-learnings.md <<'EOF'
+
+## {{slice_id}} — $(date -u +%Y-%m-%d)
+
+<your one-paragraph learning here, focused on what surprised you or what
+future implementers should know. Tag as [plugin] if it applies to the
+plugin itself, [project] if it's project-specific.>
+EOF
+```
+
+## 15. STATE.yaml update snippet (run on completion)
+
+```bash
+yq -i '.slices.status["{{slice_id}}"] = "completed" | .project.last_updated_at = "'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"' \
+    docs/larv/STATE.yaml
+```
+
+## 16. Implementation report
+
+Write `IMPLEMENTATION-REPORT-{{slice_id}}.md` at the project root with the following sections:
+
+```markdown
+# {{slice_id}} — {{slice_name}}
+
+## What was built
+- ...
+
+## How to QA
+URL: http://{{vm_host}}:{{app_port}}/{{smoke_path}}
+Login: {{seeded_email}} / {{seeded_password}}
+1. ...
+2. ...
+
+## Tests
+Pest: {{passed}}/{{total}}
+
+## Notes for the next implementer
+- ...
+```
+
+## 17. Foreign-AI notes
+
+If you are not Claude Code or are unfamiliar with the larv plugin: this document is self-contained. Do not look for plugin scripts to call; every action above is plain bash. Identify yourself accurately in section 13's tracker append snippet.
