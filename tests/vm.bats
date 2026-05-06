@@ -8,7 +8,7 @@ load helpers
     [ "$output" = "31.220.79.31" ]
 }
 
-@test "vm.sh sets LARV_VM_HOST_DEFAULT_BRANCH to a non-empty string" {
+@test "vm.sh sets LARV_VM_HOST_SSH_USER to a non-empty string" {
     run bash -c 'source scripts/lib/vm.sh && echo "$LARV_VM_HOST_SSH_USER"'
     [ "$status" -eq 0 ]
     [ -n "$output" ]
