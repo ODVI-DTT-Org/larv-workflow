@@ -9,6 +9,8 @@ Commands:
   init <dir> <name> <mode>
   read <dir>
   update <dir> <yq-expr>
+  set-mode <dir> <mode>
+  record-allocation <dir> <kind> <value>
 EOF
     exit 64
 }
@@ -96,6 +98,11 @@ policies:
   slice_failure:
     max_attempts: 3
     default_action: halt_and_ask
+execution:
+  mode: not-yet-decided
+  allocations: []
+features: []
+debugs: []
 EOF
 }
 
@@ -118,6 +125,24 @@ cmd_update() {
     mv "$tmp" "$sp"
 }
 
+cmd_set_mode() {
+    local dir="$1"
+    local mode="$2"
+    case "$mode" in
+        not-yet-decided|executing-same-session|executing-subagents|handed-off-external)
+            ;;
+        *) echo "ERROR: invalid mode: $mode" >&2; return 1 ;;
+    esac
+    cmd_update "$dir" ".execution.mode = \"$mode\""
+}
+
+cmd_record_allocation() {
+    local dir="$1"
+    local kind="$2"
+    local value="$3"
+    cmd_update "$dir" ".execution.allocations += [{ \"kind\": \"$kind\", \"value\": \"$value\" }]"
+}
+
 main() {
     [ "$#" -lt 2 ] && usage
     local cmd="$1"
@@ -126,6 +151,8 @@ main() {
         init) [ "$#" -eq 3 ] || usage; cmd_init "$@" ;;
         read) [ "$#" -eq 1 ] || usage; cmd_read "$@" ;;
         update) [ "$#" -eq 2 ] || usage; cmd_update "$@" ;;
+        set-mode) [ "$#" -eq 2 ] || usage; cmd_set_mode "$@" ;;
+        record-allocation) [ "$#" -eq 3 ] || usage; cmd_record_allocation "$@" ;;
         *) usage ;;
     esac
 }
