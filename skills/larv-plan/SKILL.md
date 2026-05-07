@@ -1,11 +1,11 @@
 ---
 name: larv-plan
-description: Phase 6 - Elephant Carpaccio slice plan with parallelism annotations, token budget, and the mandatory sandbox deploy/start script consumed by Phase 7.
+description: Phase 6 - Elephant Carpaccio slice plan with parallelism annotations, token budget, and the mandatory sandbox deploy/start script consumed by handoff bootstrap.
 ---
 
 # larv-plan
 
-Turn the approved design, architecture, and test strategy into implementation slices and write the exact sandbox deployment script that Phase 7 will run on the VM.
+Turn the approved design, architecture, and test strategy into implementation slices and write the exact sandbox deployment script that `docs/Handsoff/bootstrap-sandbox.md` will run on the VM during implementation.
 
 ## Inputs
 
@@ -23,11 +23,11 @@ Turn the approved design, architecture, and test strategy into implementation sl
 2. Annotate every slice with `id`, `goal`, user-visible value, files, migrations, tests, acceptance criteria, `depends_on`, and `parallel`.
 3. Produce `docs/larv/06-implementation/token-budget.md` with slice-level token/minute estimates.
 4. Initialize or update `STATE.yaml.slices` with the planned slice IDs.
-5. Write the executable Phase 7 deployment script at `docs/larv/07-runtime/deploy-sandbox.sh`.
+5. Write the executable sandbox deployment script at `docs/larv/07-runtime/deploy-sandbox.sh`.
 
 ## Mandatory deploy script
 
-`docs/larv/07-runtime/deploy-sandbox.sh` is required. Phase 7 refuses to provision without it.
+`docs/larv/07-runtime/deploy-sandbox.sh` is required. Handoff bootstrap refuses to start the app sandbox without it.
 
 The script runs on the VM from the rsynced project root and must:
 
@@ -84,9 +84,9 @@ chmod +x docs/larv/07-runtime/deploy-sandbox.sh
 
 ## What you do not do
 
-- Do not leave deployment as a prose instruction. Phase 7 needs an executable script.
+- Do not leave deployment as a prose instruction. Handoff bootstrap needs an executable script.
 - Do not include placeholder commands in the deploy script.
-- Do not start the VM services in Phase 6. Phase 7 executes the script.
+- Do not start the VM services in Phase 6. Implementation executes the script through `docs/Handsoff/bootstrap-sandbox.md`.
 
 ## Subagent return contract
 

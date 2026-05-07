@@ -56,8 +56,9 @@ yaml.safe_load(parts[1])
 
 @test "larv-provision SKILL.md is no longer a stub" {
     ! grep -q "STUB — sub-project A scaffolding only" skills/larv-provision/SKILL.md
-    grep -q "allocate_port" skills/larv-provision/SKILL.md
-    grep -q "probe_with_retries" skills/larv-provision/SKILL.md
+    grep -q "Do not dispatch this during" skills/larv-provision/SKILL.md
+    grep -q "docs/Handsoff/bootstrap-sandbox.md" skills/larv-provision/SKILL.md
+    grep -q "Bootstrap Invariants" skills/larv-provision/SKILL.md
 }
 
 @test "larv-implement SKILL.md is no longer a stub" {
@@ -80,11 +81,11 @@ yaml.safe_load(parts[1])
     fi
 }
 
-@test "larv-orchestrator SKILL.md describes hybrid gates" {
+@test "larv-orchestrator SKILL.md describes required gates" {
     grep -q "soft_gate" skills/larv-orchestrator/SKILL.md
-    grep -q "hard_gate" skills/larv-orchestrator/SKILL.md
+    ! grep -q "hard_gate" skills/larv-orchestrator/SKILL.md
     grep -q "routing_menu" skills/larv-orchestrator/SKILL.md
-    grep -q "Hard gates" skills/larv-orchestrator/SKILL.md
+    grep -q "Phase 8 routing menu" skills/larv-orchestrator/SKILL.md
 }
 
 @test "larv-orchestrator handles all three execution modes" {
@@ -146,22 +147,24 @@ yaml.safe_load(parts[1])
     grep -q "docsite_url: \"http://31.220.79.31:<port>/\"" skills/larv-docsite/SKILL.md
     grep -q "static_server_check_remote_deps" skills/larv-docsite/SKILL.md
     grep -q "runtime_gate_require_phase_url . docsite" skills/larv-docsite/SKILL.md
+    grep -q "docs/Handsoff.md" skills/larv-docsite/SKILL.md
+    grep -q "docs/Handsoff/" skills/larv-docsite/SKILL.md
 }
 
-@test "larv-provision makes sandbox URL a mandatory completion gate" {
-    grep -q "Mandatory completion gate" skills/larv-provision/SKILL.md
-    grep -q "sandbox_url" skills/larv-provision/SKILL.md
-    grep -q "status: failed" skills/larv-provision/SKILL.md
-    grep -q "sandbox_url: \"http://31.220.79.31:<port>/\"" skills/larv-provision/SKILL.md
-    grep -q "deploy-sandbox.sh" skills/larv-provision/SKILL.md
-    grep -q "runtime_gate_require_phase_url . sandbox" skills/larv-provision/SKILL.md
+@test "larv-provision redirects active sandbox startup to handoff bootstrap" {
+    grep -q "Do not dispatch this during" skills/larv-provision/SKILL.md
+    grep -q "app sandbox belongs to implementation handoff" skills/larv-provision/SKILL.md
+    grep -q "docs/Handsoff/bootstrap-sandbox.md" skills/larv-provision/SKILL.md
+    grep -q "Print the sandbox URL only after both probes pass" skills/larv-provision/SKILL.md
+    grep -q "not from larv-provision during /larv:full" skills/larv-provision/SKILL.md
 }
 
-@test "larv-plan requires deploy-sandbox script for Phase 7" {
+@test "larv-plan requires deploy-sandbox script for handoff bootstrap" {
     grep -q "deploy-sandbox.sh" skills/larv-plan/SKILL.md
     grep -q "executable" skills/larv-plan/SKILL.md
     grep -q "APP_PORT" skills/larv-plan/SKILL.md
     grep -q "DB_DATABASE" skills/larv-plan/SKILL.md
+    grep -q "Handoff bootstrap refuses" skills/larv-plan/SKILL.md
 }
 
 @test "larv-orchestrator describes Phase 0a and Phase 6.5 in greenfield sequence" {
@@ -175,6 +178,19 @@ yaml.safe_load(parts[1])
     grep -q "Runtime URL enforcement" skills/larv-orchestrator/SKILL.md
     grep -q "mockup_url" skills/larv-orchestrator/SKILL.md
     grep -q "docsite_url" skills/larv-orchestrator/SKILL.md
-    grep -q "sandbox_url" skills/larv-orchestrator/SKILL.md
+    ! grep -q "sandbox_url" skills/larv-orchestrator/SKILL.md
     grep -q "treat the phase as failed" skills/larv-orchestrator/SKILL.md
+}
+
+@test "larv-orchestrator shows handoff paths before execution routing" {
+    grep -q "docs/Handsoff.md" skills/larv-orchestrator/SKILL.md
+    grep -q "docs/Handsoff/bootstrap-sandbox.md" skills/larv-orchestrator/SKILL.md
+    grep -q "docs/Handsoff/slice-NN-<name>.md" skills/larv-orchestrator/SKILL.md
+    grep -q "docs/larv/docsite-url.txt" skills/larv-orchestrator/SKILL.md
+}
+
+@test "larv-implement requires sandbox bootstrap before slices" {
+    grep -q "Bootstrap — mandatory before first slice" skills/larv-implement/SKILL.md
+    grep -q "docs/Handsoff/bootstrap-sandbox.md" skills/larv-implement/SKILL.md
+    grep -q "docs/larv/07-runtime/sandbox-url.txt" skills/larv-implement/SKILL.md
 }

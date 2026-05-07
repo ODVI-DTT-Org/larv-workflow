@@ -1,6 +1,6 @@
 ---
 name: larv-docsite
-description: Phase 6.5 - Docsify-served review of the entire plan before the Phase 7 hard gate. Verifier allocates a port from the docsite range; firewall opened; probe-before-announce.
+description: Phase 6.5 - Docsify-served review of the full plan and generated handoff before the Phase 8 routing menu. Verifier allocates a port from the docsite range; firewall opened; probe-before-announce.
 ---
 
 # larv-docsite
@@ -9,12 +9,14 @@ Serve `docs/larv/` as a navigable Docsify site so the user can review the full p
 
 ## Trigger
 
-Runs automatically after Phase 6 (Plan) approval, before the Phase 7 hard gate.
+Runs automatically after `larv-handoff`, before the Phase 8 routing menu, so the served doc-site includes `docs/Handsoff.md`, `docs/Handsoff/bootstrap-sandbox.md`, and per-slice handoffs.
 
 ## Inputs
 
 - All files under `docs/larv/`
-- `docs/Handsoff.md` (if it exists at this point)
+- `docs/Handsoff.md`
+- `docs/Handsoff/bootstrap-sandbox.md`
+- `docs/Handsoff/slice-NN-*.md`
 
 ## What you do
 
@@ -38,9 +40,11 @@ docsite_port=$(allocate_port docsite)
 bash scripts/state.sh record-allocation . docsite-port "$docsite_port"
 static_server_open_firewall "$ssh_target" "$docsite_port"
 
-# 2. Stage docs/ and a Docsify index.html on the VM
+# 2. Stage docs/larv plus generated handoff docs and a Docsify index.html on the VM
 ssh "$ssh_target" "mkdir -p $project_root/docsite"
 rsync -avz docs/larv/ "$ssh_target:$project_root/docsite/"
+rsync -avz docs/Handsoff.md "$ssh_target:$project_root/docsite/Handsoff.md"
+rsync -avz docs/Handsoff/ "$ssh_target:$project_root/docsite/Handsoff/"
 ssh "$ssh_target" "cat > $project_root/docsite/index.html" <<'HTML'
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>larv plan</title>
@@ -81,11 +85,12 @@ echo "Plan available for review at $docsite_url"
 
 ## Mandatory completion gate
 
-The doc-site server is not optional. Do not advance to the Phase 7 hard gate, auto-commit, or return `status: complete` until all of these are true:
+The doc-site server is not optional. Do not advance to the Phase 8 routing menu, auto-commit, or return `status: complete` until all of these are true:
 
 - `docsite_port` was allocated through `allocate_port docsite` and recorded as `docsite-port` in `STATE.yaml.execution.allocations`.
 - `static_server_check_remote_deps "$ssh_target"` passed for `php`, `tmux`, `curl`, and `rsync`.
 - `docs/larv/` was rsynced to `$project_root/docsite` on the VM.
+- `docs/Handsoff.md` and `docs/Handsoff/` were rsynced to `$project_root/docsite` on the VM.
 - Docsify `index.html` was written on the VM.
 - `static_server_start` succeeded.
 - `probe_url_inside "$ssh_target" "$docsite_port" static` succeeded.
@@ -105,7 +110,7 @@ errors_unresolved:
 
 ## Server lifetime
 
-Stays up through the Phase 7 hard gate. Released after the routing menu is answered, or `/larv:docsite teardown-server`.
+Stays up through the Phase 8 routing menu and handoff decision. Released after the routing menu is answered, or `/larv:docsite teardown-server`.
 
 ## Required outputs
 

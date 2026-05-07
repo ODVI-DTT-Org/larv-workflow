@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Handsoff document generator. Per spec §15: writes docs/Handsoff.md (index)
-# and docs/Handsoff/slice-NN-<name>.md (per slice), plus AI starting-point
+# Handsoff document generator. Per spec §15: writes docs/Handsoff.md (index),
+# docs/Handsoff/bootstrap-sandbox.md, and docs/Handsoff/slice-NN-<name>.md (per slice), plus AI starting-point
 # files (CLAUDE.md, AGENTS.md, GEMINI.md, .cursor/rules/larv.mdc, .codex/AGENTS.md).
 # Self-contained: handsoff content references no plugin scripts.
 
@@ -121,6 +121,19 @@ handsoff_render_index() {
     mkdir -p "$dir/docs"
     __handsoff_render_template "$plugin_root/templates/handsoff-index.md.tmpl" "$tokens" \
         > "$dir/docs/Handsoff.md"
+    rm -f "$tokens"
+}
+
+handsoff_render_bootstrap_sandbox() {
+    local dir="$1"
+    local plugin_root
+    plugin_root="$(__handsoff_plugin_root)"
+    local tokens
+    tokens="$(mktemp)"
+    handsoff_collect_tokens "$dir" > "$tokens"
+    mkdir -p "$dir/docs/Handsoff"
+    __handsoff_render_template "$plugin_root/templates/bootstrap-sandbox.md.tmpl" "$tokens" \
+        > "$dir/docs/Handsoff/bootstrap-sandbox.md"
     rm -f "$tokens"
 }
 

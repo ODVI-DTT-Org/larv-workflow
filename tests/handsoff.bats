@@ -87,3 +87,22 @@ EOF
     grep -q -- "- User" "$TMP/docs/Handsoff.md"
     grep -q -- "- Workspace" "$TMP/docs/Handsoff.md"
 }
+
+@test "handsoff_render_bootstrap_sandbox writes self-contained bootstrap" {
+    run bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_bootstrap_sandbox '$TMP'"
+    [ "$status" -eq 0 ]
+    [ -f "$TMP/docs/Handsoff/bootstrap-sandbox.md" ]
+    grep -q "Bootstrap Sandbox" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+    grep -q "deploy-sandbox.sh" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+    grep -q "Sandbox ready at" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+    ! grep -E 'scripts/lib/[a-z_]+\.sh' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+}
+
+@test "starting-point files require bootstrap before slices" {
+    bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_starting_points '$TMP'"
+    grep -q "bootstrap-sandbox.md" "$TMP/CLAUDE.md"
+    grep -q "bootstrap-sandbox.md" "$TMP/AGENTS.md"
+    grep -q "bootstrap-sandbox.md" "$TMP/GEMINI.md"
+    grep -q "bootstrap-sandbox.md" "$TMP/.cursor/rules/larv.mdc"
+    grep -q "bootstrap-sandbox.md" "$TMP/.codex/AGENTS.md"
+}

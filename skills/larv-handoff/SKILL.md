@@ -1,6 +1,6 @@
 ---
 name: larv-handoff
-description: Generate the universal Handsoff.md index, per-slice handsoffs, and AI starting-point files. Mandatory before the Phase 8 routing menu.
+description: Generate the universal Handsoff.md index, sandbox bootstrap handoff, per-slice handsoffs, and AI starting-point files. Mandatory before the routing menu.
 ---
 
 # larv-handoff
@@ -36,14 +36,17 @@ fi
 # 2. Render the Handsoff index
 handsoff_render_index "."
 
-# 3. Render per-slice handsoffs from elephant-carpaccio.md
+# 3. Render sandbox bootstrap handoff
+handsoff_render_bootstrap_sandbox "."
+
+# 4. Render per-slice handsoffs from elephant-carpaccio.md
 #    For each slice id + name in the slice plan:
 #      handsoff_render_slice "." "$slice_id" "$slice_slug"
 
-# 4. Render the AI starting-point files
+# 5. Render the AI starting-point files
 handsoff_render_starting_points "."
 
-# 5. Commit (auto-commit policy)
+# 6. Commit (auto-commit policy)
 safe_commit_docs "[larv] handsoff documents generated for $(yq -r .project.slug docs/larv/STATE.yaml)"
 ```
 
@@ -52,11 +55,12 @@ safe_commit_docs "[larv] handsoff documents generated for $(yq -r .project.slug 
 - You do not invoke other skills.
 - You do not write content directly to handsoff files; you call library functions.
 - You do not modify files outside `docs/`, `adr/`, and the AI starting-point paths.
-- You do not run probe/verifier — that is `larv-provision`'s job.
+- You do not start the app sandbox while generating handoff. You write `docs/Handsoff/bootstrap-sandbox.md`; the implementation venue runs it before the first slice.
 
 ## Required outputs
 
 - `docs/Handsoff.md`
+- `docs/Handsoff/bootstrap-sandbox.md`
 - `docs/Handsoff/slice-NN-<name>.md` for every slice in the plan
 - `docs/larv/implementation-tracker.yaml` and `.md`
 - `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `.cursor/rules/larv.mdc`, `.codex/AGENTS.md`
@@ -69,6 +73,7 @@ Return:
 status: complete
 files_written:
   - docs/Handsoff.md
+  - docs/Handsoff/bootstrap-sandbox.md
   - docs/Handsoff/slice-NN-<name>.md  (one per slice)
   - docs/larv/implementation-tracker.yaml
   - docs/larv/implementation-tracker.md

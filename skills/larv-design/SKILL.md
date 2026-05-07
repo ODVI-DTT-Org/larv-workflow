@@ -130,7 +130,7 @@ Invoke huashu-design with the chosen pick only. Outputs:
 
 ### 10. Server lifetime
 
-Stays up through Phase 6 for reference. Released by Phase 7 provisioning, or `/larv:design teardown-server`.
+Stays up through Phase 6 for reference. Released after handoff/docsite review, or `/larv:design teardown-server`.
 
 ### 11. Auto-commit
 

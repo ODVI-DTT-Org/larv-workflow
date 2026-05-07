@@ -50,37 +50,32 @@ Brand spec: `docs/larv/03-design/brand-spec.md`
 
 {{slice_plan_inlined}}
 
-For each slice, see the per-slice handsoff at `docs/Handsoff/slice-NN-<name>.md`.
+Before the first slice, run `docs/Handsoff/bootstrap-sandbox.md` to start and probe the app sandbox. Then implement slices from `docs/Handsoff/slice-NN-<name>.md` in dependency order.
 
-## 11. Sandbox info
+## 11. Sandbox Bootstrap
+
+The app sandbox is started by the implementation venue, not during planning.
+
+Start here: `docs/Handsoff/bootstrap-sandbox.md`
+
+After bootstrap succeeds, the app URL is written to `docs/larv/07-runtime/sandbox-url.txt`.
 
 | | |
 |---|---|
 | VM host | {{vm_host}} |
-| App port | {{app_port}} |
 | Mockup port | {{mockup_port}} |
-| Database | {{db_name}} |
-| DB user | {{db_user}} |
-| Project root | {{project_root}} |
-| Redis prefix | {{redis_prefix}} |
-| SSH key | {{ssh_key_path}} |
-
-Verify the sandbox is alive:
-
-```bash
-ssh {{ssh_user}}@{{vm_host}} "cd {{project_root}} && docker compose ps"
-```
+| Project root base | /srv/larv/{{project_slug}} |
 
 ## 12. Verification commands
 
 ```bash
-# Run from {{project_root}} on the VM
+# Run after bootstrap, from the VM project root shown in docs/larv/07-runtime/sandbox-runbook.md
 docker compose exec app vendor/bin/pest
 docker compose exec app vendor/bin/pint --test
 docker compose exec app vendor/bin/phpstan analyse
 ```
 
-Smoke-test URL (after each slice): `http://{{vm_host}}:{{app_port}}/{{smoke_path}}`
+Smoke-test URL (after each slice): read base URL from `docs/larv/07-runtime/sandbox-url.txt`, then visit `/{{smoke_path}}`.
 
 ## 13. Constraints for the implementer
 

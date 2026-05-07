@@ -11,7 +11,12 @@ Execute slices by following their handsoff documents. Do not improvise. Do not c
 
 - `docs/larv/STATE.yaml`
 - `docs/Handsoff.md`
+- `docs/Handsoff/bootstrap-sandbox.md`
 - `docs/Handsoff/slice-NN-<name>.md` (one per slice)
+
+## Bootstrap — mandatory before first slice
+
+Before executing any slice, read `docs/Handsoff/bootstrap-sandbox.md` and execute its bash block top to bottom. Do not proceed to slice implementation until it prints the sandbox URL and writes `docs/larv/07-runtime/sandbox-url.txt`.
 
 ## Loop body — do this for every slice in dependency order
 

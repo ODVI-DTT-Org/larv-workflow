@@ -1,0 +1,118 @@
+# Bootstrap Sandbox — {{project_slug}}
+
+> Run this before implementing the first slice. This file is self-contained and does not require the larv plugin.
+
+## Purpose
+
+Allocate VM runtime resources, copy the project to the VM, run `docs/larv/07-runtime/deploy-sandbox.sh`, probe the app from inside and outside the VM, then write the sandbox URL back into project docs.
+
+## Required local files
+
+- `docs/larv/STATE.yaml`
+- `docs/larv/07-runtime/deploy-sandbox.sh`
+- `docs/Handsoff.md`
+- `docs/Handsoff/slice-NN-*.md`
+
+## Bootstrap commands
+
+```bash
+set -euo pipefail
+
+VM_HOST="{{vm_host}}"
+SSH_USER="{{ssh_user}}"
+SLUG="{{project_slug}}"
+SSH_TARGET="$SSH_USER@$VM_HOST"
+PROJECT_ROOT="/srv/larv/$SLUG"
+DB_NAME="larv_${SLUG//-/_}"
+
+if [ ! -x docs/larv/07-runtime/deploy-sandbox.sh ]; then
+    echo "ERROR: docs/larv/07-runtime/deploy-sandbox.sh is missing or not executable" >&2
+    exit 1
+fi
+
+if ! command -v ssh >/dev/null || ! command -v rsync >/dev/null || ! command -v yq >/dev/null; then
+    echo "ERROR: local ssh, rsync, and yq are required" >&2
+    exit 1
+fi
+
+ssh -o BatchMode=yes -o ConnectTimeout=5 "$SSH_TARGET" \
+    "command -v php >/dev/null && command -v tmux >/dev/null && command -v curl >/dev/null && command -v rsync >/dev/null && command -v ss >/dev/null"
+
+listening="$(ssh -o BatchMode=yes -o ConnectTimeout=5 "$SSH_TARGET" "ss -tlnp 2>/dev/null" 2>/dev/null \
+    | awk '{print $4}' | awk -F: '{print $NF}' | sort -un)"
+
+APP_PORT=""
+for port in $(seq 8000 8999); do
+    if ! grep -qx "$port" <<<"$listening"; then
+        APP_PORT="$port"
+        break
+    fi
+done
+
+if [ -z "$APP_PORT" ]; then
+    echo "ERROR: no free app port in 8000-8999" >&2
+    exit 1
+fi
+
+ssh "$SSH_TARGET" "if command -v ufw >/dev/null; then sudo ufw allow '$APP_PORT'/tcp >/dev/null; fi"
+
+ssh "$SSH_TARGET" "mkdir -p '$PROJECT_ROOT'"
+rsync -avz --delete \
+    --exclude .git \
+    --exclude docs/larv/07-runtime/sandbox-url.txt \
+    ./ "$SSH_TARGET:$PROJECT_ROOT/app/"
+
+ssh "$SSH_TARGET" "cd '$PROJECT_ROOT/app' && APP_PORT='$APP_PORT' DB_DATABASE='$DB_NAME' bash docs/larv/07-runtime/deploy-sandbox.sh"
+
+for attempt in $(seq 1 6); do
+    if ssh "$SSH_TARGET" "curl -fsS --max-time 5 -o /dev/null 'http://127.0.0.1:$APP_PORT/'"; then
+        break
+    fi
+    if [ "$attempt" -eq 6 ]; then
+        echo "ERROR: inside-VM app probe failed on port $APP_PORT" >&2
+        exit 1
+    fi
+    sleep 10
+done
+
+APP_URL="http://$VM_HOST:$APP_PORT/"
+for attempt in $(seq 1 6); do
+    if curl -fsS --max-time 5 -o /dev/null "$APP_URL"; then
+        break
+    fi
+    if [ "$attempt" -eq 6 ]; then
+        echo "ERROR: external app probe failed at $APP_URL" >&2
+        exit 1
+    fi
+    sleep 10
+done
+
+mkdir -p docs/larv/07-runtime
+printf "%s\n" "$APP_URL" > docs/larv/07-runtime/sandbox-url.txt
+cat > docs/larv/07-runtime/sandbox-runbook.md <<EOF
+# Sandbox Runbook — $SLUG
+
+App URL: $APP_URL
+DB: $DB_NAME
+Project root: $PROJECT_ROOT
+SSH: ssh $SSH_TARGET
+EOF
+
+export APP_PORT DB_NAME PROJECT_ROOT APP_URL
+yq -i '
+  .execution.allocations += [
+    {"kind":"app-port","value": strenv(APP_PORT)},
+    {"kind":"db-name","value": strenv(DB_NAME)},
+    {"kind":"project-root","value": strenv(PROJECT_ROOT)}
+  ] |
+  .sandbox.app_url = strenv(APP_URL) |
+  .sandbox.status = "provisioned" |
+  .project.last_updated_at = "'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"
+' docs/larv/STATE.yaml
+
+echo "Sandbox ready at $APP_URL"
+```
+
+## Next Step
+
+After this succeeds, implement slices from `docs/Handsoff/slice-NN-*.md` in dependency order.

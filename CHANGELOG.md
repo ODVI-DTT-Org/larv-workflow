@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.3 (next) - Handoff sandbox flow
+
+- Moves app sandbox startup out of `/larv:full` planning and into the implementation handoff via generated `docs/Handsoff/bootstrap-sandbox.md`.
+- Makes `larv-handoff` generate the bootstrap file before per-slice execution, and makes `larv-implement` require it before the first slice.
+- Serves the Docsify plan site after handoff generation so the doc-site includes `docs/Handsoff.md`, `docs/Handsoff/bootstrap-sandbox.md`, and per-slice handoffs.
+- Updates the Phase 8 routing menu and AI starting-point files to show the exact next-step paths for external handoff.
+- Retires `larv-provision` from the active `/larv:full` sequence; it now documents legacy invariants only.
+
 ## 0.4.2 (next) - Server reliability hardening
 
 - Adds `runtime_gate.sh` so mockup, doc-site, and sandbox URL artifacts can be validated as real external VM URLs instead of `TBD`/`null`/local placeholders.

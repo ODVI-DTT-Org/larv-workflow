@@ -2,11 +2,15 @@
 
 load helpers
 
-TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report ddd-interview-questions)
+TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report ddd-interview-questions bootstrap-sandbox.md.tmpl)
 
-@test "all 6 templates exist" {
+@test "all 7 templates exist" {
     for t in "${TEMPLATES[@]}"; do
-        [ -f "templates/${t}.md" ] || { echo "missing templates/${t}.md"; return 1; }
+        if [[ "$t" == *.tmpl ]]; then
+            [ -f "templates/${t}" ] || { echo "missing templates/${t}"; return 1; }
+        else
+            [ -f "templates/${t}.md" ] || { echo "missing templates/${t}.md"; return 1; }
+        fi
     done
 }
 
@@ -34,4 +38,13 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "business-purpose.md" templates/ddd-interview-questions.md
     grep -q "ubiquitous-language.md" templates/ddd-interview-questions.md
     grep -q "subdomain-candidates.md" templates/ddd-interview-questions.md
+}
+
+@test "bootstrap-sandbox template is self-contained and writes runtime URL" {
+    grep -q "does not require the larv plugin" templates/bootstrap-sandbox.md.tmpl
+    grep -q "docs/larv/07-runtime/deploy-sandbox.sh" templates/bootstrap-sandbox.md.tmpl
+    grep -q "docs/larv/07-runtime/sandbox-url.txt" templates/bootstrap-sandbox.md.tmpl
+    grep -q "ufw allow" templates/bootstrap-sandbox.md.tmpl
+    grep -q "export APP_PORT DB_NAME PROJECT_ROOT APP_URL" templates/bootstrap-sandbox.md.tmpl
+    grep -q "Sandbox ready at" templates/bootstrap-sandbox.md.tmpl
 }
