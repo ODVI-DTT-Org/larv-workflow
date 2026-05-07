@@ -5,7 +5,7 @@ description: Phase 6 - Elephant Carpaccio slice plan with parallelism annotation
 
 # larv-plan
 
-Turn the approved design, architecture, and test strategy into implementation slices and write the exact sandbox deployment script that `docs/Handsoff/bootstrap-sandbox.md` will run on the VM during implementation.
+Turn the approved design, architecture, and test strategy into implementation slices and write the exact sandbox deployment script that `docs/Handsoff/bootstrap-sandbox.md` will run locally on the sandbox VM during implementation.
 
 ## Inputs
 
@@ -53,7 +53,7 @@ Do not leave a selected package as an architecture-only decision. If there is no
 
 `docs/larv/07-runtime/deploy-sandbox.sh` is required. Handoff bootstrap refuses to start the app sandbox without it.
 
-The script runs on the VM from the rsynced project root and must:
+The script runs locally on the VM from `/srv/larv/<slug>/app` and must:
 
 - Use `APP_PORT` from the environment.
 - Use `DB_DATABASE` from the environment when database configuration is needed.
@@ -71,7 +71,7 @@ set -euo pipefail
 : "${DB_DATABASE:?DB_DATABASE is required}"
 
 if [ ! -f artisan ]; then
-    echo "ERROR: artisan not found in $(pwd); project was not rsynced correctly" >&2
+    echo "ERROR: artisan not found in $(pwd); project was not copied correctly" >&2
     exit 1
 fi
 
@@ -110,7 +110,7 @@ chmod +x docs/larv/07-runtime/deploy-sandbox.sh
 
 - Do not leave deployment as a prose instruction. Handoff bootstrap needs an executable script.
 - Do not include placeholder commands in the deploy script.
-- Do not start the VM services in Phase 6. Implementation executes the script through `docs/Handsoff/bootstrap-sandbox.md`.
+- Do not start the VM services in Phase 6. Implementation executes the script locally through `docs/Handsoff/bootstrap-sandbox.md`.
 
 ## Subagent return contract
 

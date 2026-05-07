@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.9 (next) - Local VM runtime default
+
+- Changes the sandbox runtime model to default to local execution on the VM instead of SSHing to `31.220.79.31`.
+- Sets the default runtime user metadata to `claude-team` and keeps SSH-only behavior behind explicit `LARV_RUNTIME_MODE=remote`.
+- Updates mockup, doc-site, verifier, probe, pre-flight, and handoff bootstrap flows to execute locally while still serving browser URLs at `http://31.220.79.31:<port>`.
+- Updates generated handoff, starting-point, runbook, and README guidance to warn agents not to SSH for the normal larv flow.
+
 ## 0.4.8 (next) - Deployment automation and continuation
 
 - Adds a production deployment mode chooser for `guide-only`, Laravel Cloud CLI automation, Laravel Cloud API automation, mixed automation, and Namecheap DNS automation.

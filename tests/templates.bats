@@ -38,6 +38,7 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
 @test "sandbox-runbook documents URL, SSH, docker, firewall" {
     run grep -E "App URL|VM|Docker|Firewall" templates/sandbox-runbook.md
     [ "$status" -eq 0 ]
+    grep -q "Do not SSH" templates/sandbox-runbook.md
 }
 
 @test "project-lessons explains [project] vs [plugin] tagging" {
@@ -67,6 +68,9 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "CREATE DATABASE" templates/bootstrap-sandbox.md.tmpl
     grep -q "DB_INSTALL_MODE" templates/bootstrap-sandbox.md.tmpl
     grep -q "Sandbox ready at" templates/bootstrap-sandbox.md.tmpl
+    grep -q "LARV_RUNTIME_MODE" templates/bootstrap-sandbox.md.tmpl
+    grep -q "Do not SSH" templates/bootstrap-sandbox.md.tmpl
+    ! grep -q "ssh -o BatchMode" templates/bootstrap-sandbox.md.tmpl
 }
 
 @test "production deploy template covers Laravel Cloud and Namecheap" {

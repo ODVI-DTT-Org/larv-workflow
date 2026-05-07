@@ -1,10 +1,18 @@
 #!/usr/bin/env bash
-# Live-scan VM resource verifier. No central registry. Per spec §14.
+# Live-scan runtime resource verifier. No central registry. Per spec §14.
 #
-# Requires: scripts/lib/vm.sh sourced first (LARV_VM_HOST, LARV_VM_HOST_SSH_USER).
+# Requires: scripts/lib/vm.sh sourced first.
 
 verifier_ssh_target() {
     echo "${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}"
+}
+
+verifier_run() {
+    if [ "${LARV_RUNTIME_MODE:-local}" = "local" ]; then
+        bash -lc "$1"
+    else
+        ssh -o BatchMode=yes -o ConnectTimeout=5 "$(verifier_ssh_target)" "$1"
+    fi
 }
 
 # allocate_port <role>
@@ -22,8 +30,7 @@ allocate_port() {
     esac
 
     local listening
-    listening="$(ssh -o BatchMode=yes -o ConnectTimeout=5 \
-        "$(verifier_ssh_target)" "ss -tlnp 2>/dev/null" 2>/dev/null \
+    listening="$(verifier_run "ss -tlnp 2>/dev/null" 2>/dev/null \
         | awk '{print $4}' | awk -F: '{print $NF}' | sort -un)"
 
     local port
@@ -45,9 +52,7 @@ allocate_db() {
     local db_name
     db_name="larv_$(echo "$slug" | tr '-' '_')"
     local existing
-    existing="$(ssh -o BatchMode=yes -o ConnectTimeout=5 \
-        "$(verifier_ssh_target)" \
-        "mysql -N -B -e 'SHOW DATABASES' 2>/dev/null" 2>/dev/null || true)"
+    existing="$(verifier_run "mysql -N -B -e 'SHOW DATABASES' 2>/dev/null" 2>/dev/null || true)"
     if grep -qx "$db_name" <<<"$existing"; then
         echo "ERROR: database $db_name already exists on VM" >&2
         return 1
@@ -60,8 +65,7 @@ allocate_db() {
 allocate_project_root() {
     local slug="$1"
     local existing
-    existing="$(ssh -o BatchMode=yes -o ConnectTimeout=5 \
-        "$(verifier_ssh_target)" "ls /srv/larv/ 2>/dev/null" 2>/dev/null || true)"
+    existing="$(verifier_run "ls /srv/larv/ 2>/dev/null" 2>/dev/null || true)"
     if grep -qx "$slug" <<<"$existing"; then
         echo "ERROR: project root /srv/larv/$slug is taken" >&2
         return 1
@@ -75,8 +79,7 @@ allocate_project_root() {
 verify_allocation() {
     local port="$1"
     local listening
-    listening="$(ssh -o BatchMode=yes -o ConnectTimeout=5 \
-        "$(verifier_ssh_target)" "ss -tlnp 2>/dev/null" 2>/dev/null \
+    listening="$(verifier_run "ss -tlnp 2>/dev/null" 2>/dev/null \
         | awk '{print $4}' | awk -F: '{print $NF}' | sort -un)"
     ! grep -qx "$port" <<<"$listening"
 }

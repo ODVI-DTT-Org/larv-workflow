@@ -25,8 +25,8 @@ Keep this skill only as a reference for the required invariants in the bootstrap
 - Allocate a free app port from the app range.
 - Open the selected app port in the VM firewall before the external probe.
 - Allocate a database name from the project slug.
-- Copy the project to the VM project root.
-- Run `docs/larv/07-runtime/deploy-sandbox.sh` on the VM with `APP_PORT` and `DB_DATABASE`.
+- Copy the project to the local VM project root.
+- Run `docs/larv/07-runtime/deploy-sandbox.sh` locally with `APP_PORT` and `DB_DATABASE`.
 - Probe the app from inside the VM before any announcement.
 - Probe the external app URL before any announcement.
 - Write `docs/larv/07-runtime/sandbox-url.txt`.
@@ -34,6 +34,7 @@ Keep this skill only as a reference for the required invariants in the bootstrap
 - Update `STATE.yaml.execution.allocations`.
 - Update `STATE.yaml.sandbox.app_url` and `STATE.yaml.sandbox.status`.
 - Print the sandbox URL only after both probes pass.
+- Never SSH to `31.220.79.31` in the default flow; the AI is expected to already be running on that VM. Remote SSH is only for explicit `LARV_RUNTIME_MODE=remote` workflows.
 
 ## What You Do Not Do
 

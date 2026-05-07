@@ -34,7 +34,7 @@ slug=$(yq -r .project.slug docs/larv/STATE.yaml)
 ssh_target="${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}"
 project_root="/srv/larv/$slug"
 if ! static_server_check_remote_deps "$ssh_target"; then
-    echo "ERROR: VM missing required static-server tools: php, tmux, curl, or rsync" >&2
+    echo "ERROR: runtime missing required static-server tools: php, tmux, or curl" >&2
     exit 1
 fi
 
@@ -43,12 +43,19 @@ docsite_port=$(allocate_port docsite)
 bash scripts/state.sh record-allocation . docsite-port "$docsite_port"
 static_server_open_firewall "$ssh_target" "$docsite_port"
 
-# 2. Stage docs/larv plus generated handoff docs and a Docsify index.html on the VM
-ssh "$ssh_target" "mkdir -p $project_root/docsite"
-rsync -avz docs/larv/ "$ssh_target:$project_root/docsite/"
-rsync -avz docs/Handsoff.md "$ssh_target:$project_root/docsite/Handsoff.md"
-rsync -avz docs/Handsoff/ "$ssh_target:$project_root/docsite/Handsoff/"
-ssh "$ssh_target" "cat > $project_root/docsite/index.html" <<'HTML'
+# 2. Stage docs/larv plus generated handoff docs and a Docsify index.html on the local VM
+mkdir -p "$project_root/docsite"
+if command -v rsync >/dev/null; then
+    rsync -a docs/larv/ "$project_root/docsite/"
+    rsync -a docs/Handsoff.md "$project_root/docsite/Handsoff.md"
+    rsync -a docs/Handsoff/ "$project_root/docsite/Handsoff/"
+else
+    cp -R docs/larv/. "$project_root/docsite/"
+    cp docs/Handsoff.md "$project_root/docsite/Handsoff.md"
+    mkdir -p "$project_root/docsite/Handsoff"
+    cp -R docs/Handsoff/. "$project_root/docsite/Handsoff/"
+fi
+cat > "$project_root/docsite/index.html" <<'HTML'
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>larv plan</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -91,10 +98,10 @@ echo "Plan available for review at $docsite_url"
 The doc-site server is not optional. Do not advance to the Phase 8 routing menu, auto-commit, or return `status: complete` until all of these are true:
 
 - `docsite_port` was allocated through `allocate_port docsite` and recorded as `docsite-port` in `STATE.yaml.execution.allocations`.
-- `static_server_check_remote_deps "$ssh_target"` passed for `php`, `tmux`, `curl`, and `rsync`.
-- `docs/larv/` was rsynced to `$project_root/docsite` on the VM.
-- `docs/Handsoff.md` and `docs/Handsoff/` were rsynced to `$project_root/docsite` on the VM.
-- Docsify `index.html` was written on the VM.
+- `static_server_check_remote_deps "$ssh_target"` passed for `php`, `tmux`, and `curl` on the local VM runtime.
+- `docs/larv/` was copied to `$project_root/docsite` on the local VM.
+- `docs/Handsoff.md` and `docs/Handsoff/` were copied to `$project_root/docsite` on the local VM.
+- Docsify `index.html` was written on the local VM.
 - `static_server_start` succeeded.
 - `probe_url_inside "$ssh_target" "$docsite_port" static` succeeded.
 - `probe_with_retries "$docsite_url" static` succeeded.

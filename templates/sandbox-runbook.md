@@ -9,8 +9,7 @@ Login: {{seeded-email}} / {{seeded-password}}
 
 Host: {{vm-host}}
 User: {{vm-user}}
-SSH: ssh {{vm-user}}@{{vm-host}}
-Key: ~/.ssh/larv_{{slug}}_ed25519
+Runtime: local on this VM. Do not SSH to {{vm-host}} for the normal larv flow.
 
 ## Docker Stack
 

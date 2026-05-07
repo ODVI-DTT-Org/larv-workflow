@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Allocate VM runtime resources, copy the project to the VM, run `docs/larv/07-runtime/deploy-sandbox.sh`, probe the app from inside and outside the VM, then write the sandbox URL back into project docs.
+Allocate local VM runtime resources, copy the project into `/srv/larv`, run `docs/larv/07-runtime/deploy-sandbox.sh`, probe the app from inside and outside the VM, then write the sandbox URL back into project docs. This assumes the AI is already running on the sandbox VM.
 
 ## Required local files
 
@@ -19,10 +19,9 @@ Allocate VM runtime resources, copy the project to the VM, run `docs/larv/07-run
 set -euo pipefail
 
 VM_HOST="{{vm_host}}"
-SSH_USER="{{ssh_user}}"
 SLUG="{{project_slug}}"
-SSH_TARGET="$SSH_USER@$VM_HOST"
 PROJECT_ROOT="/srv/larv/$SLUG"
+APP_ROOT="$PROJECT_ROOT/app"
 DB_NAME="larv_${SLUG//-/_}"
 DB_CONNECTION="${DB_CONNECTION:-mysql}"
 DB_HOST="${DB_HOST:-127.0.0.1}"
@@ -31,47 +30,51 @@ DB_USERNAME="${DB_USERNAME:-larv}"
 DB_PASSWORD="${DB_PASSWORD:-}"
 DB_INSTALL_MODE="${DB_INSTALL_MODE:-fail}"
 
+if [ "${LARV_RUNTIME_MODE:-local}" != "local" ]; then
+    echo "ERROR: this handoff expects local execution on the sandbox VM. Do not SSH to $VM_HOST unless a separate remote-mode runbook was generated." >&2
+    exit 1
+fi
+
 if [ ! -x docs/larv/07-runtime/deploy-sandbox.sh ]; then
     echo "ERROR: docs/larv/07-runtime/deploy-sandbox.sh is missing or not executable" >&2
     exit 1
 fi
 
-if ! command -v ssh >/dev/null || ! command -v rsync >/dev/null || ! command -v yq >/dev/null; then
-    echo "ERROR: local ssh, rsync, and yq are required" >&2
+if ! command -v php >/dev/null || ! command -v tmux >/dev/null || ! command -v curl >/dev/null || ! command -v ss >/dev/null || ! command -v yq >/dev/null; then
+    echo "ERROR: php, tmux, curl, ss, and yq are required on this VM" >&2
     exit 1
 fi
 
-ssh -o BatchMode=yes -o ConnectTimeout=5 "$SSH_TARGET" \
-    "command -v php >/dev/null && command -v tmux >/dev/null && command -v curl >/dev/null && command -v rsync >/dev/null && command -v ss >/dev/null"
-
 if [ "$DB_CONNECTION" = "pgsql" ]; then
     DB_PORT="${DB_PORT:-5432}"
-    if ! ssh "$SSH_TARGET" "command -v psql >/dev/null && command -v createdb >/dev/null"; then
+    if ! command -v psql >/dev/null || ! command -v createdb >/dev/null; then
         if [ "$DB_INSTALL_MODE" = "apt" ]; then
-            ssh "$SSH_TARGET" "sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql postgresql-contrib"
+            sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql postgresql-contrib
         else
-            echo "ERROR: PostgreSQL tools are missing on the VM. Install PostgreSQL or rerun with DB_INSTALL_MODE=apt." >&2
+            echo "ERROR: PostgreSQL tools are missing. Install PostgreSQL or rerun with DB_INSTALL_MODE=apt." >&2
             exit 1
         fi
     fi
-    ssh "$SSH_TARGET" "if command -v systemctl >/dev/null && systemctl list-unit-files | grep -q '^postgresql'; then sudo systemctl start postgresql; fi"
-    ssh "$SSH_TARGET" "command -v psql >/dev/null && command -v createdb >/dev/null"
-    ssh "$SSH_TARGET" "sudo -u postgres psql -tAc \"SELECT 1 FROM pg_roles WHERE rolname='$DB_USERNAME'\" | grep -q 1 || sudo -u postgres psql -c \"CREATE ROLE $DB_USERNAME LOGIN PASSWORD '$DB_PASSWORD'\""
-    ssh "$SSH_TARGET" "sudo -u postgres psql -tAc \"SELECT 1 FROM pg_database WHERE datname='$DB_NAME'\" | grep -q 1 || sudo -u postgres createdb '$DB_NAME'"
-    ssh "$SSH_TARGET" "sudo -u postgres psql -c \"ALTER DATABASE $DB_NAME OWNER TO $DB_USERNAME\""
+    if command -v systemctl >/dev/null && systemctl list-unit-files | grep -q '^postgresql'; then sudo systemctl start postgresql; fi
+    command -v psql >/dev/null && command -v createdb >/dev/null
+    sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DB_USERNAME'" | grep -q 1 || sudo -u postgres psql -c "CREATE ROLE $DB_USERNAME LOGIN PASSWORD '$DB_PASSWORD'"
+    sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" | grep -q 1 || sudo -u postgres createdb "$DB_NAME"
+    sudo -u postgres psql -c "ALTER DATABASE $DB_NAME OWNER TO $DB_USERNAME"
 elif [ "$DB_CONNECTION" = "mysql" ] || [ "$DB_CONNECTION" = "mariadb" ]; then
     DB_PORT="${DB_PORT:-3306}"
-    if ! ssh "$SSH_TARGET" "command -v mysql >/dev/null"; then
+    if ! command -v mysql >/dev/null; then
         if [ "$DB_INSTALL_MODE" = "apt" ]; then
-            ssh "$SSH_TARGET" "sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y mariadb-server"
+            sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y mariadb-server
         else
-            echo "ERROR: MySQL/MariaDB client/server tools are missing on the VM. Install MariaDB/MySQL or rerun with DB_INSTALL_MODE=apt." >&2
+            echo "ERROR: MySQL/MariaDB client/server tools are missing. Install MariaDB/MySQL or rerun with DB_INSTALL_MODE=apt." >&2
             exit 1
         fi
     fi
-    ssh "$SSH_TARGET" "if command -v systemctl >/dev/null; then if systemctl list-unit-files | grep -q '^mysql'; then sudo systemctl start mysql; elif systemctl list-unit-files | grep -q '^mariadb'; then sudo systemctl start mariadb; fi; fi"
-    ssh "$SSH_TARGET" "command -v mysql >/dev/null"
-    ssh "$SSH_TARGET" "mysql -N -B -e \"CREATE DATABASE IF NOT EXISTS \\`$DB_NAME\\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; CREATE USER IF NOT EXISTS '$DB_USERNAME'@'localhost' IDENTIFIED BY '$DB_PASSWORD'; CREATE USER IF NOT EXISTS '$DB_USERNAME'@'%' IDENTIFIED BY '$DB_PASSWORD'; GRANT ALL PRIVILEGES ON \\`$DB_NAME\\`.* TO '$DB_USERNAME'@'localhost'; GRANT ALL PRIVILEGES ON \\`$DB_NAME\\`.* TO '$DB_USERNAME'@'%'; FLUSH PRIVILEGES;\""
+    if command -v systemctl >/dev/null; then
+        if systemctl list-unit-files | grep -q '^mysql'; then sudo systemctl start mysql; elif systemctl list-unit-files | grep -q '^mariadb'; then sudo systemctl start mariadb; fi
+    fi
+    command -v mysql >/dev/null
+    mysql -N -B -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; CREATE USER IF NOT EXISTS '$DB_USERNAME'@'localhost' IDENTIFIED BY '$DB_PASSWORD'; CREATE USER IF NOT EXISTS '$DB_USERNAME'@'%' IDENTIFIED BY '$DB_PASSWORD'; GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USERNAME'@'localhost'; GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USERNAME'@'%'; FLUSH PRIVILEGES;"
 else
     echo "ERROR: DB_CONNECTION must be mysql, mariadb, or pgsql" >&2
     exit 1
@@ -99,8 +102,7 @@ upsert_env DB_DATABASE "$DB_NAME"
 upsert_env DB_USERNAME "$DB_USERNAME"
 upsert_env DB_PASSWORD "$DB_PASSWORD"
 
-listening="$(ssh -o BatchMode=yes -o ConnectTimeout=5 "$SSH_TARGET" "ss -tlnp 2>/dev/null" 2>/dev/null \
-    | awk '{print $4}' | awk -F: '{print $NF}' | sort -un)"
+listening="$(ss -tlnp 2>/dev/null | awk '{print $4}' | awk -F: '{print $NF}' | sort -un)"
 
 APP_PORT=""
 for port in $(seq 8000 8999); do
@@ -115,22 +117,26 @@ if [ -z "$APP_PORT" ]; then
     exit 1
 fi
 
-ssh "$SSH_TARGET" "if command -v ufw >/dev/null; then sudo ufw allow '$APP_PORT'/tcp >/dev/null; fi"
+if command -v ufw >/dev/null; then sudo ufw allow "$APP_PORT/tcp" >/dev/null; fi
 
-ssh "$SSH_TARGET" "mkdir -p '$PROJECT_ROOT'"
-rsync -avz --delete \
-    --exclude .git \
-    --exclude docs/larv/07-runtime/sandbox-url.txt \
-    ./ "$SSH_TARGET:$PROJECT_ROOT/app/"
+mkdir -p "$APP_ROOT"
+if command -v rsync >/dev/null; then
+    rsync -a --delete \
+        --exclude .git \
+        --exclude docs/larv/07-runtime/sandbox-url.txt \
+        ./ "$APP_ROOT/"
+else
+    tar --exclude=.git --exclude=docs/larv/07-runtime/sandbox-url.txt -cf - . | tar -C "$APP_ROOT" -xf -
+fi
 
 APP_URL="http://$VM_HOST:$APP_PORT/"
 upsert_env APP_URL "$APP_URL"
-rsync -avz .env "$SSH_TARGET:$PROJECT_ROOT/app/.env"
+cp .env "$APP_ROOT/.env"
 
-ssh "$SSH_TARGET" "cd '$PROJECT_ROOT/app' && APP_PORT='$APP_PORT' DB_DATABASE='$DB_NAME' bash docs/larv/07-runtime/deploy-sandbox.sh"
+(cd "$APP_ROOT" && APP_PORT="$APP_PORT" DB_DATABASE="$DB_NAME" bash docs/larv/07-runtime/deploy-sandbox.sh)
 
 for attempt in $(seq 1 6); do
-    if ssh "$SSH_TARGET" "curl -fsS --max-time 5 -o /dev/null 'http://127.0.0.1:$APP_PORT/'"; then
+    if curl -fsS --max-time 5 -o /dev/null "http://127.0.0.1:$APP_PORT/"; then
         break
     fi
     if [ "$attempt" -eq 6 ]; then
@@ -163,7 +169,7 @@ DB host: $DB_HOST
 DB port: $DB_PORT
 DB username: $DB_USERNAME
 Project root: $PROJECT_ROOT
-SSH: ssh $SSH_TARGET
+Runtime: local on $VM_HOST as $(whoami)
 EOF
 
 export APP_PORT DB_NAME PROJECT_ROOT APP_URL DB_CONNECTION DB_HOST DB_PORT DB_USERNAME

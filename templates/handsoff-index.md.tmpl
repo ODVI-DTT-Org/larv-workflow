@@ -67,13 +67,14 @@ After bootstrap succeeds, the app URL is written to `docs/larv/07-runtime/sandbo
 | | |
 |---|---|
 | VM host | {{vm_host}} |
+| Runtime mode | local on this VM |
 | Mockup port | {{mockup_port}} |
 | Project root base | /srv/larv/{{project_slug}} |
 
 ## 12. Verification commands
 
 ```bash
-# Run after bootstrap, from the VM project root shown in docs/larv/07-runtime/sandbox-runbook.md
+# Run after bootstrap, from the local VM project root shown in docs/larv/07-runtime/sandbox-runbook.md
 docker compose exec app vendor/bin/pest
 docker compose exec app vendor/bin/pint --test
 docker compose exec app vendor/bin/phpstan analyse
@@ -102,6 +103,8 @@ If context is nearly full, stop after the current atomic step and tell the user 
 7. If every slice is complete, run verification or deployment depending on the user's request.
 
 Do not rely on previous chat context. The docs, tracker, reports, and STATE file are the source of truth.
+
+Runtime note: this handoff assumes the AI is already running on the sandbox VM. Do not SSH to `{{ssh_user}}@{{vm_host}}`; execute the bootstrap, mockup server, doc-site server, and app sandbox commands locally.
 
 ## 15. New feature in a fresh session
 

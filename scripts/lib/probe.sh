@@ -68,8 +68,8 @@ probe_with_retries() {
 }
 
 # probe_url_inside <ssh-target> <port> <profile>
-# Probe via SSH from inside the VM. Used to confirm the service is bound on
-# 127.0.0.1 from the VM's perspective before exposing it externally.
+# Probe from inside the runtime host. In default local mode this curls
+# 127.0.0.1 directly. In remote mode it curls through SSH.
 probe_url_inside() {
     local ssh_target="$1"
     local port="$2"
@@ -78,10 +78,16 @@ probe_url_inside() {
     retries="$(probe_profile_retries "$profile")" || return 2
     delay="$(probe_profile_delay "$profile")"
     for ((attempt=1; attempt<=retries; attempt++)); do
-        if ssh -o BatchMode=yes -o ConnectTimeout=5 "$ssh_target" \
-            "curl -fsS --max-time 5 -o /dev/null http://127.0.0.1:$port/" \
-            >/dev/null 2>&1; then
-            return 0
+        if [ "${LARV_RUNTIME_MODE:-local}" = "local" ]; then
+            if curl -fsS --max-time 5 -o /dev/null "http://127.0.0.1:$port/" >/dev/null 2>&1; then
+                return 0
+            fi
+        else
+            if ssh -o BatchMode=yes -o ConnectTimeout=5 "$ssh_target" \
+                "curl -fsS --max-time 5 -o /dev/null http://127.0.0.1:$port/" \
+                >/dev/null 2>&1; then
+                return 0
+            fi
         fi
         [ "$attempt" -lt "$retries" ] && sleep "$delay"
     done

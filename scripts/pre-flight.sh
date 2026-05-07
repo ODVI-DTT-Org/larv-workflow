@@ -22,10 +22,23 @@ read_bundle_version() {
 }
 
 vm_runtime_check() {
-    local ssh_target="${LARV_VM_HOST_SSH_USER:-larv}@${LARV_VM_HOST:-31.220.79.31}"
-    local required="php tmux curl rsync"
+    local ssh_target="${LARV_VM_HOST_SSH_USER:-claude-team}@${LARV_VM_HOST:-31.220.79.31}"
+    local required="php tmux curl"
     if [ "${LARV_PREFLIGHT_SKIP_VM_CHECK:-0}" = "1" ]; then
         echo "  skipped (LARV_PREFLIGHT_SKIP_VM_CHECK=1)"
+        return 0
+    fi
+    if [ "${LARV_RUNTIME_MODE:-local}" = "local" ]; then
+        local missing=""
+        local tool
+        for tool in $required; do
+            command -v "$tool" >/dev/null 2>&1 || missing="$missing $tool"
+        done
+        if [ -z "$missing" ]; then
+            echo "  ok: local runtime has $required"
+        else
+            echo "  warn: local runtime missing:$missing"
+        fi
         return 0
     fi
     if ! command -v ssh >/dev/null 2>&1; then

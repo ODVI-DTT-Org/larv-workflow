@@ -11,7 +11,13 @@ load helpers
 @test "vm.sh sets LARV_VM_HOST_SSH_USER to a non-empty string" {
     run bash -c 'source scripts/lib/vm.sh && echo "$LARV_VM_HOST_SSH_USER"'
     [ "$status" -eq 0 ]
-    [ -n "$output" ]
+    [ "$output" = "claude-team" ]
+}
+
+@test "vm.sh defaults to local runtime mode" {
+    run bash -c 'source scripts/lib/vm.sh && echo "$LARV_RUNTIME_MODE"'
+    [ "$status" -eq 0 ]
+    [ "$output" = "local" ]
 }
 
 @test "vm.sh allows override via environment" {

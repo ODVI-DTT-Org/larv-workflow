@@ -21,7 +21,7 @@ Login: {{seeded-creds}}
 
 ## Sandbox Controls
 
-SSH: ssh {{vm-user}}@{{vm-host}}
+Runtime: local on {{vm-host}}; do not SSH for the normal larv flow.
 Logs: docker compose -f /srv/{{slug}}/docker-compose.yml logs -f app
 Reset: docker compose exec app php artisan migrate:fresh --seed
 

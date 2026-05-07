@@ -6,7 +6,24 @@ setup() {
     TMP="$(setup_tmp_project)"
     BIN="$TMP/bin"
     mkdir -p "$BIN"
-    # fake ssh that prints a deterministic "ss -tlnp" result based on env
+    # fake local runtime commands that print deterministic results based on env
+    cat >"$BIN/ss" <<'EOF'
+#!/usr/bin/env bash
+printf "%s\n" "${LARV_TEST_SS_OUTPUT:-}"
+EOF
+    cat >"$BIN/mysql" <<'EOF'
+#!/usr/bin/env bash
+printf "%s\n" "${LARV_TEST_DB_OUTPUT:-}"
+EOF
+    cat >"$BIN/ls" <<'EOF'
+#!/usr/bin/env bash
+case "$*" in
+    *"/srv/larv"*) printf "%s\n" "${LARV_TEST_LS_OUTPUT:-}" ;;
+    *) /usr/bin/ls "$@" ;;
+esac
+EOF
+    chmod +x "$BIN/ss" "$BIN/mysql" "$BIN/ls"
+    # fake ssh remains available for explicit remote-mode tests
     cat >"$BIN/ssh" <<'EOF'
 #!/usr/bin/env bash
 # Returns the contents of $LARV_TEST_SS_OUTPUT for any command containing 'ss -tlnp'

@@ -55,7 +55,7 @@ teardown() {
 exit 0
 EOF
     chmod +x "$bin/ssh"
-    PATH="$bin:$PATH" run bash -c "source scripts/lib/probe.sh && probe_url_inside user@example.test 8000 static"
+    PATH="$bin:$PATH" run bash -c "export LARV_RUNTIME_MODE=remote; source scripts/lib/probe.sh && probe_url_inside user@example.test 8000 static"
     [ "$status" -eq 0 ]
 }
 
@@ -67,6 +67,6 @@ EOF
 exit 1
 EOF
     chmod +x "$bin/ssh"
-    PATH="$bin:$PATH" run bash -c "source scripts/lib/probe.sh && PROBE_STATIC_RETRIES=2 PROBE_STATIC_DELAY=0 probe_url_inside user@example.test 8000 static"
+    PATH="$bin:$PATH" run bash -c "export LARV_RUNTIME_MODE=remote; source scripts/lib/probe.sh && PROBE_STATIC_RETRIES=2 PROBE_STATIC_DELAY=0 probe_url_inside user@example.test 8000 static"
     [ "$status" -ne 0 ]
 }

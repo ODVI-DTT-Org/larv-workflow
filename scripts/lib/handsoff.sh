@@ -52,7 +52,7 @@ handsoff_collect_tokens() {
     __handsoff_token git_sha "$git_sha"
     __handsoff_token git_default_branch "$git_default_branch"
     __handsoff_token vm_host "${LARV_VM_HOST:-31.220.79.31}"
-    __handsoff_token ssh_user "${LARV_VM_HOST_SSH_USER:-larv}"
+    __handsoff_token ssh_user "${LARV_VM_HOST_SSH_USER:-claude-team}"
     __handsoff_token app_port "${app_port:-TBD}"
     __handsoff_token mockup_port "${mockup_port:-TBD}"
     __handsoff_token db_name "${db_name:-TBD}"

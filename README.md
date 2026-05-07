@@ -21,7 +21,7 @@ Five things it does that nothing else does together:
 ## Prerequisites
 
 - Claude Code installed
-- A cloud VM you can SSH to (the sandbox)
+- Claude Code running on the sandbox VM. Default runtime is local on `31.220.79.31`; SSH is only for explicit remote-mode overrides.
 - A Laravel Cloud account (production deploys)
 - A GitHub repo for the plugin (private or org-internal — this is where self-improvement PRs land)
 - The four bundled upstream plugins are included automatically — no separate install
@@ -36,7 +36,7 @@ The routing menu before Phase 8 lets you choose where to execute:
 - `subagents` — fresh subagents per slice
 - `handoff` — stop here; you point another AI at `docs/Handsoff.md`
 
-All three options use the same handsoff documents. The plugin's job ends at the handoff for the third option; for the first two, it loops slices through `larv-implement`, which itself only reads handoff content. The app sandbox is started by `docs/Handsoff/bootstrap-sandbox.md` during implementation, not during `/larv:full` planning.
+All three options use the same handoff documents. The plugin's job ends at the handoff for the third option; for the first two, it loops slices through `larv-implement`, which itself only reads handoff content. The app sandbox is started by `docs/Handsoff/bootstrap-sandbox.md` during implementation, not during `/larv:full` planning. The bootstrap runs locally on the VM; it should not SSH to `31.220.79.31`.
 
 ## Layer 2 phases
 
@@ -279,7 +279,7 @@ The implementation AI must run:
 docs/Handsoff/bootstrap-sandbox.md
 ```
 
-That bootstrap checks/starts MySQL, MariaDB, or PostgreSQL, creates the app database if missing, writes `.env` database/app values, starts the app sandbox, probes it from inside and outside the VM, and writes:
+That bootstrap runs locally on the VM. It checks/starts MySQL, MariaDB, or PostgreSQL, creates the app database if missing, writes `.env` database/app values, starts the app sandbox, probes it from inside and outside the VM, and writes:
 
 ```
 docs/larv/07-runtime/sandbox-url.txt
@@ -299,7 +299,7 @@ Subagent spawned (fresh context, budget 60min, $5)
   → invokes superpowers-laravel:laravel-form-requests (contextual)
   → writes: 14 files (User model, RegisterController, LoginController,
             ProfileController, 8 Pest tests, 2 Playwright tests, 1 migration)
-  → rsyncs to vm.example.com:/srv/todo-app-2026-05/
+  → copies to /srv/larv/todo-app-2026-05/app/
   → runs: docker compose exec app php artisan migrate
   → runs: docker compose exec app php artisan test --parallel
                                                   ✅ 8/8 passing
@@ -673,7 +673,7 @@ Walkthrough:
   4. Delete the list → confirm soft-delete (still in DB with deleted_at)
 
 ## Sandbox controls
-SSH:    ssh deploy@vm.example.com
+Runtime: local on the sandbox VM
 Logs:   docker compose -f /srv/todo-app-2026-05/docker-compose.yml logs -f app
 Reset:  docker compose exec app php artisan migrate:fresh --seed
 

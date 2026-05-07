@@ -37,7 +37,29 @@ case "$*" in
 esac
 EOF
     chmod +x "$BIN/ssh"
-    PATH="$BIN:$PATH" run bash -c "source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_check_remote_deps user@example.test"
+    PATH="$BIN:$PATH" run bash -c "export LARV_RUNTIME_MODE=remote; source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_check_remote_deps user@example.test"
+    [ "$status" -eq 0 ]
+}
+
+@test "static_server_check_remote_deps defaults to local runtime without ssh" {
+    cat > "$BIN/php" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+    cat > "$BIN/tmux" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+    cat > "$BIN/curl" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+    cat > "$BIN/ssh" <<'EOF'
+#!/usr/bin/env bash
+exit 99
+EOF
+    chmod +x "$BIN/php" "$BIN/tmux" "$BIN/curl" "$BIN/ssh"
+    PATH="$BIN:$PATH" run bash -c "source $PROJECT_ROOT/scripts/lib/vm.sh && source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_check_remote_deps ignored"
     [ "$status" -eq 0 ]
 }
 
@@ -47,6 +69,6 @@ EOF
 exit 1
 EOF
     chmod +x "$BIN/ssh"
-    PATH="$BIN:$PATH" run bash -c "source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_open_firewall user@example.test 9000"
+    PATH="$BIN:$PATH" run bash -c "export LARV_RUNTIME_MODE=remote; source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_open_firewall user@example.test 9000"
     [ "$status" -ne 0 ]
 }

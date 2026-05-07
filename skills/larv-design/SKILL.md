@@ -51,7 +51,7 @@ mockup_port=$(allocate_port mockup)
 bash scripts/state.sh record-allocation . mockup-port "$mockup_port"
 ssh_target="${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}"
 if ! static_server_check_remote_deps "$ssh_target"; then
-    echo "ERROR: VM missing required static-server tools: php, tmux, curl, or rsync" >&2
+    echo "ERROR: runtime missing required static-server tools: php, tmux, or curl" >&2
     exit 1
 fi
 static_server_open_firewall "$ssh_target" "$mockup_port"
@@ -70,8 +70,12 @@ Invoke the bundled `huashu-design` skill for each pick (`bundle/huashu-design/SK
 . scripts/lib/runtime_gate.sh
 
 slug=$(yq -r .project.slug docs/larv/STATE.yaml)
-ssh "$ssh_target" "mkdir -p /srv/larv/$slug/mockups"
-rsync -avz docs/larv/03-design/mockups/ "$ssh_target:/srv/larv/$slug/mockups/"
+mkdir -p "/srv/larv/$slug/mockups"
+if command -v rsync >/dev/null; then
+    rsync -a docs/larv/03-design/mockups/ "/srv/larv/$slug/mockups/"
+else
+    cp -R docs/larv/03-design/mockups/. "/srv/larv/$slug/mockups/"
+fi
 
 static_server_start "$ssh_target" "$mockup_port" \
     "/srv/larv/$slug/mockups" \
@@ -97,8 +101,8 @@ The mockup server is not optional. Do not proceed to brand finalization, `design
 
 - At least one HTML mockup exists under `docs/larv/03-design/mockups/`.
 - `mockup_port` was allocated through `allocate_port mockup` and recorded as `mockup-port` in `STATE.yaml.execution.allocations`.
-- `static_server_check_remote_deps "$ssh_target"` passed for `php`, `tmux`, `curl`, and `rsync`.
-- The mockups were rsynced to the VM.
+- `static_server_check_remote_deps "$ssh_target"` passed for `php`, `tmux`, and `curl` on the local VM runtime.
+- The mockups were copied to `/srv/larv/<slug>/mockups` on the local VM.
 - `static_server_start` succeeded.
 - `probe_url_inside "$ssh_target" "$mockup_port" static` succeeded.
 - `probe_with_retries "$mockup_url" static` succeeded.
