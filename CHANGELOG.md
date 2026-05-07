@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.4 (next) - Runtime guides and production handoff
+
+- Adds generated handoff guides for production deployment, environment variables, and user operations: `docs/Handsoff/production-deploy.md`, `docs/Handsoff/env-guide.md`, and `docs/Handsoff/operations-guide.md`.
+- Hardens the sandbox bootstrap handoff to detect/start MySQL, MariaDB, or PostgreSQL, create the app database when missing, configure a database user, write `.env` database/app values, and record database details in `STATE.yaml`.
+- Fills `larv-verify` with concrete Pint, Pest, Larastan, asset build, migration, Playwright-if-present, and sandbox smoke checks.
+- Fills `larv-deploy` with Laravel Cloud and Namecheap defaults, user questions, env-var handling, DNS instructions, production smoke checks, and rollback reporting.
+- Adds explicit bundled-skill references for domain-driven-design, masterplan, huashu-design, and superpowers-laravel in the phase prompts.
+
 ## 0.4.3 (next) - Handoff sandbox flow
 
 - Moves app sandbox startup out of `/larv:full` planning and into the implementation handoff via generated `docs/Handsoff/bootstrap-sandbox.md`.

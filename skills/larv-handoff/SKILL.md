@@ -1,6 +1,6 @@
 ---
 name: larv-handoff
-description: Generate the universal Handsoff.md index, sandbox bootstrap handoff, per-slice handsoffs, and AI starting-point files. Mandatory before the routing menu.
+description: Generate the universal Handsoff.md index, sandbox bootstrap handoff, production/env/ops guides, per-slice handsoffs, and AI starting-point files. Mandatory before the routing menu.
 ---
 
 # larv-handoff
@@ -39,14 +39,17 @@ handsoff_render_index "."
 # 3. Render sandbox bootstrap handoff
 handsoff_render_bootstrap_sandbox "."
 
-# 4. Render per-slice handsoffs from elephant-carpaccio.md
+# 4. Render runtime guides
+handsoff_render_runtime_guides "."
+
+# 5. Render per-slice handsoffs from elephant-carpaccio.md
 #    For each slice id + name in the slice plan:
 #      handsoff_render_slice "." "$slice_id" "$slice_slug"
 
-# 5. Render the AI starting-point files
+# 6. Render the AI starting-point files
 handsoff_render_starting_points "."
 
-# 6. Commit (auto-commit policy)
+# 7. Commit (auto-commit policy)
 safe_commit_docs "[larv] handsoff documents generated for $(yq -r .project.slug docs/larv/STATE.yaml)"
 ```
 
@@ -61,6 +64,9 @@ safe_commit_docs "[larv] handsoff documents generated for $(yq -r .project.slug 
 
 - `docs/Handsoff.md`
 - `docs/Handsoff/bootstrap-sandbox.md`
+- `docs/Handsoff/production-deploy.md`
+- `docs/Handsoff/env-guide.md`
+- `docs/Handsoff/operations-guide.md`
 - `docs/Handsoff/slice-NN-<name>.md` for every slice in the plan
 - `docs/larv/implementation-tracker.yaml` and `.md`
 - `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `.cursor/rules/larv.mdc`, `.codex/AGENTS.md`
@@ -74,6 +80,9 @@ status: complete
 files_written:
   - docs/Handsoff.md
   - docs/Handsoff/bootstrap-sandbox.md
+  - docs/Handsoff/production-deploy.md
+  - docs/Handsoff/env-guide.md
+  - docs/Handsoff/operations-guide.md
   - docs/Handsoff/slice-NN-<name>.md  (one per slice)
   - docs/larv/implementation-tracker.yaml
   - docs/larv/implementation-tracker.md

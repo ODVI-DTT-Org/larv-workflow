@@ -24,6 +24,11 @@ SLUG="{{project_slug}}"
 SSH_TARGET="$SSH_USER@$VM_HOST"
 PROJECT_ROOT="/srv/larv/$SLUG"
 DB_NAME="larv_${SLUG//-/_}"
+DB_CONNECTION="${DB_CONNECTION:-mysql}"
+DB_HOST="${DB_HOST:-127.0.0.1}"
+DB_PORT="${DB_PORT:-}"
+DB_USERNAME="${DB_USERNAME:-larv}"
+DB_PASSWORD="${DB_PASSWORD:-}"
 
 if [ ! -x docs/larv/07-runtime/deploy-sandbox.sh ]; then
     echo "ERROR: docs/larv/07-runtime/deploy-sandbox.sh is missing or not executable" >&2
@@ -37,6 +42,45 @@ fi
 
 ssh -o BatchMode=yes -o ConnectTimeout=5 "$SSH_TARGET" \
     "command -v php >/dev/null && command -v tmux >/dev/null && command -v curl >/dev/null && command -v rsync >/dev/null && command -v ss >/dev/null"
+
+if [ "$DB_CONNECTION" = "pgsql" ]; then
+    DB_PORT="${DB_PORT:-5432}"
+    ssh "$SSH_TARGET" "if command -v systemctl >/dev/null && systemctl list-unit-files | grep -q '^postgresql'; then sudo systemctl start postgresql; fi"
+    ssh "$SSH_TARGET" "command -v psql >/dev/null && command -v createdb >/dev/null"
+    ssh "$SSH_TARGET" "sudo -u postgres psql -tAc \"SELECT 1 FROM pg_roles WHERE rolname='$DB_USERNAME'\" | grep -q 1 || sudo -u postgres psql -c \"CREATE ROLE $DB_USERNAME LOGIN PASSWORD '$DB_PASSWORD'\""
+    ssh "$SSH_TARGET" "sudo -u postgres psql -tAc \"SELECT 1 FROM pg_database WHERE datname='$DB_NAME'\" | grep -q 1 || sudo -u postgres createdb '$DB_NAME'"
+    ssh "$SSH_TARGET" "sudo -u postgres psql -c \"ALTER DATABASE $DB_NAME OWNER TO $DB_USERNAME\""
+elif [ "$DB_CONNECTION" = "mysql" ] || [ "$DB_CONNECTION" = "mariadb" ]; then
+    DB_PORT="${DB_PORT:-3306}"
+    ssh "$SSH_TARGET" "if command -v systemctl >/dev/null; then if systemctl list-unit-files | grep -q '^mysql'; then sudo systemctl start mysql; elif systemctl list-unit-files | grep -q '^mariadb'; then sudo systemctl start mariadb; fi; fi"
+    ssh "$SSH_TARGET" "command -v mysql >/dev/null"
+    ssh "$SSH_TARGET" "mysql -N -B -e \"CREATE DATABASE IF NOT EXISTS \\`$DB_NAME\\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; CREATE USER IF NOT EXISTS '$DB_USERNAME'@'localhost' IDENTIFIED BY '$DB_PASSWORD'; CREATE USER IF NOT EXISTS '$DB_USERNAME'@'%' IDENTIFIED BY '$DB_PASSWORD'; GRANT ALL PRIVILEGES ON \\`$DB_NAME\\`.* TO '$DB_USERNAME'@'localhost'; GRANT ALL PRIVILEGES ON \\`$DB_NAME\\`.* TO '$DB_USERNAME'@'%'; FLUSH PRIVILEGES;\""
+else
+    echo "ERROR: DB_CONNECTION must be mysql, mariadb, or pgsql" >&2
+    exit 1
+fi
+
+if [ ! -f .env ] && [ -f .env.example ]; then
+    cp .env.example .env
+fi
+touch .env
+upsert_env() {
+    local key="$1"
+    local value="$2"
+    if grep -q "^${key}=" .env; then
+        sed -i "s|^${key}=.*|${key}=${value}|" .env
+    else
+        printf "%s=%s\n" "$key" "$value" >> .env
+    fi
+}
+upsert_env APP_ENV local
+upsert_env APP_DEBUG true
+upsert_env DB_CONNECTION "$DB_CONNECTION"
+upsert_env DB_HOST "$DB_HOST"
+upsert_env DB_PORT "$DB_PORT"
+upsert_env DB_DATABASE "$DB_NAME"
+upsert_env DB_USERNAME "$DB_USERNAME"
+upsert_env DB_PASSWORD "$DB_PASSWORD"
 
 listening="$(ssh -o BatchMode=yes -o ConnectTimeout=5 "$SSH_TARGET" "ss -tlnp 2>/dev/null" 2>/dev/null \
     | awk '{print $4}' | awk -F: '{print $NF}' | sort -un)"
@@ -62,6 +106,10 @@ rsync -avz --delete \
     --exclude docs/larv/07-runtime/sandbox-url.txt \
     ./ "$SSH_TARGET:$PROJECT_ROOT/app/"
 
+APP_URL="http://$VM_HOST:$APP_PORT/"
+upsert_env APP_URL "$APP_URL"
+rsync -avz .env "$SSH_TARGET:$PROJECT_ROOT/app/.env"
+
 ssh "$SSH_TARGET" "cd '$PROJECT_ROOT/app' && APP_PORT='$APP_PORT' DB_DATABASE='$DB_NAME' bash docs/larv/07-runtime/deploy-sandbox.sh"
 
 for attempt in $(seq 1 6); do
@@ -75,7 +123,6 @@ for attempt in $(seq 1 6); do
     sleep 10
 done
 
-APP_URL="http://$VM_HOST:$APP_PORT/"
 for attempt in $(seq 1 6); do
     if curl -fsS --max-time 5 -o /dev/null "$APP_URL"; then
         break
@@ -94,11 +141,15 @@ cat > docs/larv/07-runtime/sandbox-runbook.md <<EOF
 
 App URL: $APP_URL
 DB: $DB_NAME
+DB connection: $DB_CONNECTION
+DB host: $DB_HOST
+DB port: $DB_PORT
+DB username: $DB_USERNAME
 Project root: $PROJECT_ROOT
 SSH: ssh $SSH_TARGET
 EOF
 
-export APP_PORT DB_NAME PROJECT_ROOT APP_URL
+export APP_PORT DB_NAME PROJECT_ROOT APP_URL DB_CONNECTION DB_HOST DB_PORT DB_USERNAME
 yq -i '
   .execution.allocations += [
     {"kind":"app-port","value": strenv(APP_PORT)},
@@ -107,6 +158,11 @@ yq -i '
   ] |
   .sandbox.app_url = strenv(APP_URL) |
   .sandbox.status = "provisioned" |
+  .sandbox.database.connection = strenv(DB_CONNECTION) |
+  .sandbox.database.host = strenv(DB_HOST) |
+  .sandbox.database.port = strenv(DB_PORT) |
+  .sandbox.database.name = strenv(DB_NAME) |
+  .sandbox.database.username = strenv(DB_USERNAME) |
   .project.last_updated_at = "'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"
 ' docs/larv/STATE.yaml
 

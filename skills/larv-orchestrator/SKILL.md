@@ -67,7 +67,7 @@ The greenfield mode dispatches phases in this exact order:
 7. **Phase 4**: dispatch `larv-tests`
 8. **Phase 5**: dispatch `larv-premortem`
 9. **Phase 6**: dispatch `larv-plan`
-10. **larv-handoff** (mandatory): writes `docs/Handsoff.md`, `docs/Handsoff/bootstrap-sandbox.md`, and per-slice handoffs.
+10. **larv-handoff** (mandatory): writes `docs/Handsoff.md`, `docs/Handsoff/bootstrap-sandbox.md`, production/env/ops guides, and per-slice handoffs.
 11. **Phase 6.5**: dispatch `larv-docsite` after handoff so the doc-site includes `docs/Handsoff/*`.
 12. **Phase 8 routing menu**: show exact handoff paths and ask `same-session` | `subagents` | `handoff`.
 13. **Phase 8**: dispatch `larv-implement` (or stop, if `handoff` was chosen). Implementation must run `docs/Handsoff/bootstrap-sandbox.md` before the first slice.
@@ -80,6 +80,9 @@ The greenfield mode dispatches phases in this exact order:
 - **Before Phase 8**: After `larv-handoff` and `larv-docsite` succeed, print the next-step paths:
   - `docs/Handsoff.md`
   - `docs/Handsoff/bootstrap-sandbox.md`
+  - `docs/Handsoff/production-deploy.md`
+  - `docs/Handsoff/env-guide.md`
+  - `docs/Handsoff/operations-guide.md`
   - `docs/Handsoff/slice-NN-<name>.md`
   - `docs/larv/docsite-url.txt`
   Then call `routing_menu "$dir"`. If `mode=handed-off-external`, mark `/larv:full` complete and exit after telling the user to open `docs/Handsoff.md` first and run `docs/Handsoff/bootstrap-sandbox.md` before any slice. Otherwise, dispatch `larv-implement`.

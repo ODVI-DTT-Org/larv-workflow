@@ -94,8 +94,24 @@ EOF
     [ -f "$TMP/docs/Handsoff/bootstrap-sandbox.md" ]
     grep -q "Bootstrap Sandbox" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     grep -q "deploy-sandbox.sh" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+    grep -q "DB_CONNECTION" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+    grep -q "createdb" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+    grep -q "CREATE DATABASE" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+    grep -q "DB_HOST" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     grep -q "Sandbox ready at" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     ! grep -E 'scripts/lib/[a-z_]+\.sh' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+}
+
+@test "handsoff_render_runtime_guides writes deploy env and ops guides" {
+    run bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_runtime_guides '$TMP'"
+    [ "$status" -eq 0 ]
+    [ -f "$TMP/docs/Handsoff/production-deploy.md" ]
+    [ -f "$TMP/docs/Handsoff/env-guide.md" ]
+    [ -f "$TMP/docs/Handsoff/operations-guide.md" ]
+    grep -q "Laravel Cloud" "$TMP/docs/Handsoff/production-deploy.md"
+    grep -q "Namecheap" "$TMP/docs/Handsoff/production-deploy.md"
+    grep -q "DB_DATABASE" "$TMP/docs/Handsoff/env-guide.md"
+    grep -q "Install" "$TMP/docs/Handsoff/operations-guide.md"
 }
 
 @test "starting-point files require bootstrap before slices" {

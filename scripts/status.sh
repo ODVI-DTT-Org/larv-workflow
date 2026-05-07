@@ -20,7 +20,7 @@ phase_name() {
         4) echo "Test strategy" ;;
         5) echo "Premortem" ;;
         6) echo "Slice plan" ;;
-        7) echo "Provision sandbox" ;;
+        7) echo "Handoff and doc-site" ;;
         8) echo "Implementation loop" ;;
         9) echo "Final verification" ;;
         10) echo "Deploy" ;;

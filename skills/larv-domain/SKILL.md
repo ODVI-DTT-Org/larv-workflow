@@ -7,6 +7,8 @@ description: Phase 1 - DDD viability check, then either Laravel-DDD architecture
 
 Map the Phase 0a DDD interview output to a Laravel architecture. If DDD viability passes, produce a full DDD layout; otherwise, produce a flat Eloquent model that still uses the canonical ubiquitous-language terms.
 
+Use the bundled DDD reference at `bundle/domain-driven-design/skills/domain-driven-design/SKILL.md` for domain modeling discipline, then apply the Laravel-specific mapping rules in this skill.
+
 ## Inputs
 
 - `docs/larv/ddd-interview/*.md` (Phase 0a)

@@ -7,6 +7,8 @@ description: Phase 8 thin loop — read each docs/Handsoff/slice-NN-*.md and exe
 
 Execute slices by following their handsoff documents. Do not improvise. Do not call plugin scripts that are not referenced inside the handsoff. The handsoff is self-contained by spec rule §3.2.
 
+When Claude Code executes this phase directly, use bundled Laravel guidance from `bundle/superpowers-laravel/skills` as needed for migrations, policies, validation, queues, env config, tests, and quality checks. External handoff tools do not need those skills because the handoff files are self-contained.
+
 ## Inputs
 
 - `docs/larv/STATE.yaml`

@@ -16,6 +16,11 @@ Run premortem (what could go wrong) + adversarial review. If showstoppers found,
 - `masterplan-bug-premortem`
 - `masterplan-adversarial-review`
 
+Bundled references:
+
+- `bundle/masterplan/skills/masterplan-bug-premortem/SKILL.md`
+- `bundle/masterplan/skills/masterplan-adversarial-review/SKILL.md`
+
 ## Required outputs
 
 - `docs/larv/05-premortem/failure-modes.md`

@@ -1,0 +1,64 @@
+# Environment Guide — {{project_slug}}
+
+Use this guide for sandbox and production configuration. Do not commit real secrets.
+
+## Sandbox defaults
+
+| Variable | Sandbox value | Source |
+|---|---|---|
+| `APP_NAME` | `{{project_name}}` | project name |
+| `APP_ENV` | `local` | sandbox |
+| `APP_DEBUG` | `true` | sandbox |
+| `APP_URL` | read from `docs/larv/07-runtime/sandbox-url.txt` | bootstrap |
+| `DB_CONNECTION` | `mysql` unless `DB_CONNECTION=pgsql` was passed | bootstrap |
+| `DB_HOST` | `127.0.0.1` | bootstrap |
+| `DB_PORT` | `3306` for MySQL/MariaDB, `5432` for PostgreSQL | bootstrap |
+| `DB_DATABASE` | `larv_{{project_slug}}` with dashes converted to underscores | bootstrap |
+| `DB_USERNAME` | `larv` unless overridden | bootstrap |
+| `DB_PASSWORD` | empty unless overridden | bootstrap |
+| `CACHE_STORE` | `database` or plan-specific value | app plan |
+| `QUEUE_CONNECTION` | `database`, `redis`, or plan-specific value | app plan |
+| `SESSION_DRIVER` | `database` or plan-specific value | app plan |
+| `MAIL_MAILER` | provider-specific | user |
+| `MAIL_HOST` | provider-specific | user |
+| `MAIL_PORT` | provider-specific | user |
+| `MAIL_USERNAME` | provider-specific secret | user |
+| `MAIL_PASSWORD` | provider-specific secret | user |
+| `MAIL_FROM_ADDRESS` | verified sender | user |
+
+## Production values to collect
+
+Ask the user or read from Laravel Cloud:
+
+```dotenv
+APP_NAME="{{project_name}}"
+APP_ENV=production
+APP_KEY=<generate with php artisan key:generate --show>
+APP_DEBUG=false
+APP_URL=https://<production-domain>
+
+DB_CONNECTION=<mysql or pgsql>
+DB_HOST=<laravel-cloud-db-host>
+DB_PORT=<laravel-cloud-db-port>
+DB_DATABASE=<laravel-cloud-db-name>
+DB_USERNAME=<laravel-cloud-db-user>
+DB_PASSWORD=<laravel-cloud-db-password>
+
+CACHE_STORE=<database|redis>
+QUEUE_CONNECTION=<database|redis>
+SESSION_DRIVER=<database|redis>
+
+MAIL_MAILER=<smtp|resend|postmark|mailgun|ses>
+MAIL_HOST=<mail-host>
+MAIL_PORT=<mail-port>
+MAIL_USERNAME=<mail-username>
+MAIL_PASSWORD=<mail-password>
+MAIL_FROM_ADDRESS=<verified-sender>
+MAIL_FROM_NAME="{{project_name}}"
+```
+
+## Secret handling
+
+- Put production secrets only in Laravel Cloud environment variables or the selected secret manager.
+- Do not paste production secrets into `docs/`.
+- If a secret is accidentally committed, rotate it immediately.

@@ -16,6 +16,12 @@ Define test strategy - Pest unit/feature layers, Playwright browser flows, accep
 - `masterplan-test-strategy`
 - `superpowers-laravel:laravel-tdd` (hints, not full invocation here)
 
+Bundled references:
+
+- `bundle/masterplan/skills/masterplan-test-strategy/SKILL.md`
+- `bundle/superpowers-laravel/skills/tdd-with-pest/SKILL.md`
+- `bundle/superpowers-laravel/skills/e2e-playwright/SKILL.md`
+
 ## Required outputs
 
 - `docs/larv/04-test-strategy/pest-strategy.md`

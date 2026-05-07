@@ -59,7 +59,7 @@ static_server_open_firewall "$ssh_target" "$mockup_port"
 
 ### 6. Huashu generates mockups
 
-Invoke the bundled `huashu-design` skill for each pick. Render 5-7 key screens per pick at `docs/larv/03-design/mockups/<pick-slug>/<screen>.html`.
+Invoke the bundled `huashu-design` skill for each pick (`bundle/huashu-design/SKILL.md`). Render 5-7 key screens per pick at `docs/larv/03-design/mockups/<pick-slug>/<screen>.html`.
 
 **Feasibility fallback (per spec section 9.1 step 6):** if huashu cannot sustain consistency across all picks x screens, degrade to one mockup per pick (hero/dashboard only). Record the decision in `docs/larv/03-design/recommendations.md`.
 

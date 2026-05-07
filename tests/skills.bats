@@ -24,10 +24,10 @@ SKILLS=(
     done
 }
 
-@test "every skill stub flags itself as a stub deferring to sub-project B" {
+@test "remaining skill stubs flag themselves as stubs" {
     for skill in larv-architecture \
                  larv-tests larv-premortem \
-                 larv-verify larv-deploy larv-learn \
+                 larv-learn \
                  larv-adopt; do
         run grep -F "STUB" "skills/${skill}/SKILL.md"
         [ "$status" -eq 0 ] || { echo "${skill} not marked STUB"; return 1; }
@@ -193,4 +193,36 @@ yaml.safe_load(parts[1])
     grep -q "Bootstrap — mandatory before first slice" skills/larv-implement/SKILL.md
     grep -q "docs/Handsoff/bootstrap-sandbox.md" skills/larv-implement/SKILL.md
     grep -q "docs/larv/07-runtime/sandbox-url.txt" skills/larv-implement/SKILL.md
+}
+
+@test "larv-handoff renders production and user guide documents" {
+    grep -q "handsoff_render_runtime_guides" skills/larv-handoff/SKILL.md
+    grep -q "docs/Handsoff/production-deploy.md" skills/larv-handoff/SKILL.md
+    grep -q "docs/Handsoff/env-guide.md" skills/larv-handoff/SKILL.md
+    grep -q "docs/Handsoff/operations-guide.md" skills/larv-handoff/SKILL.md
+}
+
+@test "larv-deploy is filled with Laravel Cloud and Namecheap handoff guidance" {
+    ! grep -q "STUB" skills/larv-deploy/SKILL.md
+    grep -q "Laravel Cloud" skills/larv-deploy/SKILL.md
+    grep -q "Namecheap" skills/larv-deploy/SKILL.md
+    grep -q "docs/Handsoff/production-deploy.md" skills/larv-deploy/SKILL.md
+    grep -q "Ask the user" skills/larv-deploy/SKILL.md
+}
+
+@test "larv-verify is filled with concrete verification checks" {
+    ! grep -q "STUB" skills/larv-verify/SKILL.md
+    grep -q "vendor/bin/pest" skills/larv-verify/SKILL.md
+    grep -q "vendor/bin/pint --test" skills/larv-verify/SKILL.md
+    grep -q "vendor/bin/phpstan analyse" skills/larv-verify/SKILL.md
+    grep -q "docs/larv/09-verification/final-report.md" skills/larv-verify/SKILL.md
+}
+
+@test "phase prompts reference required bundled skills" {
+    grep -q "bundle/domain-driven-design" skills/larv-domain/SKILL.md
+    grep -q "bundle/masterplan/skills/masterplan-c4-architecture" skills/larv-architecture/SKILL.md
+    grep -q "bundle/masterplan/skills/masterplan-test-strategy" skills/larv-tests/SKILL.md
+    grep -q "bundle/masterplan/skills/masterplan-bug-premortem" skills/larv-premortem/SKILL.md
+    grep -q "bundle/superpowers-laravel/skills" skills/larv-implement/SKILL.md
+    grep -q "bundle/huashu-design/SKILL.md" skills/larv-design/SKILL.md
 }

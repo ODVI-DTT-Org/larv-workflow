@@ -16,7 +16,10 @@ Runs automatically after `larv-handoff`, before the Phase 8 routing menu, so the
 - All files under `docs/larv/`
 - `docs/Handsoff.md`
 - `docs/Handsoff/bootstrap-sandbox.md`
-- `docs/Handsoff/slice-NN-*.md`
+- `docs/Handsoff/production-deploy.md`
+- `docs/Handsoff/env-guide.md`
+- `docs/Handsoff/operations-guide.md`
+- all files under `docs/Handsoff/`
 
 ## What you do
 

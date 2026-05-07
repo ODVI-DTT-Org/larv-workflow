@@ -16,6 +16,11 @@ Produce C4 levels 1–3, lock library policy decisions (Filament/Nova, Horizon, 
 - `masterplan-c4-architecture`
 - `masterplan-master-design`
 
+Bundled references:
+
+- `bundle/masterplan/skills/masterplan-c4-architecture/SKILL.md`
+- `bundle/masterplan/skills/masterplan-master-design/SKILL.md`
+
 ## Required outputs
 
 - `docs/larv/02-architecture/c4-context.md`

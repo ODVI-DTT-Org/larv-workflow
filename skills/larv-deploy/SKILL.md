@@ -1,20 +1,77 @@
 ---
 name: larv-deploy
-description: Phase 10 wrapper - Laravel Cloud deployment. Sub-project D defines mechanics.
+description: Phase 10 - production deployment guidance and verification. Defaults to Laravel Cloud hosting and Namecheap DNS; deploy instructions are also generated into docs/Handsoff/production-deploy.md for external AI handoff.
 ---
 
 # larv-deploy
 
-> **STUB — sub-project A scaffolding only. Mechanics defined in sub-project D.**
+Prepare and guide production deployment. If implementation was handed off to another AI, that AI should follow `docs/Handsoff/production-deploy.md`; this skill mirrors the same contract for Claude Code execution.
 
-## Phase responsibility
+## Inputs
 
-Deploy to Laravel Cloud. Pre-deploy - full Pest + asset build + env-var verification. Post-deploy - smoke test on prod URL, DB migrate, queue worker restart.
+- `docs/Handsoff/production-deploy.md`
+- `docs/Handsoff/env-guide.md`
+- `docs/Handsoff/operations-guide.md`
+- `docs/larv/09-verification/final-report.md`
+- `docs/larv/STATE.yaml`
 
-## Required outputs
+## Ask the user
 
-- `docs/larv/07-runtime/laravel-cloud.md` (updated)
+Ask the user these questions before any production action:
+
+```text
+Recommendation: Laravel Cloud + Namecheap
+Why: That is the larv default and gives the shortest managed Laravel production path.
+Tradeoffs: Other hosts or registrars need a custom deployment runbook.
+
+1. Are we deploying to Laravel Cloud? Default: yes.
+2. Are you using Namecheap for DNS? Default: yes.
+3. What production domain should point to this app?
+4. What Laravel Cloud organization, project, and environment should be used?
+5. Should Laravel Cloud create/attach the production database?
+6. Which mail provider and sender address should production use?
+7. Are queue workers, scheduler, Horizon, Reverb, or storage disks needed?
+```
+
+Record answers in `docs/larv/10-deploy/production-answers.md`.
+
+## What you do
+
+1. Read `docs/larv/09-verification/final-report.md`; stop if it does not recommend production readiness.
+2. Walk the user through `docs/Handsoff/production-deploy.md`.
+3. Build an env-var checklist from `docs/Handsoff/env-guide.md`.
+4. Ask the user to fill Laravel Cloud secrets in Laravel Cloud, not in git.
+5. Ask for Namecheap DNS values or Laravel Cloud custom-domain target.
+6. After deploy, smoke-test the production URL and configured health path.
+7. Write `docs/larv/10-deploy/laravel-cloud.md`.
+
+## Required output
+
+`docs/larv/10-deploy/laravel-cloud.md` must include:
+
+- hosting provider
+- DNS provider
+- production domain
+- Laravel Cloud org/project/environment
+- database type and provider
+- env vars configured, with secret values redacted
+- build/release commands
+- DNS record instructions
+- smoke-test result
+- rollback instructions
+
+## Completion gate
+
+Do not return `status: complete` until the production URL has been probe-confirmed or the user explicitly chooses `guide-only`.
 
 ## Subagent return contract
 
-See spec §8.
+```yaml
+status: complete | guide_only | failed
+production_url: "https://<domain>" | null
+files_written:
+  - docs/larv/10-deploy/production-answers.md
+  - docs/larv/10-deploy/laravel-cloud.md
+errors_unresolved: []
+plugin_improvement_notes: (none)
+```

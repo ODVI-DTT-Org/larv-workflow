@@ -43,6 +43,7 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
 
         handsoff_render_index "."
         handsoff_render_bootstrap_sandbox "."
+        handsoff_render_runtime_guides "."
         handsoff_render_slice "." slice-01 auth-scaffold
         handsoff_render_slice "." slice-02 todos-crud
         handsoff_render_starting_points "."
@@ -50,6 +51,9 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
 
     [ -f docs/Handsoff.md ]
     [ -f docs/Handsoff/bootstrap-sandbox.md ]
+    [ -f docs/Handsoff/production-deploy.md ]
+    [ -f docs/Handsoff/env-guide.md ]
+    [ -f docs/Handsoff/operations-guide.md ]
     [ -f docs/Handsoff/slice-01-auth-scaffold.md ]
     [ -f docs/Handsoff/slice-02-todos-crud.md ]
     [ -f CLAUDE.md ]
@@ -73,11 +77,17 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
     grep -q "Handsoff — todo-app" docs/Handsoff.md
     grep -q "Sandbox Bootstrap" docs/Handsoff.md
     grep -q "bootstrap-sandbox.md" docs/Handsoff.md
+    grep -q "production-deploy.md" docs/Handsoff.md
+    grep -q "env-guide.md" docs/Handsoff.md
+    grep -q "operations-guide.md" docs/Handsoff.md
     grep -q "Bootstrap Sandbox" docs/Handsoff/bootstrap-sandbox.md
+    grep -q "Laravel Cloud" docs/Handsoff/production-deploy.md
+    grep -q "Namecheap" docs/Handsoff/production-deploy.md
 
     # Starting-point files all reference Handsoff.md
     grep -q "Handsoff.md" CLAUDE.md
     grep -q "bootstrap-sandbox.md" CLAUDE.md
+    grep -q "production-deploy.md" CLAUDE.md
     grep -q "Handsoff.md" AGENTS.md
     grep -q "Handsoff.md" GEMINI.md
     grep -q "Handsoff.md" .cursor/rules/larv.mdc

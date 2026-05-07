@@ -1,0 +1,89 @@
+# Operations Guide — {{project_slug}}
+
+This is the user-facing manual for installing, running, checking, and troubleshooting the app.
+
+## Install
+
+```bash
+composer install
+npm install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+npm run build
+```
+
+Use `docs/Handsoff/env-guide.md` to fill `.env` values.
+
+## Run locally
+
+```bash
+php artisan serve
+npm run dev
+php artisan queue:work
+```
+
+If the app uses Horizon:
+
+```bash
+php artisan horizon
+```
+
+## Run sandbox
+
+The sandbox is managed through:
+
+```text
+docs/Handsoff/bootstrap-sandbox.md
+```
+
+After it succeeds:
+
+```bash
+cat docs/larv/07-runtime/sandbox-url.txt
+cat docs/larv/07-runtime/sandbox-runbook.md
+```
+
+## Verify
+
+```bash
+vendor/bin/pint --test
+vendor/bin/pest
+vendor/bin/phpstan analyse
+npm run build
+```
+
+Smoke test:
+
+```bash
+curl -fsS "$(cat docs/larv/07-runtime/sandbox-url.txt)" >/dev/null
+```
+
+## Troubleshooting
+
+### App does not boot
+
+1. Check `.env` values against `docs/Handsoff/env-guide.md`.
+2. Run `php artisan config:clear`.
+3. Check the Laravel log at `storage/logs/laravel.log`.
+4. Confirm `APP_KEY` exists.
+
+### Database errors
+
+1. Confirm `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD`.
+2. Confirm the database server is running.
+3. Run `php artisan migrate:status`.
+4. Run `php artisan migrate --force` only when the migration plan is understood.
+
+### Queue jobs are stuck
+
+1. Confirm `QUEUE_CONNECTION`.
+2. Start `php artisan queue:work` or Horizon.
+3. Check failed jobs with `php artisan queue:failed`.
+
+### Production domain does not resolve
+
+1. Check `docs/Handsoff/production-deploy.md`.
+2. Confirm Namecheap DNS record type and value.
+3. Confirm Laravel Cloud custom domain status.
+4. Wait for DNS propagation.

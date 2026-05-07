@@ -1,0 +1,163 @@
+# Production Deploy — {{project_slug}}
+
+This guide is for the implementation AI after the user has accepted the sandbox implementation. It is self-contained and does not require the larv plugin.
+
+Defaults:
+
+- Hosting: Laravel Cloud
+- DNS registrar: Namecheap
+
+## 1. Ask the user before deploying
+
+Ask the user these questions and record answers in `docs/larv/10-deploy/production-answers.md`.
+
+```text
+Recommendation: Laravel Cloud + Namecheap
+Why: The larv default path keeps PHP/Laravel operations managed and leaves DNS ownership with the user's registrar.
+Tradeoffs: A custom VPS or another registrar is possible, but requires a different runbook.
+
+Questions:
+1. Are we deploying to Laravel Cloud? Default: yes.
+2. Are you using Namecheap for DNS? Default: yes.
+3. What production domain should point to this app? Example: app.example.com.
+4. What Laravel Cloud organization, project, and environment should be used?
+5. Which production database should Laravel Cloud attach or create?
+6. Which mail provider should production use?
+7. Which queue/cache/session drivers should production use?
+8. Are file uploads needed in production? If yes, which storage provider?
+```
+
+Do not deploy until the user answers the domain, Laravel Cloud project/environment, database, and required secrets.
+
+## 2. Pre-deploy verification
+
+Run locally or in the sandbox project root:
+
+```bash
+composer install --no-interaction --prefer-dist --optimize-autoloader
+php artisan key:generate --show >/tmp/larv-app-key.txt
+vendor/bin/pint --test
+vendor/bin/pest
+vendor/bin/phpstan analyse
+npm install
+npm run build
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
+php artisan migrate --pretend --force
+```
+
+Stop on any failure.
+
+## 3. Laravel Cloud setup
+
+In Laravel Cloud:
+
+1. Create or select the project for `{{project_name}}`.
+2. Connect the Git repository and production branch.
+3. Create/select the production environment.
+4. Attach a managed database.
+5. Configure build commands:
+   ```bash
+   composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+   npm ci
+   npm run build
+   php artisan config:cache
+   php artisan route:cache
+   php artisan view:cache
+   ```
+6. Configure release command:
+   ```bash
+   php artisan migrate --force
+   ```
+7. Configure worker command if queues are used:
+   ```bash
+   php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+   ```
+8. Configure scheduler if the app has scheduled jobs.
+
+## 4. Required environment variables
+
+Use `docs/Handsoff/env-guide.md` as the source checklist. At minimum, production needs:
+
+```dotenv
+APP_NAME="{{project_name}}"
+APP_ENV=production
+APP_KEY=<generate with php artisan key:generate --show>
+APP_DEBUG=false
+APP_URL=https://<production-domain>
+
+DB_CONNECTION=<mysql or pgsql>
+DB_HOST=<from Laravel Cloud database>
+DB_PORT=<from Laravel Cloud database>
+DB_DATABASE=<from Laravel Cloud database>
+DB_USERNAME=<from Laravel Cloud database>
+DB_PASSWORD=<from Laravel Cloud database>
+
+CACHE_STORE=database
+QUEUE_CONNECTION=database
+SESSION_DRIVER=database
+
+MAIL_MAILER=<provider>
+MAIL_HOST=<provider host>
+MAIL_PORT=<provider port>
+MAIL_USERNAME=<provider username>
+MAIL_PASSWORD=<provider password>
+MAIL_FROM_ADDRESS=<verified sender>
+MAIL_FROM_NAME="{{project_name}}"
+```
+
+Never commit production secrets.
+
+## 5. Namecheap DNS
+
+In Namecheap:
+
+1. Open Domain List -> Manage -> Advanced DNS.
+2. Add or update the app host.
+3. Use the Laravel Cloud-provided DNS target.
+4. If Laravel Cloud provides an IP, create an `A record`.
+5. If Laravel Cloud provides a hostname, create a `CNAME record`.
+6. Set TTL to Automatic unless the user requests otherwise.
+7. Wait for DNS propagation.
+
+Record the final DNS values:
+
+```text
+Domain:
+Record type:
+Host:
+Value:
+TTL:
+Laravel Cloud custom domain status:
+TLS/SSL status:
+```
+
+## 6. Deploy and verify
+
+After deployment:
+
+```bash
+curl -fsS https://<production-domain>/ >/dev/null
+curl -fsS https://<production-domain>/{{smoke_path}} >/dev/null
+```
+
+Then verify in Laravel Cloud:
+
+- latest deploy succeeded
+- migrations ran
+- queue worker is healthy, if configured
+- scheduler is healthy, if configured
+- logs show no boot errors
+- custom domain is active
+- TLS is active
+
+Write the final report to `docs/larv/10-deploy/laravel-cloud.md`.
+
+## 7. Rollback
+
+If production smoke tests fail:
+
+1. Revert to the previous Laravel Cloud deployment.
+2. Restore database only if a migration caused data loss or unrecoverable schema failure.
+3. Record failure and fix plan in `docs/larv/10-deploy/rollback-report.md`.

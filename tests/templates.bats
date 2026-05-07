@@ -2,9 +2,9 @@
 
 load helpers
 
-TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report ddd-interview-questions bootstrap-sandbox.md.tmpl)
+TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report ddd-interview-questions bootstrap-sandbox.md.tmpl production-deploy.md.tmpl env-guide.md.tmpl operations-guide.md.tmpl)
 
-@test "all 7 templates exist" {
+@test "all 10 templates exist" {
     for t in "${TEMPLATES[@]}"; do
         if [[ "$t" == *.tmpl ]]; then
             [ -f "templates/${t}" ] || { echo "missing templates/${t}"; return 1; }
@@ -46,5 +46,24 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "docs/larv/07-runtime/sandbox-url.txt" templates/bootstrap-sandbox.md.tmpl
     grep -q "ufw allow" templates/bootstrap-sandbox.md.tmpl
     grep -q "export APP_PORT DB_NAME PROJECT_ROOT APP_URL" templates/bootstrap-sandbox.md.tmpl
+    grep -q "DB_CONNECTION" templates/bootstrap-sandbox.md.tmpl
+    grep -q "createdb" templates/bootstrap-sandbox.md.tmpl
+    grep -q "CREATE DATABASE" templates/bootstrap-sandbox.md.tmpl
     grep -q "Sandbox ready at" templates/bootstrap-sandbox.md.tmpl
+}
+
+@test "production deploy template covers Laravel Cloud and Namecheap" {
+    grep -q "Laravel Cloud" templates/production-deploy.md.tmpl
+    grep -q "Namecheap" templates/production-deploy.md.tmpl
+    grep -q "Ask the user" templates/production-deploy.md.tmpl
+    grep -q "APP_KEY" templates/production-deploy.md.tmpl
+    grep -q "A record" templates/production-deploy.md.tmpl
+}
+
+@test "env and operations guide templates cover setup values" {
+    grep -q "DB_DATABASE" templates/env-guide.md.tmpl
+    grep -q "DB_USERNAME" templates/env-guide.md.tmpl
+    grep -q "MAIL_" templates/env-guide.md.tmpl
+    grep -q "Install" templates/operations-guide.md.tmpl
+    grep -q "Troubleshooting" templates/operations-guide.md.tmpl
 }

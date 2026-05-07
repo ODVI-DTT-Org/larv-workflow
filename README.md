@@ -12,7 +12,7 @@ A bundled-marketplace Claude Code plugin. One install gives you 8 commands that 
 
 Five things it does that nothing else does together:
 
-1. **End-to-end** — brainstorm → DDD viability → C4 architecture → UI design → tests → premortem → slices → sandbox → deploy. One command, twelve numbered phases (with a pre-flight setup step).
+1. **End-to-end** — brainstorm → DDD viability → C4 architecture → UI design → tests → premortem → slices → handoff → sandbox implementation → deploy guidance. One command gets the project to an implementation-ready handoff, with production runbooks included.
 2. **Subagent-driven** — every phase runs in a fresh agent context, so a 3-day project doesn't blow up your conversation buffer.
 3. **Resumable** — `docs/larv/STATE.yaml` makes any project recoverable by any teammate at any point.
 4. **Self-improving** — every project run can propose edits to the plugin's own skills via PR. The plugin gets smarter with use.
@@ -30,13 +30,13 @@ Five things it does that nothing else does together:
 
 larv produces docs in `docs/Handsoff.md` and `docs/Handsoff/slice-NN-*.md` that are self-contained: every action a foreign AI must take is encoded as inline bash, no plugin script references. Same-session, subagents, and external-AI execution all read these same files. There is no internal Phase 8 logic distinct from "what we tell a foreign AI to do."
 
-The routing menu (Phase 7 → 8) lets you choose where to execute:
+The routing menu before Phase 8 lets you choose where to execute:
 
 - `same-session` — this Claude Code session continues
 - `subagents` — fresh subagents per slice
 - `handoff` — stop here; you point another AI at `docs/Handsoff.md`
 
-All three options use the same handsoff documents. The plugin's job ends at the handoff for the third option; for the first two, it loops slices through `larv-implement`, which itself only reads handsoff content.
+All three options use the same handsoff documents. The plugin's job ends at the handoff for the third option; for the first two, it loops slices through `larv-implement`, which itself only reads handoff content. The app sandbox is started by `docs/Handsoff/bootstrap-sandbox.md` during implementation, not during `/larv:full` planning.
 
 ## Layer 2 phases
 
@@ -47,6 +47,7 @@ Layer 2 adds richer per-phase content:
 - **Phase 1 (Domain)** WebFetches a current Laravel-DDD reference and produces either a full DDD layout or a flat Eloquent model based on a viability gate.
 - **Phase 3 (Design)** asks you to browse https://getdesign.md/ in your own browser and pick >=3 designs. The agent then renders your app's screens in each picked style and serves a comparison harness at `http://31.220.79.31:<port>` so you can pick one or merge two.
 - **Phase 6.5 (Doc-site)** spins up a Docsify-rendered version of your entire plan at `http://31.220.79.31:<port>` for a final read-through before implementation begins.
+- **Handoff runtime guides** generate sandbox, production deployment, environment, and operations docs under `docs/Handsoff/`. Production defaults are Laravel Cloud for hosting and Namecheap for DNS.
 
 ## Installation
 
@@ -232,32 +233,35 @@ The agent moves through:
 
 You approve each phase as it completes. Total time so far: ~50 minutes, ~$8.
 
-### What you'll see — Phase 7 (provision sandbox)
+### What you'll see — handoff and app sandbox
 
 ```
-[Phase 7 — Provisioning sandbox]
+[Handoff ready]
 
-SSH to vm.example.com as deploy ............. ✅
-Generated SSH key larv_todo-app-2026-05_ed25519
-Apt update + Docker prerequisites ........... ✅
-Docker compose stack:
-  - app (php-fpm 8.3)
-  - nginx
-  - mysql 8.4
-  - redis 7
-  - mailpit (dev SMTP)
-.................................................. ✅
-Firewall (ufw): allow 80, 443, 8025 .......... ✅
-Reverse proxy: nginx → app:8000 .............. ✅
-DNS: A record todo-app-2026-05.vm.example .... ✅
-TLS: Let's Encrypt cert + auto-renew ......... ✅
-Seeded DB with admin user .................... ✅
-Smoke test: GET / returns 200 ................ ✅
+Handsoff documents written:
+  docs/Handsoff.md
+  docs/Handsoff/bootstrap-sandbox.md
+  docs/Handsoff/production-deploy.md
+  docs/Handsoff/env-guide.md
+  docs/Handsoff/operations-guide.md
+  docs/Handsoff/slice-NN-<name>.md
 
-App URL:  https://todo-app-2026-05.vm.example
-Login:    test@example.com / password (seeded)
+Choose: same-session | subagents | handoff
+```
 
-Output:   docs/larv/07-runtime/sandbox-runbook.md
+If you choose `handoff`, open Codex CLI or another AI tool in the same repo and point it at `docs/Handsoff.md`.
+
+The implementation AI must run:
+
+```
+docs/Handsoff/bootstrap-sandbox.md
+```
+
+That bootstrap checks/starts MySQL, MariaDB, or PostgreSQL, creates the app database if missing, writes `.env` database/app values, starts the app sandbox, probes it from inside and outside the VM, and writes:
+
+```
+docs/larv/07-runtime/sandbox-url.txt
+docs/larv/07-runtime/sandbox-runbook.md
 ```
 
 ### What you'll see — Phase 8 (implementation loop)
@@ -347,29 +351,31 @@ Auto-fix? [Y/n]
 
 You: `Y`. Agent fixes the N+1, re-runs perf check, all green. Output: `docs/larv/09-verification/final-report.md`.
 
-### What you'll see — Phase 10 (deploy)
+### What you'll see — Phase 10 (deploy guidance)
 
 ```
-[Phase 10 — Deploy to Laravel Cloud]
+[Phase 10 — Deploy]
 
-Project: todo-app (your Laravel Cloud account)
-Branch:  main
-Env:     production
+Defaults:
+  Hosting: Laravel Cloud
+  DNS:     Namecheap
 
-Pre-deploy:
-  - Pest suite ............... ✅
-  - DB migration plan ........ 4 migrations to run
-  - Asset build .............. ✅
-  - Env vars verified ........ 12/12
+The agent asks:
+  - Are we deploying to Laravel Cloud? Default: yes.
+  - Are you using Namecheap for DNS? Default: yes.
+  - What production domain should point to this app?
+  - What Laravel Cloud organization/project/environment should be used?
+  - Should Laravel Cloud create or attach the production database?
+  - Which mail, queue, scheduler, storage, and worker settings are needed?
 
-Deploy ......................... in progress ... ✅
-Post-deploy:
-  - Smoke test on prod URL ... ✅
-  - DB migrate ............... ✅
-  - Queue worker restart ..... ✅
+Guides:
+  docs/Handsoff/production-deploy.md
+  docs/Handsoff/env-guide.md
+  docs/Handsoff/operations-guide.md
 
-Production URL: https://todo-app.laravel.cloud
-Output:         docs/larv/07-runtime/laravel-cloud.md (updated)
+Output:
+  docs/larv/10-deploy/production-answers.md
+  docs/larv/10-deploy/laravel-cloud.md
 ```
 
 ### What you'll see — Phase 11 (learn)
@@ -659,39 +665,22 @@ Playwright:  ✅ 4/4
 ## Next: slice-03-sharing
 ```
 
-### Sandbox runbook template (Phase 7)
+### Sandbox and production handoff guides
 
 ```markdown
-# Sandbox Runbook — todo-app
+# Generated guides
 
-## App URL
-https://todo-app-2026-05.vm.example
-Login: test@example.com / password   (seeded)
+- docs/Handsoff/bootstrap-sandbox.md
+  Starts/probes the app sandbox during implementation. Checks MySQL/MariaDB/PostgreSQL, creates the app database when missing, writes `.env`, and records the sandbox URL.
 
-## VM
-Host:  vm.example.com   user: deploy
-SSH:   ssh deploy@vm.example.com
-Key:   ~/.ssh/larv_todo-app-2026-05_ed25519
+- docs/Handsoff/env-guide.md
+  Explains sandbox and production `.env` values, including APP_KEY, APP_URL, DB_*, MAIL_*, queue, cache, and session settings.
 
-## Docker stack
-Compose:  ~/apps/todo-app-2026-05/docker-compose.yml
-Services: app · nginx · mysql · redis · mailpit
-Up:       docker compose up -d
-Logs:     docker compose logs -f app
-Reset:    docker compose exec app php artisan migrate:fresh --seed
+- docs/Handsoff/operations-guide.md
+  Install, run, verify, queue, logs, and troubleshooting guide.
 
-## Firewall (already configured)
-ufw allow from any to any port 80,443,8025
-
-## Reverse proxy
-nginx → app:8000   TLS: Let's Encrypt (auto-renew)
-DNS: A record todo-app-2026-05.vm.example → VM
-
-## How to QA
-1. Open https://todo-app-2026-05.vm.example
-2. Login with seeded creds
-3. After each slice, read slice-NN/handoff.md for the walkthrough
-4. File feedback in plain English in the chat — no code needed
+- docs/Handsoff/production-deploy.md
+  Laravel Cloud and Namecheap default production deployment guide, including env vars, database, DNS, smoke tests, and rollback.
 ```
 
 ---
@@ -770,10 +759,10 @@ The contract:
 | Discuss | answer Qs | ask Qs (multiple choice mostly), validate via MCPs |
 | Domain → Premortem | review docs, approve gates | produce docs |
 | Slice plan | approve slice list | break into 1-day slices |
-| Provision | confirm VM + domain | SSH, docker, firewall, TLS |
-| Implementation | **QA in browser, give feedback in English** | code, deploy, test, iterate, notify |
+| Handoff | choose execution venue | generate handoff, sandbox bootstrap, env/deploy/ops guides |
+| Implementation | **QA in browser, give feedback in English** | run bootstrap, code slices, test, iterate, notify |
 | Verification | sign off | full suite + smoke + perf |
-| Deploy | confirm cutover | Laravel Cloud deploy |
+| Deploy | confirm cutover | Laravel Cloud + Namecheap guide, env checklist, production smoke |
 | Learn | review plugin PR (optional) | propose plugin edits |
 
 You never open an editor. You answer, review, click, and respond.
