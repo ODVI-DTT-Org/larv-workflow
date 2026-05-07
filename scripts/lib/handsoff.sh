@@ -152,6 +152,8 @@ handsoff_render_runtime_guides() {
         > "$dir/docs/Handsoff/env-guide.md"
     __handsoff_render_template "$plugin_root/templates/operations-guide.md.tmpl" "$tokens" \
         > "$dir/docs/Handsoff/operations-guide.md"
+    __handsoff_render_template "$plugin_root/templates/package-matrix.md.tmpl" "$tokens" \
+        > "$dir/docs/Handsoff/package-guide.md"
     rm -f "$tokens"
 }
 

@@ -83,6 +83,7 @@ The greenfield mode dispatches phases in this exact order:
   - `docs/Handsoff/production-deploy.md`
   - `docs/Handsoff/env-guide.md`
   - `docs/Handsoff/operations-guide.md`
+  - `docs/Handsoff/package-guide.md`
   - `docs/Handsoff/slice-NN-<name>.md`
   - `docs/larv/docsite-url.txt`
   Then call `routing_menu "$dir"`. If `mode=handed-off-external`, mark `/larv:full` complete and exit after telling the user to open `docs/Handsoff.md` first and run `docs/Handsoff/bootstrap-sandbox.md` before any slice. Otherwise, dispatch `larv-implement`.

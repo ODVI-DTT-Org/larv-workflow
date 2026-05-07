@@ -1,0 +1,36 @@
+# Laravel Package Guide — {{project_slug}}
+
+Use this guide to turn Phase 0 package choices into implementation, tests, environment values, and production operations. If a package was not approved in `docs/larv/00-discuss/library-decisions.md`, mark it `not selected` and do not implement it.
+
+## Source of Truth
+
+- Approved package decisions: `docs/larv/00-discuss/library-decisions.md`
+- Architecture package matrix: `docs/larv/02-architecture/package-integration-matrix.md`
+- Test package matrix: `docs/larv/04-test-strategy/package-test-matrix.md`
+- Slice plan: `docs/larv/06-implementation/elephant-carpaccio.md`
+
+## Package Matrix
+
+| Package area | If selected, implementation must include | Tests must include | Env/deploy notes |
+|---|---|---|---|
+| Filament | Panels, Resources, Relation Managers, table filters, actions, policies, widgets when useful | resource authorization, form validation, table filters/actions, policy coverage | admin route/domain, staff roles, production asset build |
+| Nova | Resources, lenses, actions, policies | resource authorization, action tests, lens/query behavior | license/secrets if applicable |
+| Sanctum | API tokens or SPA auth, middleware, token abilities if used | authenticated/unauthenticated API feature tests, ability checks | session/cors config when SPA |
+| Fortify | login, registration, password reset, email verification if selected | auth flow feature tests, throttling, password reset | mail provider required for reset/verification |
+| Passport | OAuth clients, scopes, token lifetimes | OAuth flow tests, scope enforcement | key generation and secure storage |
+| Socialite | providers, callback handling, account linking | provider callback tests with fakes, duplicate email behavior | provider client id/secret |
+| Horizon | queued jobs, retry/backoff policy, dashboard authorization | job dispatch, queue behavior, failed job handling | Redis, worker process, Laravel Cloud worker |
+| Reverb | channels, events, broadcasting auth | channel auth, event broadcast tests | websocket host, port, TLS/domain |
+| Pulse | dashboards/recorders, access policy | access tests and smoke check | production visibility and retention |
+| Telescope | local/staging observability, access policy | access policy test | disable or restrict in production |
+| Octane | long-lived app compatibility, cache/state audit | smoke under Octane if enabled | worker/server selection, reload command |
+| Cashier Stripe/Paddle | billing models, checkout/customer portal, webhook controller, subscription states | webhook signature tests, subscription state tests, invoice/payment flows | provider keys, webhook secret, production webhook URL |
+| tenancy | tenant identification, tenant-aware models, queues/cache isolation | tenant isolation, cross-tenant authorization, tenant migrations | domain/subdomain/DNS strategy |
+| Scout + Meilisearch/Typesense | searchable models, indexing jobs, filters | indexing/search tests, queue tests | search host/key, indexing command |
+| Storage/uploads | disks, validation, URL generation, cleanup | upload tests, private/public URL behavior | S3-compatible secrets, bucket/CORS |
+| Scheduler | scheduled commands | schedule smoke/command tests | Laravel Cloud scheduler |
+| Mail/notifications | mailables/notifications, templates | notification fakes, rendered content | provider secrets and verified sender |
+
+## Implementation Rule
+
+Every selected package must appear in at least one implementation slice, one test strategy entry, and one env/deploy note. If it does not, stop and update the plan before coding.

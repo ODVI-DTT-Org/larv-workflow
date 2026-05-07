@@ -108,10 +108,12 @@ EOF
     [ -f "$TMP/docs/Handsoff/production-deploy.md" ]
     [ -f "$TMP/docs/Handsoff/env-guide.md" ]
     [ -f "$TMP/docs/Handsoff/operations-guide.md" ]
+    [ -f "$TMP/docs/Handsoff/package-guide.md" ]
     grep -q "Laravel Cloud" "$TMP/docs/Handsoff/production-deploy.md"
     grep -q "Namecheap" "$TMP/docs/Handsoff/production-deploy.md"
     grep -q "DB_DATABASE" "$TMP/docs/Handsoff/env-guide.md"
     grep -q "Install" "$TMP/docs/Handsoff/operations-guide.md"
+    grep -q "Filament" "$TMP/docs/Handsoff/package-guide.md"
 }
 
 @test "starting-point files require bootstrap before slices" {

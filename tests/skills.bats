@@ -25,13 +25,39 @@ SKILLS=(
 }
 
 @test "remaining skill stubs flag themselves as stubs" {
-    for skill in larv-architecture \
-                 larv-tests larv-premortem \
-                 larv-learn \
-                 larv-adopt; do
+    for skill in larv-premortem \
+                 larv-learn; do
         run grep -F "STUB" "skills/${skill}/SKILL.md"
         [ "$status" -eq 0 ] || { echo "${skill} not marked STUB"; return 1; }
     done
+}
+
+@test "larv-architecture is filled and propagates package decisions" {
+    ! grep -q "STUB" skills/larv-architecture/SKILL.md
+    grep -q "library-decisions.md" skills/larv-architecture/SKILL.md
+    grep -q "package-integration-matrix.md" skills/larv-architecture/SKILL.md
+    grep -q "Filament" skills/larv-architecture/SKILL.md
+    grep -q "Horizon" skills/larv-architecture/SKILL.md
+    grep -q "Cashier" skills/larv-architecture/SKILL.md
+    grep -q "tenancy" skills/larv-architecture/SKILL.md
+}
+
+@test "larv-tests is filled and requires package-specific tests" {
+    ! grep -q "STUB" skills/larv-tests/SKILL.md
+    grep -q "package-test-matrix.md" skills/larv-tests/SKILL.md
+    grep -q "Filament" skills/larv-tests/SKILL.md
+    grep -q "Cashier" skills/larv-tests/SKILL.md
+    grep -q "Horizon" skills/larv-tests/SKILL.md
+    grep -q "Scout" skills/larv-tests/SKILL.md
+}
+
+@test "larv-plan requires package slices from approved packages" {
+    grep -q "package-integration-matrix.md" skills/larv-plan/SKILL.md
+    grep -q "package-test-matrix.md" skills/larv-plan/SKILL.md
+    grep -q "Filament" skills/larv-plan/SKILL.md
+    grep -q "Cashier" skills/larv-plan/SKILL.md
+    grep -q "Horizon" skills/larv-plan/SKILL.md
+    grep -q "Scout" skills/larv-plan/SKILL.md
 }
 
 @test "every skill SKILL.md frontmatter is valid YAML" {
@@ -200,6 +226,7 @@ yaml.safe_load(parts[1])
     grep -q "docs/Handsoff/production-deploy.md" skills/larv-handoff/SKILL.md
     grep -q "docs/Handsoff/env-guide.md" skills/larv-handoff/SKILL.md
     grep -q "docs/Handsoff/operations-guide.md" skills/larv-handoff/SKILL.md
+    grep -q "docs/Handsoff/package-guide.md" skills/larv-handoff/SKILL.md
 }
 
 @test "larv-deploy is filled with Laravel Cloud and Namecheap handoff guidance" {
@@ -225,4 +252,13 @@ yaml.safe_load(parts[1])
     grep -q "bundle/masterplan/skills/masterplan-bug-premortem" skills/larv-premortem/SKILL.md
     grep -q "bundle/superpowers-laravel/skills" skills/larv-implement/SKILL.md
     grep -q "bundle/huashu-design/SKILL.md" skills/larv-design/SKILL.md
+}
+
+@test "larv-adopt detects existing Laravel package surface" {
+    grep -q "composer.json" skills/larv-adopt/SKILL.md
+    grep -q "package-detection.md" skills/larv-adopt/SKILL.md
+    grep -q "Filament" skills/larv-adopt/SKILL.md
+    grep -q "Horizon" skills/larv-adopt/SKILL.md
+    grep -q "Cashier" skills/larv-adopt/SKILL.md
+    grep -q "Telescope" skills/larv-adopt/SKILL.md
 }

@@ -2,9 +2,9 @@
 
 load helpers
 
-TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report ddd-interview-questions bootstrap-sandbox.md.tmpl production-deploy.md.tmpl env-guide.md.tmpl operations-guide.md.tmpl)
+TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report ddd-interview-questions bootstrap-sandbox.md.tmpl production-deploy.md.tmpl env-guide.md.tmpl operations-guide.md.tmpl package-matrix.md.tmpl)
 
-@test "all 10 templates exist" {
+@test "all 11 templates exist" {
     for t in "${TEMPLATES[@]}"; do
         if [[ "$t" == *.tmpl ]]; then
             [ -f "templates/${t}" ] || { echo "missing templates/${t}"; return 1; }
@@ -66,4 +66,18 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "MAIL_" templates/env-guide.md.tmpl
     grep -q "Install" templates/operations-guide.md.tmpl
     grep -q "Troubleshooting" templates/operations-guide.md.tmpl
+}
+
+@test "package matrix template covers Laravel ecosystem package propagation" {
+    grep -q "Filament" templates/package-matrix.md.tmpl
+    grep -q "Sanctum" templates/package-matrix.md.tmpl
+    grep -q "Fortify" templates/package-matrix.md.tmpl
+    grep -q "Horizon" templates/package-matrix.md.tmpl
+    grep -q "Cashier" templates/package-matrix.md.tmpl
+    grep -q "Scout" templates/package-matrix.md.tmpl
+    grep -q "Pulse" templates/package-matrix.md.tmpl
+    grep -q "Telescope" templates/package-matrix.md.tmpl
+    grep -q "Octane" templates/package-matrix.md.tmpl
+    grep -q "Reverb" templates/package-matrix.md.tmpl
+    grep -q "tenancy" templates/package-matrix.md.tmpl
 }

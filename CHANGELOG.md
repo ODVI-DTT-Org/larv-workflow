@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.5 (next) - Laravel package deepening
+
+- Adds generated `docs/Handsoff/package-guide.md` so external handoff tools get a Laravel package implementation/test/env/deploy matrix.
+- Fills `larv-architecture` with concrete package propagation from `library-decisions.md` into `package-integration-matrix.md` and ADRs.
+- Fills `larv-tests` with package-specific test obligations for Filament/Nova, auth, Horizon, Reverb, Pulse/Telescope, Octane, Cashier, tenancy, Scout/search, uploads, and notifications.
+- Strengthens `larv-plan` so every approved Laravel package must appear in at least one implementation slice or be explicitly deferred by ADR.
+- Strengthens `larv-adopt` to detect installed Laravel packages from `composer.json`, config, routes, providers, app folders, migrations, and test tooling.
+
 ## 0.4.4 (next) - Runtime guides and production handoff
 
 - Adds generated handoff guides for production deployment, environment variables, and user operations: `docs/Handsoff/production-deploy.md`, `docs/Handsoff/env-guide.md`, and `docs/Handsoff/operations-guide.md`.

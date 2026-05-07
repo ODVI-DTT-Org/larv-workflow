@@ -48,6 +48,7 @@ Layer 2 adds richer per-phase content:
 - **Phase 3 (Design)** asks you to browse https://getdesign.md/ in your own browser and pick >=3 designs. The agent then renders your app's screens in each picked style and serves a comparison harness at `http://31.220.79.31:<port>` so you can pick one or merge two.
 - **Phase 6.5 (Doc-site)** spins up a Docsify-rendered version of your entire plan at `http://31.220.79.31:<port>` for a final read-through before implementation begins.
 - **Handoff runtime guides** generate sandbox, production deployment, environment, and operations docs under `docs/Handsoff/`. Production defaults are Laravel Cloud for hosting and Namecheap for DNS.
+- **Laravel package matrix** turns selected packages like Filament, Sanctum/Fortify, Horizon, Cashier, tenancy, Scout, Pulse/Telescope, Octane, Reverb, uploads, and notifications into required architecture notes, tests, slices, env vars, and deployment notes.
 
 ## Installation
 
