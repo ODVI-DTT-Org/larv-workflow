@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.11 (next) - PRD-assisted DDD interview guard
+
+- Clarifies that a complete PRD reduces Phase 0a question count but never replaces the DDD interview.
+- Adds PRD-assisted interview mode: summarize inferred business answers, then ask at least five targeted confirmation or gap questions before completing Phase 0a.
+- Prevents `status: complete` for the domain interview until the user answers those targeted questions or explicitly accepts all inferred answers.
+
 ## 0.4.10 (next) - Full-flow interruption hardening
 
 - Slugifies human project names before writing `STATE.yaml`, preventing spaces and punctuation from leaking into paths, database names, URLs, and generated handoff files.

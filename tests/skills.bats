@@ -127,6 +127,14 @@ yaml.safe_load(parts[1])
     grep -qi "tech-leak guard" skills/larv-domain-interview/SKILL.md
 }
 
+@test "larv-domain-interview does not skip questions when PRD is provided" {
+    grep -q "PRD-assisted interview mode" skills/larv-domain-interview/SKILL.md
+    grep -q "A PRD reduces question count; it never replaces the interview" skills/larv-domain-interview/SKILL.md
+    grep -q "inferred answers" skills/larv-domain-interview/SKILL.md
+    grep -q "at least 5 targeted confirmation or gap questions" skills/larv-domain-interview/SKILL.md
+    grep -q "Do not return status: complete" skills/larv-domain-interview/SKILL.md
+}
+
 @test "larv-discuss SKILL.md is no longer a stub" {
     ! grep -q "STUB — sub-project A scaffolding only" skills/larv-discuss/SKILL.md
     grep -q "Filament" skills/larv-discuss/SKILL.md
