@@ -188,6 +188,10 @@ yaml.safe_load(parts[1])
     grep -q "runtime_gate_require_phase_url . docsite" skills/larv-docsite/SKILL.md
     grep -q "docs/Handsoff.md" skills/larv-docsite/SKILL.md
     grep -q "docs/Handsoff/" skills/larv-docsite/SKILL.md
+    grep -q "README.md" skills/larv-docsite/SKILL.md
+    grep -q "_sidebar.md" skills/larv-docsite/SKILL.md
+    grep -q "https://cdn.jsdelivr.net/npm/docsify@4" skills/larv-docsite/SKILL.md
+    grep -q "homepage: 'README.md'" skills/larv-docsite/SKILL.md
     grep -q "docsite_root=\"/tmp/larv-" skills/larv-docsite/SKILL.md
     ! grep -q "/srv/larv/.*/docsite" skills/larv-docsite/SKILL.md
     grep -q "static_server_open_firewall" skills/larv-docsite/SKILL.md

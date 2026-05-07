@@ -133,3 +133,23 @@ EOF
     grep -q "bootstrap-sandbox.md" "$TMP/.cursor/rules/larv.mdc"
     grep -q "bootstrap-sandbox.md" "$TMP/.codex/AGENTS.md"
 }
+
+@test "handsoff_render_starting_points writes validated non-empty bodies" {
+    bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_starting_points '$TMP'"
+    for f in "$TMP/CLAUDE.md" "$TMP/AGENTS.md" "$TMP/GEMINI.md" \
+             "$TMP/.cursor/rules/larv.mdc" "$TMP/.codex/AGENTS.md"; do
+        [ "$(wc -c < "$f")" -gt 500 ] || { echo "too small: $f"; return 1; }
+        grep -q "docs/Handsoff.md" "$f" || { echo "missing handoff reference: $f"; return 1; }
+        grep -q "bootstrap-sandbox.md" "$f" || { echo "missing bootstrap reference: $f"; return 1; }
+    done
+}
+
+@test "handsoff_render_starting_points does not overwrite files when template is missing" {
+    plugin_copy="$BATS_TEST_TMPDIR/plugin-copy"
+    cp -R "$PROJECT_ROOT" "$plugin_copy"
+    rm -f "$plugin_copy/templates/ai-starting-point.md.tmpl"
+    printf "keep me\n" > "$TMP/CLAUDE.md"
+    run bash -c "source $plugin_copy/scripts/lib/handsoff.sh && handsoff_render_starting_points '$TMP'"
+    [ "$status" -ne 0 ]
+    [ "$(cat "$TMP/CLAUDE.md")" = "keep me" ]
+}

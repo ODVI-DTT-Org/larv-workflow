@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.13 (next) - Doc-site and handoff render hardening
+
+- Fixes Docsify review sites that could stay stuck on `Loading...` by always generating a root `README.md`, `_sidebar.md`, explicit HTTPS CDN URLs, and a served markdown probe.
+- Hardens AI starting-point generation so missing or empty templates fail instead of overwriting `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `.codex/AGENTS.md`, or Cursor rules with comment-only files.
+- Adds regression coverage for non-empty handoff starting-point bodies and no-overwrite behavior on render failure.
+
 ## 0.4.12 (next) - Parallel port reservation hardening
 
 - Adds VM-local port reservations under a shared flock so parallel larv runs cannot choose the same app, mockup, or doc-site port before servers bind.

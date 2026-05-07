@@ -1,7 +1,7 @@
 {
   "name": "larv",
   "description": "AI-driven Laravel app development plugin orchestrating masterplan, superpowers-laravel, domain-driven-design, and huashu-design into an end-to-end workflow.",
-  "version": "0.4.12",
+  "version": "0.4.13",
   "author": {
     "name": "your-org",
     "url": "https://github.com/your-org/larv"
