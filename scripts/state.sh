@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 usage() {
     cat <<EOF
 Usage: state.sh <command> <project-dir> [args...]
@@ -23,9 +25,25 @@ now_iso() {
     date -u +"%Y-%m-%dT%H:%M:%SZ"
 }
 
+yaml_double_quote() {
+    local value="$1"
+    value="${value//\\/\\\\}"
+    value="${value//\"/\\\"}"
+    printf '"%s"' "$value"
+}
+
+plugin_version() {
+    yq -r '.version // "0.0.0"' "$PLUGIN_ROOT/.claude-plugin/plugin.json" 2>/dev/null || echo "0.0.0"
+}
+
 slug_from_name() {
     local name="$1"
-    printf "%s-%s" "$name" "$(date -u +"%Y-%m")"
+    local base
+    base="$(printf "%s" "$name" \
+        | tr '[:upper:]' '[:lower:]' \
+        | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//; s/-+/-/g')"
+    [ -n "$base" ] || base="larv-app"
+    printf "%s-%s" "$base" "$(date -u +"%Y-%m")"
 }
 
 cmd_init() {
@@ -51,18 +69,23 @@ cmd_init() {
     now="$(now_iso)"
     slug="$(slug_from_name "$name")"
 
+    local quoted_name quoted_slug pver
+    quoted_name="$(yaml_double_quote "$name")"
+    quoted_slug="$(yaml_double_quote "$slug")"
+    pver="$(plugin_version)"
+
     cat >"$sp" <<EOF
 schema_version: 1
 project:
-  name: $name
-  slug: $slug
+  name: $quoted_name
+  slug: $quoted_slug
   greenfield: $greenfield
   mode: $mode
   started_at: "$now"
   last_updated_at: "$now"
 plugin:
   name: larv
-  version: 0.1.0
+  version: "$pver"
   bundle_versions:
     masterplan: "0.0.0"
     superpowers-laravel: "0.0.0"

@@ -156,6 +156,11 @@ yaml.safe_load(parts[1])
     grep -q "mockup_url: \"http://31.220.79.31:<port>/\"" skills/larv-design/SKILL.md
     grep -q "static_server_check_remote_deps" skills/larv-design/SKILL.md
     grep -q "runtime_gate_require_phase_url . design" skills/larv-design/SKILL.md
+    grep -q "mockups_dir" skills/larv-design/SKILL.md
+    ! grep -q "/srv/larv/.*/mockups" skills/larv-design/SKILL.md
+    grep -q "static_server_open_firewall" skills/larv-design/SKILL.md
+    grep -q "refusing to announce local-only mockup URL" skills/larv-design/SKILL.md
+    grep -q "http://31.220.79.31:<port>/" skills/larv-design/SKILL.md
 }
 
 @test "larv-docsite SKILL.md exists for Phase 6.5" {
@@ -175,6 +180,11 @@ yaml.safe_load(parts[1])
     grep -q "runtime_gate_require_phase_url . docsite" skills/larv-docsite/SKILL.md
     grep -q "docs/Handsoff.md" skills/larv-docsite/SKILL.md
     grep -q "docs/Handsoff/" skills/larv-docsite/SKILL.md
+    grep -q "docsite_root=\"/tmp/larv-" skills/larv-docsite/SKILL.md
+    ! grep -q "/srv/larv/.*/docsite" skills/larv-docsite/SKILL.md
+    grep -q "static_server_open_firewall" skills/larv-docsite/SKILL.md
+    grep -q "refusing to announce local-only doc-site URL" skills/larv-docsite/SKILL.md
+    grep -q "http://31.220.79.31:<port>/" skills/larv-docsite/SKILL.md
 }
 
 @test "larv-provision redirects active sandbox startup to handoff bootstrap" {
@@ -206,6 +216,8 @@ yaml.safe_load(parts[1])
     grep -q "docsite_url" skills/larv-orchestrator/SKILL.md
     ! grep -q "sandbox_url" skills/larv-orchestrator/SKILL.md
     grep -q "treat the phase as failed" skills/larv-orchestrator/SKILL.md
+    grep -q "127.0.0.1" skills/larv-orchestrator/SKILL.md
+    grep -q "firewall handling" skills/larv-orchestrator/SKILL.md
 }
 
 @test "larv-orchestrator shows handoff paths before execution routing" {

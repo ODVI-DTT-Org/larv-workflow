@@ -52,7 +52,7 @@ Required runtime fields:
 | 3 | `larv-design` | `mockup_url` | `docs/larv/03-design/mockup-url.txt` |
 | 6.5 | `larv-docsite` | `docsite_url` | `docs/larv/docsite-url.txt` |
 
-Each URL must start with `http://31.220.79.31:` and must only be accepted after the phase subagent reports both inside-VM and outside probe success. Missing URL, missing artifact, `null`, `TBD`, or "skipped" means failure.
+Each URL must start with `http://31.220.79.31:` and must only be accepted after the phase subagent reports firewall handling plus both inside-VM and outside probe success. Missing URL, missing artifact, `null`, `TBD`, `127.0.0.1`, `localhost`, or "skipped" means failure.
 
 ## Phase sequence (greenfield)
 

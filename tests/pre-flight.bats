@@ -27,6 +27,15 @@ teardown() { teardown_tmp_project "$TMP"; }
     [ "$status" -eq 0 ]
 }
 
+@test "pre-flight report uses current plugin version" {
+    bash scripts/pre-flight.sh "$TMP" my-app greenfield
+    local expected
+    expected="$(yq -r '.version' .claude-plugin/plugin.json)"
+    grep -q "Plugin: larv $expected" "$TMP/docs/larv/pre-flight.md"
+    run yq -r '.plugin.version' "$TMP/docs/larv/STATE.yaml"
+    [ "$output" = "$expected" ]
+}
+
 @test "pre-flight reports bundle and MCP checks" {
     run bash scripts/pre-flight.sh "$TMP" my-app greenfield
     [ "$status" -eq 0 ]

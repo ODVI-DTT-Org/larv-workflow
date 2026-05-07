@@ -21,6 +21,10 @@ read_bundle_version() {
     fi
 }
 
+read_plugin_version() {
+    yq -r '.version // "0.0.0"' "$PLUGIN_ROOT/.claude-plugin/plugin.json" 2>/dev/null || echo "0.0.0"
+}
+
 vm_runtime_check() {
     local ssh_target="${LARV_VM_HOST_SSH_USER:-claude-team}@${LARV_VM_HOST:-31.220.79.31}"
     local required="php tmux curl"
@@ -91,6 +95,10 @@ main() {
     bh="$(read_bundle_version huashu-design)"
     bash "$PLUGIN_ROOT/scripts/state.sh" update "$dir" \
         ".plugin.bundle_versions = {\"masterplan\": \"$bm\", \"superpowers-laravel\": \"$bs\", \"domain-driven-design\": \"$bd\", \"huashu-design\": \"$bh\"}"
+    local pv
+    pv="$(read_plugin_version)"
+    bash "$PLUGIN_ROOT/scripts/state.sh" update "$dir" \
+        ".plugin.version = \"$pv\""
     bash "$PLUGIN_ROOT/scripts/state.sh" update "$dir" \
         ".budget.estimated_total = {\"tokens\": $DEFAULT_BUDGET_TOKENS, \"minutes\": $DEFAULT_BUDGET_MINUTES, \"cost_usd\": $DEFAULT_BUDGET_COST}"
 
@@ -99,7 +107,7 @@ main() {
 
 Project: $name
 Mode: $mode
-Plugin: larv 0.1.0
+Plugin: larv $pv
 Bundle versions:
   - masterplan: $bm
   - superpowers-laravel: $bs

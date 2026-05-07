@@ -23,4 +23,6 @@ load helpers
     grep -q "hooks" README.md
     grep -q "Codex CLI" README.md
     grep -q "package-guide.md" README.md
+    grep -q "http://31.220.79.31:<port>" README.md
+    grep -q 'never `127.0.0.1` or `localhost`' README.md
 }

@@ -6,6 +6,8 @@ alwaysApply: true
 
 This project is managed by the larv plugin. See `docs/Handsoff.md` for the execution contract. Before the first slice, run `docs/Handsoff/bootstrap-sandbox.md` top to bottom. Execute slices from `docs/Handsoff/slice-NN-*.md` only — never improvise.
 
+Runtime mode is local on the sandbox VM. Do not SSH to `{{vm_host}}` for the normal larv flow.
+
 Probe-before-announce: never claim a service is running until curl confirms it. Append a tracker entry to `docs/larv/implementation-tracker.yaml` after every change.
 
 Code conventions: Pint formatting, Pest tests, Larastan static analysis. Use the canonical ubiquitous-language terms from `docs/larv/01-domain/ubiquitous-language.md`.

@@ -25,7 +25,7 @@ Keep this skill only as a reference for the required invariants in the bootstrap
 - Allocate a free app port from the app range.
 - Open the selected app port in the VM firewall before the external probe.
 - Allocate a database name from the project slug.
-- Copy the project to the local VM project root.
+- Use the current project directory as the local VM project root.
 - Run `docs/larv/07-runtime/deploy-sandbox.sh` locally with `APP_PORT` and `DB_DATABASE`.
 - Probe the app from inside the VM before any announcement.
 - Probe the external app URL before any announcement.

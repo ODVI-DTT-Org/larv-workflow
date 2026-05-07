@@ -45,8 +45,8 @@ Layer 2 adds richer per-phase content:
 - **Phase 0a** runs a business-process DDD interview before tech is discussed. Tech mentions are politely tabled.
 - **Phase 0 (Discuss)** uses the DDD interview to ground every Laravel ecosystem question. Descriptions and recommendations cite your own answers.
 - **Phase 1 (Domain)** WebFetches a current Laravel-DDD reference and produces either a full DDD layout or a flat Eloquent model based on a viability gate.
-- **Phase 3 (Design)** asks you to browse https://getdesign.md/ in your own browser and pick >=3 designs. The agent then renders your app's screens in each picked style and serves a comparison harness at `http://31.220.79.31:<port>` so you can pick one or merge two.
-- **Phase 6.5 (Doc-site)** spins up a Docsify-rendered version of your entire plan at `http://31.220.79.31:<port>` for a final read-through before implementation begins.
+- **Phase 3 (Design)** asks you to browse https://getdesign.md/ in your own browser and pick >=3 designs. The agent then renders your app's screens in each picked style, opens the VM firewall port, externally probes it, and serves a comparison harness at `http://31.220.79.31:<port>` so you can pick one or merge two.
+- **Phase 6.5 (Doc-site)** spins up a Docsify-rendered version of your entire plan at `http://31.220.79.31:<port>` for a final read-through before implementation begins. The URL is only announced after the VM firewall and external probe pass.
 - **Handoff runtime guides** generate sandbox, production deployment, environment, and operations docs under `docs/Handsoff/`. Production defaults are Laravel Cloud for hosting and Namecheap for DNS.
 - **Laravel package matrix** turns selected packages like Filament, Sanctum/Fortify, Horizon, Cashier, tenancy, Scout, Pulse/Telescope, Octane, Reverb, uploads, and notifications into required architecture notes, tests, slices, env vars, and deployment notes.
 
@@ -62,7 +62,7 @@ After install, `/larv:status` works in any directory. New projects default to `d
 
 1. Install or update the plugin, then restart Claude Code.
 2. Run `/larv:full Create a loan approval system` in Claude Code.
-3. Review each phase, including the mockup server and doc-site URL.
+3. Review each phase, including the mockup server and doc-site URL. Runtime URLs must be public VM URLs like `http://31.220.79.31:<port>`, never `127.0.0.1` or `localhost`.
 4. At the routing menu, choose `handoff` if another tool will implement.
 5. In Codex CLI, ask it to read `docs/Handsoff.md`.
 6. Codex runs `docs/Handsoff/bootstrap-sandbox.md`, then implements `docs/Handsoff/slice-NN-*.md`.
@@ -299,7 +299,7 @@ Subagent spawned (fresh context, budget 60min, $5)
   → invokes superpowers-laravel:laravel-form-requests (contextual)
   → writes: 14 files (User model, RegisterController, LoginController,
             ProfileController, 8 Pest tests, 2 Playwright tests, 1 migration)
-  → copies to /srv/larv/todo-app-2026-05/app/
+  → works in the current project root
   → runs: docker compose exec app php artisan migrate
   → runs: docker compose exec app php artisan test --parallel
                                                   ✅ 8/8 passing
@@ -674,7 +674,7 @@ Walkthrough:
 
 ## Sandbox controls
 Runtime: local on the sandbox VM
-Logs:   docker compose -f /srv/todo-app-2026-05/docker-compose.yml logs -f app
+Logs:   docker compose logs -f app
 Reset:  docker compose exec app php artisan migrate:fresh --seed
 
 ## Tests

@@ -74,7 +74,10 @@ static_server_open_firewall() {
     local ssh_target="$1" port="$2"
     [ -n "$port" ] || { echo "ERROR: port required" >&2; return 1; }
     if [ "${LARV_RUNTIME_MODE:-local}" = "local" ]; then
-        if command -v ufw >/dev/null; then sudo ufw allow "$port/tcp" >/dev/null; fi
+        if command -v ufw >/dev/null; then
+            sudo ufw allow "$port/tcp" >/dev/null
+            sudo ufw status | grep -q "$port/tcp"
+        fi
         return
     fi
     [ -n "$ssh_target" ] || { echo "ERROR: ssh_target required" >&2; return 1; }

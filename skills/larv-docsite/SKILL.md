@@ -32,7 +32,8 @@ Runs automatically after `larv-handoff`, before the Phase 8 routing menu, so the
 
 slug=$(yq -r .project.slug docs/larv/STATE.yaml)
 ssh_target="${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}"
-project_root="/srv/larv/$slug"
+project_root="$(pwd -P)"
+docsite_root="/tmp/larv-$slug-docsite"
 if ! static_server_check_remote_deps "$ssh_target"; then
     echo "ERROR: runtime missing required static-server tools: php, tmux, or curl" >&2
     exit 1
@@ -44,18 +45,19 @@ bash scripts/state.sh record-allocation . docsite-port "$docsite_port"
 static_server_open_firewall "$ssh_target" "$docsite_port"
 
 # 2. Stage docs/larv plus generated handoff docs and a Docsify index.html on the local VM
-mkdir -p "$project_root/docsite"
+rm -rf "$docsite_root"
+mkdir -p "$docsite_root"
 if command -v rsync >/dev/null; then
-    rsync -a docs/larv/ "$project_root/docsite/"
-    rsync -a docs/Handsoff.md "$project_root/docsite/Handsoff.md"
-    rsync -a docs/Handsoff/ "$project_root/docsite/Handsoff/"
+    rsync -a docs/larv/ "$docsite_root/"
+    rsync -a docs/Handsoff.md "$docsite_root/Handsoff.md"
+    rsync -a docs/Handsoff/ "$docsite_root/Handsoff/"
 else
-    cp -R docs/larv/. "$project_root/docsite/"
-    cp docs/Handsoff.md "$project_root/docsite/Handsoff.md"
-    mkdir -p "$project_root/docsite/Handsoff"
-    cp -R docs/Handsoff/. "$project_root/docsite/Handsoff/"
+    cp -R docs/larv/. "$docsite_root/"
+    cp docs/Handsoff.md "$docsite_root/Handsoff.md"
+    mkdir -p "$docsite_root/Handsoff"
+    cp -R docs/Handsoff/. "$docsite_root/Handsoff/"
 fi
-cat > "$project_root/docsite/index.html" <<'HTML'
+cat > "$docsite_root/index.html" <<'HTML'
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>larv plan</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -73,7 +75,7 @@ cat > "$project_root/docsite/index.html" <<'HTML'
 HTML
 
 # 3. Start static server. Docsify is client-side only; static server is enough.
-static_server_start "$ssh_target" "$docsite_port" "$project_root/docsite" \
+static_server_start "$ssh_target" "$docsite_port" "$docsite_root" \
     "larv-docsite-$slug"
 
 # 4. Probe-before-announce
@@ -82,6 +84,12 @@ if ! probe_url_inside "$ssh_target" "$docsite_port" static; then
     exit 1
 fi
 docsite_url="$(static_server_url "$docsite_port")/"
+case "$docsite_url" in
+    http://127.0.0.1:*|http://localhost:*)
+        echo "ERROR: refusing to announce local-only doc-site URL: $docsite_url" >&2
+        exit 1
+        ;;
+esac
 if ! probe_with_retries "$docsite_url" static; then
     echo "ERROR: external probe failed" >&2
     exit 1
@@ -99,8 +107,9 @@ The doc-site server is not optional. Do not advance to the Phase 8 routing menu,
 
 - `docsite_port` was allocated through `allocate_port docsite` and recorded as `docsite-port` in `STATE.yaml.execution.allocations`.
 - `static_server_check_remote_deps "$ssh_target"` passed for `php`, `tmux`, and `curl` on the local VM runtime.
-- `docs/larv/` was copied to `$project_root/docsite` on the local VM.
-- `docs/Handsoff.md` and `docs/Handsoff/` were copied to `$project_root/docsite` on the local VM.
+- `static_server_open_firewall "$ssh_target" "$docsite_port"` succeeded or no local `ufw` is installed.
+- `docs/larv/` was copied to `$docsite_root` on the local VM.
+- `docs/Handsoff.md` and `docs/Handsoff/` were copied to `$docsite_root` on the local VM.
 - Docsify `index.html` was written on the local VM.
 - `static_server_start` succeeded.
 - `probe_url_inside "$ssh_target" "$docsite_port" static` succeeded.
@@ -132,6 +141,7 @@ Stays up through the Phase 8 routing menu and handoff decision. Released after t
 
 - Do not modify any `docs/larv/` content. This skill is read-only on the plan.
 - Do not announce the URL until both probes succeed.
+- Do not announce `127.0.0.1` or `localhost`; always print the external URL `http://31.220.79.31:<port>/`.
 - Do not mark Phase 6.5 complete without a probe-confirmed `docsite_url`.
 - Do not require the user to install anything on their machine. The doc-site loads Docsify from CDN in their browser.
 

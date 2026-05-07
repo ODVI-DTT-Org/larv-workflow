@@ -28,6 +28,8 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "handoff" templates/happy-path.md.tmpl
     grep -q "Codex CLI" templates/happy-path.md.tmpl
     grep -q "Laravel Cloud" templates/happy-path.md.tmpl
+    grep -q "http://31.220.79.31:<port>" templates/happy-path.md.tmpl
+    grep -q "127.0.0.1" templates/happy-path.md.tmpl
 }
 
 @test "slice-handoff has Plugin Improvement Notes section" {
@@ -62,7 +64,8 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "docs/larv/07-runtime/deploy-sandbox.sh" templates/bootstrap-sandbox.md.tmpl
     grep -q "docs/larv/07-runtime/sandbox-url.txt" templates/bootstrap-sandbox.md.tmpl
     grep -q "ufw allow" templates/bootstrap-sandbox.md.tmpl
-    grep -q "export APP_PORT DB_NAME PROJECT_ROOT APP_URL" templates/bootstrap-sandbox.md.tmpl
+    grep -q "ufw status" templates/bootstrap-sandbox.md.tmpl
+    grep -q "export APP_PORT DB_NAME PROJECT_ROOT APP_ROOT APP_URL" templates/bootstrap-sandbox.md.tmpl
     grep -q "DB_CONNECTION" templates/bootstrap-sandbox.md.tmpl
     grep -q "createdb" templates/bootstrap-sandbox.md.tmpl
     grep -q "CREATE DATABASE" templates/bootstrap-sandbox.md.tmpl
@@ -70,6 +73,11 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "Sandbox ready at" templates/bootstrap-sandbox.md.tmpl
     grep -q "LARV_RUNTIME_MODE" templates/bootstrap-sandbox.md.tmpl
     grep -q "Do not SSH" templates/bootstrap-sandbox.md.tmpl
+    grep -q 'PROJECT_ROOT="$(pwd -P)"' templates/bootstrap-sandbox.md.tmpl
+    grep -q 'APP_URL="http://$VM_HOST:$APP_PORT/"' templates/bootstrap-sandbox.md.tmpl
+    grep -q "refusing to announce local-only URL" templates/bootstrap-sandbox.md.tmpl
+    grep -q "external app probe failed" templates/bootstrap-sandbox.md.tmpl
+    ! grep -q "copy the project into" templates/bootstrap-sandbox.md.tmpl
     ! grep -q "ssh -o BatchMode" templates/bootstrap-sandbox.md.tmpl
 }
 

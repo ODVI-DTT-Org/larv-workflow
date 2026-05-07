@@ -72,3 +72,23 @@ EOF
     PATH="$BIN:$PATH" run bash -c "export LARV_RUNTIME_MODE=remote; source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_open_firewall user@example.test 9000"
     [ "$status" -ne 0 ]
 }
+
+@test "static_server_open_firewall confirms local ufw rule when ufw exists" {
+    cat > "$BIN/ufw" <<'EOF'
+#!/usr/bin/env bash
+case "$1" in
+    allow) echo "$2" > "$LARV_TEST_UFW_RULE_FILE"; exit 0 ;;
+    status) printf "%s ALLOW Anywhere\n" "$(cat "$LARV_TEST_UFW_RULE_FILE")"; exit 0 ;;
+    *) exit 1 ;;
+esac
+EOF
+    cat > "$BIN/sudo" <<'EOF'
+#!/usr/bin/env bash
+exec "$@"
+EOF
+    chmod +x "$BIN/ufw" "$BIN/sudo"
+    export LARV_TEST_UFW_RULE_FILE="$BATS_TEST_TMPDIR/ufw-rule"
+    PATH="$BIN:$PATH" run bash -c "source $PROJECT_ROOT/scripts/lib/vm.sh && source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_open_firewall ignored 9000"
+    [ "$status" -eq 0 ]
+    [ "$(cat "$LARV_TEST_UFW_RULE_FILE")" = "9000/tcp" ]
+}

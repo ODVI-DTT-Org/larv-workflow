@@ -18,5 +18,8 @@ load helpers
     grep -q "Filament" "$TMP/docs/Handsoff/package-guide.md"
     grep -q "Horizon" "$TMP/docs/larv/02-architecture/package-integration-matrix.md"
     grep -q "slice-01-foundation" "$TMP/docs/larv/06-implementation/elephant-carpaccio.md"
+    grep -q "loan-approval-system-" "$TMP/docs/Handsoff.md"
+    ! grep -q "loan approval system-" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+    grep -q "cd $TMP" "$TMP/docs/Handsoff/slice-01-foundation.md"
     teardown_tmp_project "$TMP"
 }

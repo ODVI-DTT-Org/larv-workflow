@@ -70,15 +70,12 @@ Invoke the bundled `huashu-design` skill for each pick (`bundle/huashu-design/SK
 . scripts/lib/runtime_gate.sh
 
 slug=$(yq -r .project.slug docs/larv/STATE.yaml)
-mkdir -p "/srv/larv/$slug/mockups"
-if command -v rsync >/dev/null; then
-    rsync -a docs/larv/03-design/mockups/ "/srv/larv/$slug/mockups/"
-else
-    cp -R docs/larv/03-design/mockups/. "/srv/larv/$slug/mockups/"
-fi
+project_root="$(pwd -P)"
+mockups_dir="$project_root/docs/larv/03-design/mockups"
+test -d "$mockups_dir"
 
 static_server_start "$ssh_target" "$mockup_port" \
-    "/srv/larv/$slug/mockups" \
+    "$mockups_dir" \
     "larv-mockups-$slug"
 
 if ! probe_url_inside "$ssh_target" "$mockup_port" static; then
@@ -86,6 +83,12 @@ if ! probe_url_inside "$ssh_target" "$mockup_port" static; then
     exit 1
 fi
 mockup_url="$(static_server_url "$mockup_port")/"
+case "$mockup_url" in
+    http://127.0.0.1:*|http://localhost:*)
+        echo "ERROR: refusing to announce local-only mockup URL: $mockup_url" >&2
+        exit 1
+        ;;
+esac
 if ! probe_with_retries "$mockup_url" static; then
     echo "ERROR: external probe failed" >&2
     exit 1
@@ -102,7 +105,8 @@ The mockup server is not optional. Do not proceed to brand finalization, `design
 - At least one HTML mockup exists under `docs/larv/03-design/mockups/`.
 - `mockup_port` was allocated through `allocate_port mockup` and recorded as `mockup-port` in `STATE.yaml.execution.allocations`.
 - `static_server_check_remote_deps "$ssh_target"` passed for `php`, `tmux`, and `curl` on the local VM runtime.
-- The mockups were copied to `/srv/larv/<slug>/mockups` on the local VM.
+- `static_server_open_firewall "$ssh_target" "$mockup_port"` succeeded or no local `ufw` is installed.
+- The mockups are served from `docs/larv/03-design/mockups` in the current project.
 - `static_server_start` succeeded.
 - `probe_url_inside "$ssh_target" "$mockup_port" static` succeeded.
 - `probe_with_retries "$mockup_url" static` succeeded.
@@ -147,6 +151,7 @@ safe_commit_docs "[larv] phase 3: design approved (pick=$(grep -oE 'pick: [^ ]+'
 
 - Do not WebFetch from getdesign.md before the user provides explicit picks.
 - Do not announce the mockup URL until both inside and outside probes succeed.
+- Do not announce `127.0.0.1` or `localhost`; always print the external URL `http://31.220.79.31:<port>/`.
 - Do not pick the design for the user. Provide recommendations, never decisions.
 - Do not mark Phase 3 complete without a probe-confirmed `mockup_url`.
 

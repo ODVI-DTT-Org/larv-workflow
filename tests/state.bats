@@ -26,6 +26,23 @@ teardown() {
     [[ "$output" =~ ^my-app-[0-9]{4}-[0-9]{2}$ ]]
 }
 
+@test "state init slugifies human project names safely" {
+    bash scripts/state.sh init "$TMP" "Loan Approval System!" greenfield
+    run yq -r '.project.name' "$TMP/docs/larv/STATE.yaml"
+    [ "$output" = "Loan Approval System!" ]
+    run yq -r '.project.slug' "$TMP/docs/larv/STATE.yaml"
+    [[ "$output" =~ ^loan-approval-system-[0-9]{4}-[0-9]{2}$ ]]
+    [[ "$output" != *" "* ]]
+}
+
+@test "state init safely quotes project names with punctuation" {
+    bash scripts/state.sh init "$TMP" 'Loan "VIP" Approval: System' greenfield
+    run yq -r '.project.name' "$TMP/docs/larv/STATE.yaml"
+    [ "$output" = 'Loan "VIP" Approval: System' ]
+    run yq -r '.project.slug' "$TMP/docs/larv/STATE.yaml"
+    [[ "$output" =~ ^loan-vip-approval-system-[0-9]{4}-[0-9]{2}$ ]]
+}
+
 @test "state init refuses to overwrite existing STATE.yaml" {
     bash scripts/state.sh init "$TMP" my-app greenfield
     run bash scripts/state.sh init "$TMP" my-app greenfield
@@ -38,6 +55,14 @@ teardown() {
     [ "$output" = "false" ]
     run yq -r '.project.mode' "$TMP/docs/larv/STATE.yaml"
     [ "$output" = "adopted" ]
+}
+
+@test "state init records current plugin version" {
+    bash scripts/state.sh init "$TMP" my-app greenfield
+    local expected
+    expected="$(yq -r '.version' .claude-plugin/plugin.json)"
+    run yq -r '.plugin.version' "$TMP/docs/larv/STATE.yaml"
+    [ "$output" = "$expected" ]
 }
 
 @test "state read returns the YAML" {

@@ -53,7 +53,7 @@ Do not leave a selected package as an architecture-only decision. If there is no
 
 `docs/larv/07-runtime/deploy-sandbox.sh` is required. Handoff bootstrap refuses to start the app sandbox without it.
 
-The script runs locally on the VM from `/srv/larv/<slug>/app` and must:
+The script runs locally on the VM from the current project root and must:
 
 - Use `APP_PORT` from the environment.
 - Use `DB_DATABASE` from the environment when database configuration is needed.

@@ -39,7 +39,6 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
         bash '"$PROJECT_ROOT"'/scripts/state.sh record-allocation "." app-port 8001
         bash '"$PROJECT_ROOT"'/scripts/state.sh record-allocation "." mockup-port 9001
         bash '"$PROJECT_ROOT"'/scripts/state.sh record-allocation "." db-name larv_todo_app_2026_05
-        bash '"$PROJECT_ROOT"'/scripts/state.sh record-allocation "." project-root /srv/larv/todo-app-2026-05
 
         handsoff_render_index "."
         handsoff_render_bootstrap_sandbox "."
@@ -85,6 +84,7 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
     grep -q "Bootstrap Sandbox" docs/Handsoff/bootstrap-sandbox.md
     grep -q "Laravel Cloud" docs/Handsoff/production-deploy.md
     grep -q "Namecheap" docs/Handsoff/production-deploy.md
+    grep -q "cd $REPO" docs/Handsoff/slice-01-auth-scaffold.md
 
     # Starting-point files all reference Handsoff.md
     grep -q "Handsoff.md" CLAUDE.md

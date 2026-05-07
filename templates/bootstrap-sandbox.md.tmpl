@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Allocate local VM runtime resources, copy the project into `/srv/larv`, run `docs/larv/07-runtime/deploy-sandbox.sh`, probe the app from inside and outside the VM, then write the sandbox URL back into project docs. This assumes the AI is already running on the sandbox VM.
+Allocate local VM runtime resources, run `docs/larv/07-runtime/deploy-sandbox.sh` from the current project directory, probe the app from inside and outside the VM, then write the sandbox URL back into project docs. This assumes the AI is already running on the sandbox VM and that this file is being executed from the project root.
 
 ## Required local files
 
@@ -20,8 +20,8 @@ set -euo pipefail
 
 VM_HOST="{{vm_host}}"
 SLUG="{{project_slug}}"
-PROJECT_ROOT="/srv/larv/$SLUG"
-APP_ROOT="$PROJECT_ROOT/app"
+PROJECT_ROOT="$(pwd -P)"
+APP_ROOT="$PROJECT_ROOT"
 DB_NAME="larv_${SLUG//-/_}"
 DB_CONNECTION="${DB_CONNECTION:-mysql}"
 DB_HOST="${DB_HOST:-127.0.0.1}"
@@ -117,21 +117,18 @@ if [ -z "$APP_PORT" ]; then
     exit 1
 fi
 
-if command -v ufw >/dev/null; then sudo ufw allow "$APP_PORT/tcp" >/dev/null; fi
-
-mkdir -p "$APP_ROOT"
-if command -v rsync >/dev/null; then
-    rsync -a --delete \
-        --exclude .git \
-        --exclude docs/larv/07-runtime/sandbox-url.txt \
-        ./ "$APP_ROOT/"
+if command -v ufw >/dev/null; then
+    sudo ufw allow "$APP_PORT/tcp" >/dev/null
+    sudo ufw status | grep -q "$APP_PORT/tcp" || {
+        echo "ERROR: firewall rule for app port $APP_PORT was not confirmed" >&2
+        exit 1
+    }
 else
-    tar --exclude=.git --exclude=docs/larv/07-runtime/sandbox-url.txt -cf - . | tar -C "$APP_ROOT" -xf -
+    echo "WARN: ufw not installed; confirm provider firewall allows TCP $APP_PORT before sharing $APP_URL" >&2
 fi
 
 APP_URL="http://$VM_HOST:$APP_PORT/"
 upsert_env APP_URL "$APP_URL"
-cp .env "$APP_ROOT/.env"
 
 (cd "$APP_ROOT" && APP_PORT="$APP_PORT" DB_DATABASE="$DB_NAME" bash docs/larv/07-runtime/deploy-sandbox.sh)
 
@@ -157,6 +154,13 @@ for attempt in $(seq 1 6); do
     sleep 10
 done
 
+case "$APP_URL" in
+    http://127.0.0.1:*|http://localhost:*)
+        echo "ERROR: refusing to announce local-only URL: $APP_URL" >&2
+        exit 1
+        ;;
+esac
+
 mkdir -p docs/larv/07-runtime
 printf "%s\n" "$APP_URL" > docs/larv/07-runtime/sandbox-url.txt
 cat > docs/larv/07-runtime/sandbox-runbook.md <<EOF
@@ -172,12 +176,12 @@ Project root: $PROJECT_ROOT
 Runtime: local on $VM_HOST as $(whoami)
 EOF
 
-export APP_PORT DB_NAME PROJECT_ROOT APP_URL DB_CONNECTION DB_HOST DB_PORT DB_USERNAME
+export APP_PORT DB_NAME PROJECT_ROOT APP_ROOT APP_URL DB_CONNECTION DB_HOST DB_PORT DB_USERNAME
 yq -i '
   .execution.allocations += [
     {"kind":"app-port","value": strenv(APP_PORT)},
     {"kind":"db-name","value": strenv(DB_NAME)},
-    {"kind":"project-root","value": strenv(PROJECT_ROOT)}
+    {"kind":"project-root","value": strenv(APP_ROOT)}
   ] |
   .sandbox.app_url = strenv(APP_URL) |
   .sandbox.status = "provisioned" |

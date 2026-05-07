@@ -23,7 +23,8 @@ handsoff_collect_tokens() {
     git_sha="$(git -C "$dir" rev-parse --short HEAD 2>/dev/null || echo "uncommitted")"
     git_default_branch="$(git -C "$dir" symbolic-ref --short HEAD 2>/dev/null || echo "detached")"
 
-    local app_port mockup_port db_name project_root
+    local app_port mockup_port db_name project_root slug
+    slug="$(yq -r '.project.slug' "$sp")"
     app_port="$(yq -r '.execution.allocations[] | select(.kind == "app-port") | .value' "$sp" 2>/dev/null | head -1)"
     mockup_port="$(yq -r '.execution.allocations[] | select(.kind == "mockup-port") | .value' "$sp" 2>/dev/null | head -1)"
     db_name="$(yq -r '.execution.allocations[] | select(.kind == "db-name") | .value' "$sp" 2>/dev/null | head -1)"
@@ -46,7 +47,7 @@ handsoff_collect_tokens() {
     }
 
     __handsoff_token project_name "$(yq -r '.project.name' "$sp")"
-    __handsoff_token project_slug "$(yq -r '.project.slug' "$sp")"
+    __handsoff_token project_slug "$slug"
     __handsoff_token plugin_version "$plugin_version"
     __handsoff_token generated_at "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
     __handsoff_token git_sha "$git_sha"
@@ -57,9 +58,9 @@ handsoff_collect_tokens() {
     __handsoff_token mockup_port "${mockup_port:-TBD}"
     __handsoff_token db_name "${db_name:-TBD}"
     __handsoff_token db_user "${db_name:-TBD}"
-    __handsoff_token project_root "${project_root:-/srv/larv/$(yq -r '.project.slug' "$sp")}"
-    __handsoff_token redis_prefix "larv:$(yq -r '.project.slug' "$sp"):"
-    __handsoff_token ssh_key_path "~/.ssh/larv_$(yq -r '.project.slug' "$sp")_ed25519"
+    __handsoff_token project_root "${project_root:-$(cd "$dir" && pwd -P)}"
+    __handsoff_token redis_prefix "larv:$slug:"
+    __handsoff_token ssh_key_path "~/.ssh/larv_${slug}_ed25519"
     __handsoff_token mission_paragraph "See docs/larv/00-discuss/product-brief.md"
     __handsoff_token adr_aggregator_inlined "$(__handsoff_file_or_default "$dir/docs/larv/decisions.md" "_(no ADRs yet)_")"
     __handsoff_token ddd_model_inlined_or_flat_model "$(__handsoff_file_or_default "$dir/docs/larv/01-domain/domain-model.md" "_(domain model TBD)_")"

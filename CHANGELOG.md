@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.10 (next) - Full-flow interruption hardening
+
+- Slugifies human project names before writing `STATE.yaml`, preventing spaces and punctuation from leaking into paths, database names, URLs, and generated handoff files.
+- Safely quotes project names in `STATE.yaml`, including names with punctuation or quotes.
+- Records the current plugin version in `STATE.yaml` and pre-flight reports instead of the legacy `0.1.0` placeholder.
+- Keeps implementation slices rooted in the current project directory, so code edits, tracker updates, git commits, resume, and the sandbox process all operate on the same app tree.
+- Runs sandbox bootstrap directly from the current project root instead of copying the app to `/srv/larv`.
+- Serves mockups from the project docs and stages the Docsify review site under `/tmp`, avoiding `/srv` ownership and sudo failures during `/larv:full`.
+
 ## 0.4.9 (next) - Local VM runtime default
 
 - Changes the sandbox runtime model to default to local execution on the VM instead of SSHing to `31.220.79.31`.
