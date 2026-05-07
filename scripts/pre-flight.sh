@@ -21,6 +21,26 @@ read_bundle_version() {
     fi
 }
 
+vm_runtime_check() {
+    local ssh_target="${LARV_VM_HOST_SSH_USER:-larv}@${LARV_VM_HOST:-31.220.79.31}"
+    local required="php tmux curl rsync"
+    if [ "${LARV_PREFLIGHT_SKIP_VM_CHECK:-0}" = "1" ]; then
+        echo "  skipped (LARV_PREFLIGHT_SKIP_VM_CHECK=1)"
+        return 0
+    fi
+    if ! command -v ssh >/dev/null 2>&1; then
+        echo "  unknown: local ssh client not found"
+        return 0
+    fi
+    if ssh -o BatchMode=yes -o ConnectTimeout=5 "$ssh_target" \
+        "for tool in $required; do command -v \"\$tool\" >/dev/null || exit 10; done" \
+        >/dev/null 2>&1; then
+        echo "  ok: $ssh_target has $required"
+    else
+        echo "  warn: could not verify $required on $ssh_target"
+    fi
+}
+
 main() {
     [ "$#" -eq 3 ] || usage
     local dir="$1"
@@ -44,6 +64,10 @@ main() {
     done
     echo "MCP check:"
     echo "  context7 stub"
+    echo "VM runtime check:"
+    local vm_runtime
+    vm_runtime="$(vm_runtime_check)"
+    printf "%s\n" "$vm_runtime"
 
     bash "$PLUGIN_ROOT/scripts/state.sh" init "$dir" "$name" "$mode"
 
@@ -72,7 +96,8 @@ Bundle versions:
 Estimated budget: ~$DEFAULT_BUDGET_MINUTES min, ~\$$DEFAULT_BUDGET_COST
 Cap policy: pause_at_120pct
 
-This is a sub-project A stub. Full pre-flight checks are deferred.
+VM runtime check:
+$vm_runtime
 EOF
 
     echo "Project: $name"

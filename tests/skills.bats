@@ -26,7 +26,7 @@ SKILLS=(
 
 @test "every skill stub flags itself as a stub deferring to sub-project B" {
     for skill in larv-architecture \
-                 larv-tests larv-premortem larv-plan \
+                 larv-tests larv-premortem \
                  larv-verify larv-deploy larv-learn \
                  larv-adopt; do
         run grep -F "STUB" "skills/${skill}/SKILL.md"
@@ -64,6 +64,12 @@ yaml.safe_load(parts[1])
     ! grep -q "STUB — sub-project A scaffolding only" skills/larv-implement/SKILL.md
     grep -q "Handsoff/slice-NN" skills/larv-implement/SKILL.md
     grep -q "self-contained" skills/larv-implement/SKILL.md
+}
+
+@test "larv-plan SKILL.md is no longer a stub" {
+    ! grep -q "STUB — sub-project A scaffolding only" skills/larv-plan/SKILL.md
+    grep -q "Elephant Carpaccio" skills/larv-plan/SKILL.md
+    grep -q "deploy-sandbox.sh" skills/larv-plan/SKILL.md
 }
 
 @test "larv-implement does not reference plugin lib scripts" {
@@ -121,6 +127,8 @@ yaml.safe_load(parts[1])
     grep -q "status: failed" skills/larv-design/SKILL.md
     grep -q "Do not proceed to brand finalization" skills/larv-design/SKILL.md
     grep -q "mockup_url: \"http://31.220.79.31:<port>/\"" skills/larv-design/SKILL.md
+    grep -q "static_server_check_remote_deps" skills/larv-design/SKILL.md
+    grep -q "runtime_gate_require_phase_url . design" skills/larv-design/SKILL.md
 }
 
 @test "larv-docsite SKILL.md exists for Phase 6.5" {
@@ -136,6 +144,8 @@ yaml.safe_load(parts[1])
     grep -q "docsite_url" skills/larv-docsite/SKILL.md
     grep -q "status: failed" skills/larv-docsite/SKILL.md
     grep -q "docsite_url: \"http://31.220.79.31:<port>/\"" skills/larv-docsite/SKILL.md
+    grep -q "static_server_check_remote_deps" skills/larv-docsite/SKILL.md
+    grep -q "runtime_gate_require_phase_url . docsite" skills/larv-docsite/SKILL.md
 }
 
 @test "larv-provision makes sandbox URL a mandatory completion gate" {
@@ -143,6 +153,15 @@ yaml.safe_load(parts[1])
     grep -q "sandbox_url" skills/larv-provision/SKILL.md
     grep -q "status: failed" skills/larv-provision/SKILL.md
     grep -q "sandbox_url: \"http://31.220.79.31:<port>/\"" skills/larv-provision/SKILL.md
+    grep -q "deploy-sandbox.sh" skills/larv-provision/SKILL.md
+    grep -q "runtime_gate_require_phase_url . sandbox" skills/larv-provision/SKILL.md
+}
+
+@test "larv-plan requires deploy-sandbox script for Phase 7" {
+    grep -q "deploy-sandbox.sh" skills/larv-plan/SKILL.md
+    grep -q "executable" skills/larv-plan/SKILL.md
+    grep -q "APP_PORT" skills/larv-plan/SKILL.md
+    grep -q "DB_DATABASE" skills/larv-plan/SKILL.md
 }
 
 @test "larv-orchestrator describes Phase 0a and Phase 6.5 in greenfield sequence" {

@@ -23,10 +23,15 @@ Runs automatically after Phase 6 (Plan) approval, before the Phase 7 hard gate.
 . scripts/lib/verifier.sh
 . scripts/lib/probe.sh
 . scripts/lib/static_server.sh
+. scripts/lib/runtime_gate.sh
 
 slug=$(yq -r .project.slug docs/larv/STATE.yaml)
 ssh_target="${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}"
 project_root="/srv/larv/$slug"
+if ! static_server_check_remote_deps "$ssh_target"; then
+    echo "ERROR: VM missing required static-server tools: php, tmux, curl, or rsync" >&2
+    exit 1
+fi
 
 # 1. Allocate port from docsite range (9500-9999)
 docsite_port=$(allocate_port docsite)
@@ -60,16 +65,17 @@ static_server_start "$ssh_target" "$docsite_port" "$project_root/docsite" \
 # 4. Probe-before-announce
 if ! probe_url_inside "$ssh_target" "$docsite_port" static; then
     echo "ERROR: inside-VM probe failed for docsite port" >&2
-    return 1
+    exit 1
 fi
-if ! probe_with_retries "$(static_server_url "$docsite_port")" static; then
+docsite_url="$(static_server_url "$docsite_port")/"
+if ! probe_with_retries "$docsite_url" static; then
     echo "ERROR: external probe failed" >&2
-    return 1
+    exit 1
 fi
 
 # 5. Announce
-docsite_url="$(static_server_url "$docsite_port")/"
 printf "%s\n" "$docsite_url" > docs/larv/docsite-url.txt
+runtime_gate_require_phase_url . docsite "$LARV_VM_HOST"
 echo "Plan available for review at $docsite_url"
 ```
 
@@ -78,12 +84,14 @@ echo "Plan available for review at $docsite_url"
 The doc-site server is not optional. Do not advance to the Phase 7 hard gate, auto-commit, or return `status: complete` until all of these are true:
 
 - `docsite_port` was allocated through `allocate_port docsite` and recorded as `docsite-port` in `STATE.yaml.execution.allocations`.
+- `static_server_check_remote_deps "$ssh_target"` passed for `php`, `tmux`, `curl`, and `rsync`.
 - `docs/larv/` was rsynced to `$project_root/docsite` on the VM.
 - Docsify `index.html` was written on the VM.
 - `static_server_start` succeeded.
 - `probe_url_inside "$ssh_target" "$docsite_port" static` succeeded.
 - `probe_with_retries "$docsite_url" static` succeeded.
 - `docs/larv/docsite-url.txt` exists and contains the external URL.
+- `runtime_gate_require_phase_url . docsite "$LARV_VM_HOST"` succeeded.
 - The URL was printed to the user.
 
 If any item fails or cannot be performed, stop immediately and return:

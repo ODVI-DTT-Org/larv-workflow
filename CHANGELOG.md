@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.2 (next) - Server reliability hardening
+
+- Adds `runtime_gate.sh` so mockup, doc-site, and sandbox URL artifacts can be validated as real external VM URLs instead of `TBD`/`null`/local placeholders.
+- Hardens static server startup with VM dependency checks (`php`, `tmux`, `curl`, `rsync`), session verification, and non-silent firewall failures.
+- Extends pre-flight with a VM runtime dependency check.
+- Fills `larv-plan` enough to require an executable `docs/larv/07-runtime/deploy-sandbox.sh`, removing the Phase 7 placeholder deployment path.
+- Updates Phase 3, Phase 6.5, and Phase 7 prompts to use `exit 1` in executable snippets and call the runtime gate before announcing completion.
+
 ## 0.4.1 (next) - Runtime URL gates
 
 - Tightens Phase 3 mockups, Phase 6.5 doc-site, and Phase 7 sandbox so a phase cannot complete unless its server is started, inside/outside probes pass, the URL is written to a doc artifact, and the URL is returned in the subagent contract.

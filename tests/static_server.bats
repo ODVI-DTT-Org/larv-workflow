@@ -4,6 +4,8 @@ load helpers
 
 setup() {
     PORT=$(awk 'BEGIN{srand(); print 30000 + int(rand()*10000)}')
+    BIN="$BATS_TEST_TMPDIR/bin"
+    mkdir -p "$BIN"
 }
 
 @test "static_server_compose_command produces a php -S command for a path" {
@@ -23,5 +25,28 @@ setup() {
     run bash -c "source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_compose_command '' /tmp/x"
     [ "$status" -ne 0 ]
     run bash -c "source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_compose_command 8001 ''"
+    [ "$status" -ne 0 ]
+}
+
+@test "static_server_check_remote_deps uses ssh to require php tmux curl rsync" {
+    cat > "$BIN/ssh" <<'EOF'
+#!/usr/bin/env bash
+case "$*" in
+    *"command -v php"*command\ -v\ tmux*command\ -v\ curl*command\ -v\ rsync*) exit 0 ;;
+    *) exit 1 ;;
+esac
+EOF
+    chmod +x "$BIN/ssh"
+    PATH="$BIN:$PATH" run bash -c "source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_check_remote_deps user@example.test"
+    [ "$status" -eq 0 ]
+}
+
+@test "static_server_open_firewall fails when ufw command fails" {
+    cat > "$BIN/ssh" <<'EOF'
+#!/usr/bin/env bash
+exit 1
+EOF
+    chmod +x "$BIN/ssh"
+    PATH="$BIN:$PATH" run bash -c "source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_open_firewall user@example.test 9000"
     [ "$status" -ne 0 ]
 }

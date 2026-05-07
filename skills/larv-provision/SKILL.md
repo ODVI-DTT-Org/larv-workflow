@@ -21,8 +21,10 @@ Allocate VM resources for this project, deploy the Docker compose stack, verify 
 . scripts/lib/probe.sh
 . scripts/lib/handsoff.sh
 . scripts/lib/git_safe.sh
+. scripts/lib/runtime_gate.sh
 
 slug=$(yq -r .project.slug docs/larv/STATE.yaml)
+ssh_target="${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}"
 
 # 1. Allocate
 app_port=$(allocate_port app)
@@ -35,22 +37,27 @@ bash scripts/state.sh record-allocation . mockup-port "$mockup_port"
 bash scripts/state.sh record-allocation . db-name "$db_name"
 bash scripts/state.sh record-allocation . project-root "$project_root"
 
-# 2. SSH to VM, scaffold project root, copy compose stack, bring it up
-#    (compose template + seed scripts are in templates/sandbox/ — out of MVP scope to fill in)
-ssh "${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}" "mkdir -p $project_root"
-# (deployment commands here)
+# 2. SSH to VM, scaffold project root, copy the project, and start the sandbox
+if [ ! -x docs/larv/07-runtime/deploy-sandbox.sh ]; then
+    echo "ERROR: missing executable docs/larv/07-runtime/deploy-sandbox.sh" >&2
+    echo "Phase 6 must write the exact sandbox deploy/start script before provisioning." >&2
+    exit 1
+fi
+ssh "$ssh_target" "mkdir -p $project_root"
+rsync -avz --delete --exclude .git --exclude docs/larv/07-runtime/sandbox-url.txt ./ "$ssh_target:$project_root/app/"
+ssh "$ssh_target" "cd $project_root/app && APP_PORT=$app_port DB_DATABASE=$db_name bash docs/larv/07-runtime/deploy-sandbox.sh"
 
 # 3. Probe-before-announce — both inside and outside must succeed.
 # §3.3 hard rule: do NOT set app_url until both probes pass.
-if ! probe_url_inside "${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}" "$app_port" laravel; then
+if ! probe_url_inside "$ssh_target" "$app_port" laravel; then
     echo "ERROR: inside-VM probe failed for app port $app_port" >&2
-    return 1
-fi
-if ! probe_with_retries "http://${LARV_VM_HOST}:${app_port}/" laravel; then
-    echo "ERROR: external probe failed at http://${LARV_VM_HOST}:${app_port}/" >&2
-    return 1
+    exit 1
 fi
 app_url="http://${LARV_VM_HOST}:${app_port}/"
+if ! probe_with_retries "$app_url" laravel; then
+    echo "ERROR: external probe failed at $app_url" >&2
+    exit 1
+fi
 
 # 4. Regenerate handsoff (now with allocated values inlined)
 handsoff_render_index .
@@ -68,6 +75,8 @@ Project root: $project_root
 SSH: ssh ${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}
 EOF
 printf "%s\n" "$app_url" > docs/larv/07-runtime/sandbox-url.txt
+runtime_gate_require_phase_url . sandbox "$LARV_VM_HOST"
+bash scripts/state.sh update . ".sandbox.app_url = \"$app_url\" | .sandbox.status = \"provisioned\""
 echo "Sandbox ready at $app_url"
 
 # 6. Commit
@@ -80,12 +89,14 @@ The app sandbox is not optional. Do not call `safe_commit_docs`, regenerate fina
 
 - `app_port`, `db_name`, and `project_root` were allocated through verifier helpers and recorded in `STATE.yaml.execution.allocations`.
 - The project root exists on the VM.
-- The Laravel app stack was actually started on the VM. Placeholder or skipped deployment commands are a failed phase.
+- `docs/larv/07-runtime/deploy-sandbox.sh` exists, is executable, and was run on the VM with `APP_PORT` and `DB_DATABASE`.
+- The Laravel app stack was actually started on the VM. Placeholder, missing deploy script, or skipped deployment commands are a failed phase.
 - `probe_url_inside "${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}" "$app_port" laravel` succeeded.
 - `probe_with_retries "$app_url" laravel` succeeded.
 - `docs/larv/07-runtime/sandbox-runbook.md` exists and includes `App URL: $app_url`.
 - `docs/larv/07-runtime/sandbox-url.txt` exists and contains the external URL.
 - `STATE.yaml.sandbox.app_url` and `STATE.yaml.sandbox.status` are updated.
+- `runtime_gate_require_phase_url . sandbox "$LARV_VM_HOST"` succeeded.
 - The URL was printed to the user.
 
 If any item fails or cannot be performed, stop immediately and return:

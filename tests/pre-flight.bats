@@ -32,6 +32,14 @@ teardown() { teardown_tmp_project "$TMP"; }
     [ "$status" -eq 0 ]
     echo "$output" | grep -qiE "bundle check"
     echo "$output" | grep -qiE "mcp check"
+    echo "$output" | grep -qiE "vm runtime check"
+}
+
+@test "pre-flight can skip live VM runtime check for deterministic runs" {
+    run env LARV_PREFLIGHT_SKIP_VM_CHECK=1 bash scripts/pre-flight.sh "$TMP" my-app greenfield
+    [ "$status" -eq 0 ]
+    echo "$output" | grep -q "skipped (LARV_PREFLIGHT_SKIP_VM_CHECK=1)"
+    grep -q "VM runtime check" "$TMP/docs/larv/pre-flight.md"
 }
 
 @test "pre-flight estimates a non-zero budget" {

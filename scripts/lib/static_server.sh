@@ -16,6 +16,13 @@ static_server_compose_command() {
     echo "php -S 0.0.0.0:$port -t $doc_root"
 }
 
+static_server_check_remote_deps() {
+    local ssh_target="$1"
+    [ -n "$ssh_target" ] || { echo "ERROR: ssh_target required" >&2; return 1; }
+    ssh -o BatchMode=yes -o ConnectTimeout=5 "$ssh_target" \
+        "command -v php >/dev/null && command -v tmux >/dev/null && command -v curl >/dev/null && command -v rsync >/dev/null"
+}
+
 # static_server_url <port>
 # Returns the externally visible URL for a running static server.
 static_server_url() {
@@ -34,7 +41,7 @@ static_server_start() {
     [ -n "$session" ] || { echo "ERROR: session required" >&2; return 1; }
     cmd="$(static_server_compose_command "$port" "$doc_root")" || return 1
     ssh -o BatchMode=yes -o ConnectTimeout=5 "$ssh_target" \
-        "tmux new-session -d -s '$session' '$cmd'"
+        "test -d '$doc_root' && tmux kill-session -t '$session' 2>/dev/null || true; tmux new-session -d -s '$session' '$cmd'; tmux has-session -t '$session'"
 }
 
 # static_server_stop <ssh_target> <session_name>
@@ -53,5 +60,5 @@ static_server_open_firewall() {
     [ -n "$ssh_target" ] || { echo "ERROR: ssh_target required" >&2; return 1; }
     [ -n "$port" ] || { echo "ERROR: port required" >&2; return 1; }
     ssh -o BatchMode=yes -o ConnectTimeout=5 "$ssh_target" \
-        "sudo ufw allow $port/tcp >/dev/null 2>&1 || true"
+        "if command -v ufw >/dev/null; then sudo ufw allow $port/tcp >/dev/null; fi"
 }

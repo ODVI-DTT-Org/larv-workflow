@@ -50,6 +50,10 @@ When the user replies, WebFetch each pick's `.md` from getdesign.md and cache at
 mockup_port=$(allocate_port mockup)
 bash scripts/state.sh record-allocation . mockup-port "$mockup_port"
 ssh_target="${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}"
+if ! static_server_check_remote_deps "$ssh_target"; then
+    echo "ERROR: VM missing required static-server tools: php, tmux, curl, or rsync" >&2
+    exit 1
+fi
 static_server_open_firewall "$ssh_target" "$mockup_port"
 ```
 
@@ -63,6 +67,7 @@ Invoke the bundled `huashu-design` skill for each pick. Render 5-7 key screens p
 
 ```bash
 . scripts/lib/probe.sh
+. scripts/lib/runtime_gate.sh
 
 slug=$(yq -r .project.slug docs/larv/STATE.yaml)
 ssh "$ssh_target" "mkdir -p /srv/larv/$slug/mockups"
@@ -74,14 +79,15 @@ static_server_start "$ssh_target" "$mockup_port" \
 
 if ! probe_url_inside "$ssh_target" "$mockup_port" static; then
     echo "ERROR: inside-VM probe failed for mockup port" >&2
-    return 1
-fi
-if ! probe_with_retries "$(static_server_url "$mockup_port")" static; then
-    echo "ERROR: external probe failed" >&2
-    return 1
+    exit 1
 fi
 mockup_url="$(static_server_url "$mockup_port")/"
+if ! probe_with_retries "$mockup_url" static; then
+    echo "ERROR: external probe failed" >&2
+    exit 1
+fi
 printf "%s\n" "$mockup_url" > docs/larv/03-design/mockup-url.txt
+runtime_gate_require_phase_url . design "$LARV_VM_HOST"
 echo "Mockups ready at $mockup_url"
 ```
 
@@ -91,11 +97,13 @@ The mockup server is not optional. Do not proceed to brand finalization, `design
 
 - At least one HTML mockup exists under `docs/larv/03-design/mockups/`.
 - `mockup_port` was allocated through `allocate_port mockup` and recorded as `mockup-port` in `STATE.yaml.execution.allocations`.
+- `static_server_check_remote_deps "$ssh_target"` passed for `php`, `tmux`, `curl`, and `rsync`.
 - The mockups were rsynced to the VM.
 - `static_server_start` succeeded.
 - `probe_url_inside "$ssh_target" "$mockup_port" static` succeeded.
 - `probe_with_retries "$mockup_url" static` succeeded.
 - `docs/larv/03-design/mockup-url.txt` exists and contains the external URL.
+- `runtime_gate_require_phase_url . design "$LARV_VM_HOST"` succeeded.
 - The URL was printed to the user.
 
 If any item fails or cannot be performed, stop immediately and return:
