@@ -115,6 +115,14 @@ yaml.safe_load(parts[1])
     grep -qi "probe-before-announce" skills/larv-design/SKILL.md
 }
 
+@test "larv-design makes mockup URL a mandatory completion gate" {
+    grep -q "Mandatory completion gate" skills/larv-design/SKILL.md
+    grep -q "mockup_url" skills/larv-design/SKILL.md
+    grep -q "status: failed" skills/larv-design/SKILL.md
+    grep -q "Do not proceed to brand finalization" skills/larv-design/SKILL.md
+    grep -q "mockup_url: \"http://31.220.79.31:<port>/\"" skills/larv-design/SKILL.md
+}
+
 @test "larv-docsite SKILL.md exists for Phase 6.5" {
     [ -f skills/larv-docsite/SKILL.md ]
     grep -q "^name: larv-docsite" skills/larv-docsite/SKILL.md
@@ -123,9 +131,31 @@ yaml.safe_load(parts[1])
     grep -q "Docsify" skills/larv-docsite/SKILL.md
 }
 
+@test "larv-docsite makes docsite URL a mandatory completion gate" {
+    grep -q "Mandatory completion gate" skills/larv-docsite/SKILL.md
+    grep -q "docsite_url" skills/larv-docsite/SKILL.md
+    grep -q "status: failed" skills/larv-docsite/SKILL.md
+    grep -q "docsite_url: \"http://31.220.79.31:<port>/\"" skills/larv-docsite/SKILL.md
+}
+
+@test "larv-provision makes sandbox URL a mandatory completion gate" {
+    grep -q "Mandatory completion gate" skills/larv-provision/SKILL.md
+    grep -q "sandbox_url" skills/larv-provision/SKILL.md
+    grep -q "status: failed" skills/larv-provision/SKILL.md
+    grep -q "sandbox_url: \"http://31.220.79.31:<port>/\"" skills/larv-provision/SKILL.md
+}
+
 @test "larv-orchestrator describes Phase 0a and Phase 6.5 in greenfield sequence" {
     grep -q "Phase 0a" skills/larv-orchestrator/SKILL.md
     grep -q "Phase 6.5" skills/larv-orchestrator/SKILL.md
     grep -q "larv-domain-interview" skills/larv-orchestrator/SKILL.md
     grep -q "larv-docsite" skills/larv-orchestrator/SKILL.md
+}
+
+@test "larv-orchestrator rejects missing runtime URLs for server phases" {
+    grep -q "Runtime URL enforcement" skills/larv-orchestrator/SKILL.md
+    grep -q "mockup_url" skills/larv-orchestrator/SKILL.md
+    grep -q "docsite_url" skills/larv-orchestrator/SKILL.md
+    grep -q "sandbox_url" skills/larv-orchestrator/SKILL.md
+    grep -q "treat the phase as failed" skills/larv-orchestrator/SKILL.md
 }

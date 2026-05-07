@@ -80,7 +80,31 @@ if ! probe_with_retries "$(static_server_url "$mockup_port")" static; then
     echo "ERROR: external probe failed" >&2
     return 1
 fi
-echo "Mockups ready at $(static_server_url "$mockup_port")"
+mockup_url="$(static_server_url "$mockup_port")/"
+printf "%s\n" "$mockup_url" > docs/larv/03-design/mockup-url.txt
+echo "Mockups ready at $mockup_url"
+```
+
+## Mandatory completion gate
+
+The mockup server is not optional. Do not proceed to brand finalization, `design-decision.md`, `brand-spec.md`, `ui-design.md`, auto-commit, or `status: complete` until all of these are true:
+
+- At least one HTML mockup exists under `docs/larv/03-design/mockups/`.
+- `mockup_port` was allocated through `allocate_port mockup` and recorded as `mockup-port` in `STATE.yaml.execution.allocations`.
+- The mockups were rsynced to the VM.
+- `static_server_start` succeeded.
+- `probe_url_inside "$ssh_target" "$mockup_port" static` succeeded.
+- `probe_with_retries "$mockup_url" static` succeeded.
+- `docs/larv/03-design/mockup-url.txt` exists and contains the external URL.
+- The URL was printed to the user.
+
+If any item fails or cannot be performed, stop immediately and return:
+
+```yaml
+status: failed
+mockup_url: null
+errors_unresolved:
+  - "Phase 3 mockup server was not started and probe-confirmed."
 ```
 
 ### 8. User picks one (or hybrid)
@@ -112,15 +136,18 @@ safe_commit_docs "[larv] phase 3: design approved (pick=$(grep -oE 'pick: [^ ]+'
 - Do not WebFetch from getdesign.md before the user provides explicit picks.
 - Do not announce the mockup URL until both inside and outside probes succeed.
 - Do not pick the design for the user. Provide recommendations, never decisions.
+- Do not mark Phase 3 complete without a probe-confirmed `mockup_url`.
 
 ## Subagent return contract
 
 ```yaml
 status: complete
+mockup_url: "http://31.220.79.31:<port>/"
 files_written:
   - docs/larv/03-design/recommendations.md
   - docs/larv/03-design/picks/<slug>.md  # one per pick
   - docs/larv/03-design/mockups/<slug>/...
+  - docs/larv/03-design/mockup-url.txt
   - docs/larv/03-design/design-decision.md
   - docs/larv/03-design/brand-spec.md
   - docs/larv/03-design/ui-design.md

@@ -33,10 +33,27 @@ For each phase `N`:
 
 1. **Spawn the phase subagent** (skill `larv-<name>`).
 2. **Wait for its return contract** (yaml from §8 of the spec).
-3. **Apply state_updates** via `bash scripts/state.sh update`.
-4. **Auto-commit** via `safe_commit_docs "[larv] phase $N: $name approved"`.
-5. **Soft gate** via `soft_gate "$dir" "$N" "$name" "$summary" "$changed_csv"`.
-6. **Loopback check.** If subagent's `state_updates.current_phase` points backward, jump there.
+3. **Validate hard completion requirements** for that phase.
+4. **Apply state_updates** via `bash scripts/state.sh update`.
+5. **Auto-commit** via `safe_commit_docs "[larv] phase $N: $name approved"`.
+6. **Soft gate** via `soft_gate "$dir" "$N" "$name" "$summary" "$changed_csv"`.
+7. **Loopback check.** If subagent's `state_updates.current_phase` points backward, jump there.
+
+## Runtime URL enforcement
+
+Some phases create browser-visible services. These are hard completion requirements, not optional niceties.
+
+If a phase subagent returns `status: complete` but any required runtime URL or probe artifact is missing, treat the phase as failed, write `errors_unresolved` to `STATE.yaml`, and stop. Do not soft-gate, do not advance, and do not tell the user to proceed manually.
+
+Required runtime fields:
+
+| Phase | Skill | Required field | Required artifact |
+|---|---|---|---|
+| 3 | `larv-design` | `mockup_url` | `docs/larv/03-design/mockup-url.txt` |
+| 6.5 | `larv-docsite` | `docsite_url` | `docs/larv/docsite-url.txt` |
+| 7 | `larv-provision` | `sandbox_url` | `docs/larv/07-runtime/sandbox-url.txt` |
+
+Each URL must start with `http://31.220.79.31:` and must only be accepted after the phase subagent reports both inside-VM and outside probe success. Missing URL, missing artifact, `null`, `TBD`, or "skipped" means failure.
 
 ## Phase sequence (greenfield)
 

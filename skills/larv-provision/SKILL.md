@@ -50,7 +50,7 @@ if ! probe_with_retries "http://${LARV_VM_HOST}:${app_port}/" laravel; then
     echo "ERROR: external probe failed at http://${LARV_VM_HOST}:${app_port}/" >&2
     return 1
 fi
-app_url="http://${LARV_VM_HOST}:${app_port}"
+app_url="http://${LARV_VM_HOST}:${app_port}/"
 
 # 4. Regenerate handsoff (now with allocated values inlined)
 handsoff_render_index .
@@ -67,9 +67,34 @@ DB: $db_name
 Project root: $project_root
 SSH: ssh ${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}
 EOF
+printf "%s\n" "$app_url" > docs/larv/07-runtime/sandbox-url.txt
+echo "Sandbox ready at $app_url"
 
 # 6. Commit
 safe_commit_docs "[larv] phase 7: provision approved (app=$app_port db=$db_name)"
+```
+
+## Mandatory completion gate
+
+The app sandbox is not optional. Do not call `safe_commit_docs`, regenerate final handsoff as complete, open the Phase 8 routing menu, or return `status: complete` until all of these are true:
+
+- `app_port`, `db_name`, and `project_root` were allocated through verifier helpers and recorded in `STATE.yaml.execution.allocations`.
+- The project root exists on the VM.
+- The Laravel app stack was actually started on the VM. Placeholder or skipped deployment commands are a failed phase.
+- `probe_url_inside "${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}" "$app_port" laravel` succeeded.
+- `probe_with_retries "$app_url" laravel` succeeded.
+- `docs/larv/07-runtime/sandbox-runbook.md` exists and includes `App URL: $app_url`.
+- `docs/larv/07-runtime/sandbox-url.txt` exists and contains the external URL.
+- `STATE.yaml.sandbox.app_url` and `STATE.yaml.sandbox.status` are updated.
+- The URL was printed to the user.
+
+If any item fails or cannot be performed, stop immediately and return:
+
+```yaml
+status: failed
+sandbox_url: null
+errors_unresolved:
+  - "Phase 7 sandbox app was not started and probe-confirmed."
 ```
 
 ## Probe-before-announce rule (hard requirement)
@@ -84,6 +109,7 @@ Never print a URL until both the inside probe (curl from the VM at 127.0.0.1) an
 ## Required outputs
 
 - `docs/larv/07-runtime/sandbox-runbook.md`
+- `docs/larv/07-runtime/sandbox-url.txt`
 - Updated allocations in `STATE.yaml.execution.allocations`
 - Regenerated `docs/Handsoff.md` and AI starting-point files
 
@@ -91,11 +117,13 @@ Never print a URL until both the inside probe (curl from the VM at 127.0.0.1) an
 
 ```yaml
 status: complete
+sandbox_url: "http://31.220.79.31:<port>/"
 files_written:
   - docs/larv/07-runtime/sandbox-runbook.md
+  - docs/larv/07-runtime/sandbox-url.txt
 state_updates:
   execution.allocations: [...]
-  sandbox.app_url: "http://31.220.79.31:<port>"
+  sandbox.app_url: "http://31.220.79.31:<port>/"
   sandbox.status: provisioned
 plugin_improvement_notes: (none)
 ```

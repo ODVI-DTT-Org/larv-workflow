@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.1 (next) - Runtime URL gates
+
+- Tightens Phase 3 mockups, Phase 6.5 doc-site, and Phase 7 sandbox so a phase cannot complete unless its server is started, inside/outside probes pass, the URL is written to a doc artifact, and the URL is returned in the subagent contract.
+- Adds orchestrator-level runtime URL enforcement for `mockup_url`, `docsite_url`, and `sandbox_url`.
+
 ## 0.4.0 (next) - Layer 2
 
 - **Phase 0a - DDD interview** (new skill `larv-domain-interview`): business-process-only interview before Discuss. 9 sections, about 15-20 questions, tech-leak guard, 8 output files in `docs/larv/ddd-interview/`.

@@ -68,7 +68,31 @@ if ! probe_with_retries "$(static_server_url "$docsite_port")" static; then
 fi
 
 # 5. Announce
-echo "Plan available for review at $(static_server_url "$docsite_port")"
+docsite_url="$(static_server_url "$docsite_port")/"
+printf "%s\n" "$docsite_url" > docs/larv/docsite-url.txt
+echo "Plan available for review at $docsite_url"
+```
+
+## Mandatory completion gate
+
+The doc-site server is not optional. Do not advance to the Phase 7 hard gate, auto-commit, or return `status: complete` until all of these are true:
+
+- `docsite_port` was allocated through `allocate_port docsite` and recorded as `docsite-port` in `STATE.yaml.execution.allocations`.
+- `docs/larv/` was rsynced to `$project_root/docsite` on the VM.
+- Docsify `index.html` was written on the VM.
+- `static_server_start` succeeded.
+- `probe_url_inside "$ssh_target" "$docsite_port" static` succeeded.
+- `probe_with_retries "$docsite_url" static` succeeded.
+- `docs/larv/docsite-url.txt` exists and contains the external URL.
+- The URL was printed to the user.
+
+If any item fails or cannot be performed, stop immediately and return:
+
+```yaml
+status: failed
+docsite_url: null
+errors_unresolved:
+  - "Phase 6.5 doc-site server was not started and probe-confirmed."
 ```
 
 ## Server lifetime
@@ -78,19 +102,23 @@ Stays up through the Phase 7 hard gate. Released after the routing menu is answe
 ## Required outputs
 
 - The doc-site is browsable at `http://31.220.79.31:<port>`.
+- `docs/larv/docsite-url.txt` contains the announced URL.
 - `STATE.yaml.execution.allocations` includes a `docsite-port` entry.
 
 ## What you do not do
 
 - Do not modify any `docs/larv/` content. This skill is read-only on the plan.
 - Do not announce the URL until both probes succeed.
+- Do not mark Phase 6.5 complete without a probe-confirmed `docsite_url`.
 - Do not require the user to install anything on their machine. The doc-site loads Docsify from CDN in their browser.
 
 ## Subagent return contract
 
 ```yaml
 status: complete
-files_written: []
+docsite_url: "http://31.220.79.31:<port>/"
+files_written:
+  - docs/larv/docsite-url.txt
 state_updates:
   execution.allocations: [..., { kind: docsite-port, value: "<port>" }]
 plugin_improvement_notes: (none)
