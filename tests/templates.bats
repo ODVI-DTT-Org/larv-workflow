@@ -2,9 +2,9 @@
 
 load helpers
 
-TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report ddd-interview-questions bootstrap-sandbox.md.tmpl production-deploy.md.tmpl env-guide.md.tmpl operations-guide.md.tmpl package-matrix.md.tmpl)
+TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report ddd-interview-questions bootstrap-sandbox.md.tmpl production-deploy.md.tmpl env-guide.md.tmpl operations-guide.md.tmpl package-matrix.md.tmpl package-slice-snippets.md.tmpl happy-path.md.tmpl)
 
-@test "all 11 templates exist" {
+@test "all 13 templates exist" {
     for t in "${TEMPLATES[@]}"; do
         if [[ "$t" == *.tmpl ]]; then
             [ -f "templates/${t}" ] || { echo "missing templates/${t}"; return 1; }
@@ -12,6 +12,22 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
             [ -f "templates/${t}.md" ] || { echo "missing templates/${t}.md"; return 1; }
         fi
     done
+}
+
+@test "package slice snippets cover package-specific implementation slices" {
+    grep -q "Filament Resource slice" templates/package-slice-snippets.md.tmpl
+    grep -q "Cashier billing slice" templates/package-slice-snippets.md.tmpl
+    grep -q "Horizon queue slice" templates/package-slice-snippets.md.tmpl
+    grep -q "tenancy slice" templates/package-slice-snippets.md.tmpl
+    grep -q "Scout search slice" templates/package-slice-snippets.md.tmpl
+}
+
+@test "happy path guide covers install full handoff codex deploy" {
+    grep -q "Install" templates/happy-path.md.tmpl
+    grep -q "/larv:full" templates/happy-path.md.tmpl
+    grep -q "handoff" templates/happy-path.md.tmpl
+    grep -q "Codex CLI" templates/happy-path.md.tmpl
+    grep -q "Laravel Cloud" templates/happy-path.md.tmpl
 }
 
 @test "slice-handoff has Plugin Improvement Notes section" {
@@ -49,6 +65,7 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "DB_CONNECTION" templates/bootstrap-sandbox.md.tmpl
     grep -q "createdb" templates/bootstrap-sandbox.md.tmpl
     grep -q "CREATE DATABASE" templates/bootstrap-sandbox.md.tmpl
+    grep -q "DB_INSTALL_MODE" templates/bootstrap-sandbox.md.tmpl
     grep -q "Sandbox ready at" templates/bootstrap-sandbox.md.tmpl
 }
 

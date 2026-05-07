@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.6 (next) - Guardrails and simulation hardening
+
+- Adds Claude Code hooks for session reminders, secret-edit blocking, implementation-before-bootstrap blocking, and tracker/STATE/report reminders after app edits.
+- Adds `scripts/simulate-full.sh` dry-run fixture generation for a loan approval system, covering package matrices and handoff docs.
+- Adds package-specific slice snippets for Filament, Cashier, Horizon, tenancy, Scout, observability, Reverb, and uploads.
+- Adds a happy-path guide template and README happy-path/hooks documentation for Claude Code planning, Codex CLI handoff, and Laravel Cloud deployment.
+- Adds optional `DB_INSTALL_MODE=apt` handling in sandbox bootstrap for missing MySQL/MariaDB/PostgreSQL tooling, while keeping fail-fast as the default.
+- Fills `larv-learn` with concrete aggregation of implementation reports, local learnings, dry-run mode, and `LEARNINGS.md` proposals.
+- Adds Laravel Cloud guide-only vs automation-mode guidance.
+
 ## 0.4.5 (next) - Laravel package deepening
 
 - Adds generated `docs/Handsoff/package-guide.md` so external handoff tools get a Laravel package implementation/test/env/deploy matrix.

@@ -1,0 +1,49 @@
+# Package Slice Snippets — {{project_slug}}
+
+Use these snippets when turning approved Laravel packages into `docs/larv/06-implementation/elephant-carpaccio.md` slices.
+
+## Filament Resource slice
+
+- Create panel/resource classes for selected domain models.
+- Add table filters, row actions, bulk actions, form schemas, relation managers, and widgets where the workflow needs them.
+- Add policy-backed authorization.
+- Tests: authorization, form validation, filters/actions, relation managers.
+
+## Cashier billing slice
+
+- Add billable model setup, checkout/customer portal routes, webhook controller, subscription/payment state handling.
+- Tests: webhook signature validation, subscription transitions, failed payment behavior.
+- Env/deploy: provider keys, webhook secret, production webhook URL.
+
+## Horizon queue slice
+
+- Add jobs, listeners, retry/backoff, failed job behavior, Horizon authorization.
+- Tests: job dispatch, idempotency, retry/failure behavior.
+- Deploy: Redis and Laravel Cloud worker configuration.
+
+## tenancy slice
+
+- Add tenant model/resolution, tenant-aware models, tenant migrations, cache/queue isolation.
+- Tests: tenant isolation, cross-tenant denial, tenant migration behavior.
+- Deploy: domain/subdomain and DNS strategy.
+
+## Scout search slice
+
+- Add searchable models, indexing jobs, filters, search UI/API.
+- Tests: indexing, filters, queued reindexing.
+- Deploy: Meilisearch/Typesense host, key, and reindex command.
+
+## Observability slice
+
+- Pulse/Telescope access policies, environment restrictions, dashboards, slow-query/N+1 checks.
+- Tests: dashboard access policy, disabled/restricted production posture.
+
+## Reverb realtime slice
+
+- Events, channels, broadcasting auth, websocket env values.
+- Tests: channel authorization, event broadcast.
+
+## Storage/upload slice
+
+- Disk config, validation, URL generation, cleanup/retention.
+- Tests: upload validation, private/public URL behavior.

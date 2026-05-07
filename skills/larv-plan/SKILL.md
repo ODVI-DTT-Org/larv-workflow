@@ -31,6 +31,8 @@ Turn the approved design, architecture, and test strategy into implementation sl
 
 Read `docs/larv/02-architecture/package-integration-matrix.md` and `docs/larv/04-test-strategy/package-test-matrix.md`. Every approved Laravel package must appear in at least one slice with implementation files, tests, env/deploy notes, and acceptance criteria.
 
+Use `templates/package-slice-snippets.md.tmpl` as the package-slice-snippets reference when shaping package-backed slices.
+
 Package-specific slice expectations:
 
 - **Filament/Nova**: admin panel setup, resources, policies, filters/actions, relation managers.

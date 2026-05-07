@@ -45,6 +45,15 @@ Record answers in `docs/larv/10-deploy/production-answers.md`.
 6. After deploy, smoke-test the production URL and configured health path.
 7. Write `docs/larv/10-deploy/laravel-cloud.md`.
 
+## Laravel Cloud automation mode
+
+Default is `guide-only` unless the user explicitly requests automation and confirms the Laravel Cloud CLI/API credentials are available. If automation mode is requested:
+
+1. Check whether a Laravel Cloud CLI is installed or whether the user has provided an approved API workflow.
+2. Print every production-affecting command before running it.
+3. Never read or write raw secrets into git-tracked files.
+4. Fall back to `guide-only` if CLI/API capabilities are missing or unclear.
+
 ## Required output
 
 `docs/larv/10-deploy/laravel-cloud.md` must include:
@@ -67,7 +76,7 @@ Do not return `status: complete` until the production URL has been probe-confirm
 ## Subagent return contract
 
 ```yaml
-status: complete | guide_only | failed
+status: complete | guide-only | failed
 production_url: "https://<domain>" | null
 files_written:
   - docs/larv/10-deploy/production-answers.md

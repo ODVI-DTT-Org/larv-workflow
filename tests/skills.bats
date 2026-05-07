@@ -25,8 +25,7 @@ SKILLS=(
 }
 
 @test "remaining skill stubs flag themselves as stubs" {
-    for skill in larv-premortem \
-                 larv-learn; do
+    for skill in larv-premortem; do
         run grep -F "STUB" "skills/${skill}/SKILL.md"
         [ "$status" -eq 0 ] || { echo "${skill} not marked STUB"; return 1; }
     done
@@ -58,6 +57,7 @@ SKILLS=(
     grep -q "Cashier" skills/larv-plan/SKILL.md
     grep -q "Horizon" skills/larv-plan/SKILL.md
     grep -q "Scout" skills/larv-plan/SKILL.md
+    grep -q "package-slice-snippets" skills/larv-plan/SKILL.md
 }
 
 @test "every skill SKILL.md frontmatter is valid YAML" {
@@ -261,4 +261,18 @@ yaml.safe_load(parts[1])
     grep -q "Horizon" skills/larv-adopt/SKILL.md
     grep -q "Cashier" skills/larv-adopt/SKILL.md
     grep -q "Telescope" skills/larv-adopt/SKILL.md
+}
+
+@test "larv-learn aggregates implementation reports and supports dry run" {
+    ! grep -q "STUB" skills/larv-learn/SKILL.md
+    grep -q "IMPLEMENTATION-REPORT" skills/larv-learn/SKILL.md
+    grep -q "local-learnings.md" skills/larv-learn/SKILL.md
+    grep -q -- "--dry-run" skills/larv-learn/SKILL.md
+    grep -q "LEARNINGS.md" skills/larv-learn/SKILL.md
+}
+
+@test "larv-deploy includes Laravel Cloud automation mode" {
+    grep -q "guide-only" skills/larv-deploy/SKILL.md
+    grep -q "automation mode" skills/larv-deploy/SKILL.md
+    grep -q "Laravel Cloud CLI" skills/larv-deploy/SKILL.md
 }

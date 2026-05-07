@@ -17,3 +17,10 @@ load helpers
     run grep -F "Example 1" README.md
     [ "$status" -eq 0 ]
 }
+
+@test "README documents happy path and hooks" {
+    grep -q "Happy path" README.md
+    grep -q "hooks" README.md
+    grep -q "Codex CLI" README.md
+    grep -q "package-guide.md" README.md
+}

@@ -44,3 +44,9 @@ load helpers
     run jq -r '.plugins[] | select(.name == "larv") | .source' .claude-plugin/marketplace.json
     [ "$output" = "./" ]
 }
+
+@test "Claude hooks manifest is valid JSON" {
+    [ -f hooks/hooks.json ]
+    run jq -e '.hooks.PreToolUse and .hooks.PostToolUse and .hooks.SessionStart' hooks/hooks.json
+    [ "$status" -eq 0 ]
+}

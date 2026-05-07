@@ -58,6 +58,27 @@ claude plugin install <your-org>/larv
 
 After install, `/larv:status` works in any directory. New projects default to `docs/larv/` for artifacts.
 
+## Happy path
+
+1. Install or update the plugin, then restart Claude Code.
+2. Run `/larv:full Create a loan approval system` in Claude Code.
+3. Review each phase, including the mockup server and doc-site URL.
+4. At the routing menu, choose `handoff` if another tool will implement.
+5. In Codex CLI, ask it to read `docs/Handsoff.md`.
+6. Codex runs `docs/Handsoff/bootstrap-sandbox.md`, then implements `docs/Handsoff/slice-NN-*.md`.
+7. Package-backed work must check `docs/Handsoff/package-guide.md`.
+8. Production follows `docs/Handsoff/production-deploy.md`, `env-guide.md`, and `operations-guide.md`.
+
+## Claude Code hooks
+
+larv ships optional Claude Code hooks:
+
+- `PreToolUse` blocks likely secret edits and app-code edits before sandbox bootstrap.
+- `PostToolUse` reminds the agent to update tracker, STATE, and implementation reports after app edits.
+- `SessionStart` reminds the session to read handoff docs in larv-managed projects.
+
+These hooks are guardrails for Claude Code. External handoff tools still rely on the generated `docs/Handsoff/*` files.
+
 ## Codex CLI compatibility
 
 `larv` also ships Codex plugin metadata in `.codex-plugin/plugin.json` and a local marketplace file at `.agents/plugins/marketplace.json`.

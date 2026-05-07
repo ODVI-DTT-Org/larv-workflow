@@ -29,6 +29,7 @@ DB_HOST="${DB_HOST:-127.0.0.1}"
 DB_PORT="${DB_PORT:-}"
 DB_USERNAME="${DB_USERNAME:-larv}"
 DB_PASSWORD="${DB_PASSWORD:-}"
+DB_INSTALL_MODE="${DB_INSTALL_MODE:-fail}"
 
 if [ ! -x docs/larv/07-runtime/deploy-sandbox.sh ]; then
     echo "ERROR: docs/larv/07-runtime/deploy-sandbox.sh is missing or not executable" >&2
@@ -45,6 +46,14 @@ ssh -o BatchMode=yes -o ConnectTimeout=5 "$SSH_TARGET" \
 
 if [ "$DB_CONNECTION" = "pgsql" ]; then
     DB_PORT="${DB_PORT:-5432}"
+    if ! ssh "$SSH_TARGET" "command -v psql >/dev/null && command -v createdb >/dev/null"; then
+        if [ "$DB_INSTALL_MODE" = "apt" ]; then
+            ssh "$SSH_TARGET" "sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql postgresql-contrib"
+        else
+            echo "ERROR: PostgreSQL tools are missing on the VM. Install PostgreSQL or rerun with DB_INSTALL_MODE=apt." >&2
+            exit 1
+        fi
+    fi
     ssh "$SSH_TARGET" "if command -v systemctl >/dev/null && systemctl list-unit-files | grep -q '^postgresql'; then sudo systemctl start postgresql; fi"
     ssh "$SSH_TARGET" "command -v psql >/dev/null && command -v createdb >/dev/null"
     ssh "$SSH_TARGET" "sudo -u postgres psql -tAc \"SELECT 1 FROM pg_roles WHERE rolname='$DB_USERNAME'\" | grep -q 1 || sudo -u postgres psql -c \"CREATE ROLE $DB_USERNAME LOGIN PASSWORD '$DB_PASSWORD'\""
@@ -52,6 +61,14 @@ if [ "$DB_CONNECTION" = "pgsql" ]; then
     ssh "$SSH_TARGET" "sudo -u postgres psql -c \"ALTER DATABASE $DB_NAME OWNER TO $DB_USERNAME\""
 elif [ "$DB_CONNECTION" = "mysql" ] || [ "$DB_CONNECTION" = "mariadb" ]; then
     DB_PORT="${DB_PORT:-3306}"
+    if ! ssh "$SSH_TARGET" "command -v mysql >/dev/null"; then
+        if [ "$DB_INSTALL_MODE" = "apt" ]; then
+            ssh "$SSH_TARGET" "sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y mariadb-server"
+        else
+            echo "ERROR: MySQL/MariaDB client/server tools are missing on the VM. Install MariaDB/MySQL or rerun with DB_INSTALL_MODE=apt." >&2
+            exit 1
+        fi
+    fi
     ssh "$SSH_TARGET" "if command -v systemctl >/dev/null; then if systemctl list-unit-files | grep -q '^mysql'; then sudo systemctl start mysql; elif systemctl list-unit-files | grep -q '^mariadb'; then sudo systemctl start mariadb; fi; fi"
     ssh "$SSH_TARGET" "command -v mysql >/dev/null"
     ssh "$SSH_TARGET" "mysql -N -B -e \"CREATE DATABASE IF NOT EXISTS \\`$DB_NAME\\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; CREATE USER IF NOT EXISTS '$DB_USERNAME'@'localhost' IDENTIFIED BY '$DB_PASSWORD'; CREATE USER IF NOT EXISTS '$DB_USERNAME'@'%' IDENTIFIED BY '$DB_PASSWORD'; GRANT ALL PRIVILEGES ON \\`$DB_NAME\\`.* TO '$DB_USERNAME'@'localhost'; GRANT ALL PRIVILEGES ON \\`$DB_NAME\\`.* TO '$DB_USERNAME'@'%'; FLUSH PRIVILEGES;\""

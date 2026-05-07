@@ -1,0 +1,70 @@
+# larv Happy Path — {{project_slug}}
+
+## Install
+
+```bash
+claude plugin marketplace add /path/to/larv/.claude-plugin/marketplace.json
+claude plugin install larv@larv-local
+claude plugin list
+```
+
+Restart Claude Code after install or update.
+
+## Plan in Claude Code
+
+```text
+/larv:full Create a loan approval system
+```
+
+Proceed through:
+
+1. DDD business interview.
+2. Laravel ecosystem decisions.
+3. Domain and architecture.
+4. Design picker and mockup server.
+5. Tests, premortem, and slice plan.
+6. Handoff generation and doc-site.
+
+At the routing menu, choose:
+
+```text
+handoff
+```
+
+## Implement in Codex CLI
+
+Open the same repository in Codex CLI and say:
+
+```text
+Read docs/Handsoff.md and implement the slices.
+```
+
+Codex CLI should:
+
+1. Read `docs/Handsoff.md`.
+2. Run `docs/Handsoff/bootstrap-sandbox.md`.
+3. Read `docs/Handsoff/package-guide.md` before package-backed slices.
+4. Implement `docs/Handsoff/slice-NN-*.md` in order.
+5. Update tracker, STATE, and implementation reports.
+
+## Verify
+
+```bash
+vendor/bin/pint --test
+vendor/bin/pest
+vendor/bin/phpstan analyse
+npm run build
+```
+
+## Deploy
+
+Use:
+
+- `docs/Handsoff/production-deploy.md`
+- `docs/Handsoff/env-guide.md`
+- `docs/Handsoff/operations-guide.md`
+
+Defaults:
+
+- Hosting: Laravel Cloud
+- DNS: Namecheap

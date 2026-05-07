@@ -1,29 +1,53 @@
 ---
 name: larv-learn
-description: Phase 11 + on-demand. Aggregate Plugin Improvement Notes; propose plugin edits via PR.
+description: Phase 11 - aggregate implementation reports, local learnings, and plugin improvement notes into LEARNINGS.md proposals. Supports --quick, --full, --since, and --dry-run.
 ---
 
 # larv-learn
 
-> **STUB — sub-project A scaffolding only. Governance details defined in sub-project E.**
+Aggregate project lessons and plugin improvement signals after implementation, verification, or deployment.
+
+## Inputs
+
+- `docs/larv/implementation-tracker.yaml`
+- `docs/larv/local-learnings.md`
+- `docs/larv/09-verification/final-report.md`
+- `docs/larv/10-deploy/*.md`
+- `IMPLEMENTATION-REPORT-*.md`
+- `docs/Handsoff/slice-NN-*.md` Plugin Improvement Notes sections
+- root `LEARNINGS.md`
 
 ## Modes
 
-- `--quick` — last 5 slices, `[plugin]` notes only, only if patterns clear
-- `--full` — all `[plugin]` notes since last `--full`
-- `--since=<date>` — explicit date range
-- `--dry-run` — print proposed diffs without committing
+- `--quick`: inspect latest five implementation reports and only high-confidence `[plugin]` notes.
+- `--full`: inspect all reports and local learnings.
+- `--since=YYYY-MM-DD`: inspect entries after a date.
+- `--dry-run`: print proposed `LEARNINGS.md` additions and plugin follow-up tasks without editing files.
 
-## Aggregation steps
+## What you do
 
-1. Read all `## Plugin Improvement Notes` sections from handoff docs in scope.
-2. Cluster by theme - API drift / question gap / pattern win / failure mode / library version.
-3. Draft edits - new `LEARNINGS.md` entries, diffs to skill prompts, new ADRs if structural.
-4. Branch plugin repo (`learn/<project-slug>-<date>`), commit with source-slice citations, open PR via `gh`.
-5. Post PR URL in project chat; update `STATE.yaml.learn.last_quick_pr` (or `last_full_at`).
+1. Collect recurring failures, skipped steps, unclear handoffs, package-specific gaps, deploy friction, and verification failures.
+2. Separate `[project]` lessons from `[plugin]` lessons.
+3. Propose concrete plugin improvements with affected files.
+4. In non-dry-run mode, append accepted plugin lessons to `LEARNINGS.md`.
+5. Never modify application code.
 
-## Safeguards
+## Output
 
-- PR-gated, never auto-merge
-- Diffs must cite source slice handoffs
-- CI runs fixture tests on every PR
+Write or print:
+
+- summary of project lessons
+- proposed plugin improvements
+- evidence file paths
+- whether changes were written or dry-run only
+
+## Subagent return contract
+
+```yaml
+status: complete
+mode: "--quick|--full|--since|--dry-run"
+files_written:
+  - LEARNINGS.md
+plugin_improvement_notes:
+  - ...
+```
