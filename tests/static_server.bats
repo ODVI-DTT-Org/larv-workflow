@@ -28,11 +28,11 @@ setup() {
     [ "$status" -ne 0 ]
 }
 
-@test "static_server_check_remote_deps uses ssh to require php tmux curl rsync" {
+@test "static_server_check_remote_deps uses ssh to require php tmux curl ss rsync" {
     cat > "$BIN/ssh" <<'EOF'
 #!/usr/bin/env bash
 case "$*" in
-    *"command -v php"*command\ -v\ tmux*command\ -v\ curl*command\ -v\ rsync*) exit 0 ;;
+    *"command -v php"*command\ -v\ tmux*command\ -v\ curl*command\ -v\ ss*command\ -v\ rsync*) exit 0 ;;
     *) exit 1 ;;
 esac
 EOF
@@ -54,11 +54,15 @@ EOF
 #!/usr/bin/env bash
 exit 0
 EOF
+    cat > "$BIN/ss" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
     cat > "$BIN/ssh" <<'EOF'
 #!/usr/bin/env bash
 exit 99
 EOF
-    chmod +x "$BIN/php" "$BIN/tmux" "$BIN/curl" "$BIN/ssh"
+    chmod +x "$BIN/php" "$BIN/tmux" "$BIN/curl" "$BIN/ss" "$BIN/ssh"
     PATH="$BIN:$PATH" run bash -c "source $PROJECT_ROOT/scripts/lib/vm.sh && source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_check_remote_deps ignored"
     [ "$status" -eq 0 ]
 }

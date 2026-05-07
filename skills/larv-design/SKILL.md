@@ -47,14 +47,20 @@ When the user replies, WebFetch each pick's `.md` from getdesign.md and cache at
 . scripts/lib/verifier.sh
 . scripts/lib/static_server.sh
 
-mockup_port=$(allocate_port mockup)
+slug=$(yq -r .project.slug docs/larv/STATE.yaml)
+mockup_port=$(allocate_port mockup "$slug")
 bash scripts/state.sh record-allocation . mockup-port "$mockup_port"
 ssh_target="${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}"
 if ! static_server_check_remote_deps "$ssh_target"; then
-    echo "ERROR: runtime missing required static-server tools: php, tmux, or curl" >&2
+    echo "ERROR: runtime missing required static-server tools: php, tmux, curl, or ss" >&2
+    release_port_reservation mockup "$mockup_port" "$slug" || true
     exit 1
 fi
-static_server_open_firewall "$ssh_target" "$mockup_port"
+if ! static_server_open_firewall "$ssh_target" "$mockup_port"; then
+    echo "ERROR: firewall rule for mockup port $mockup_port was not confirmed" >&2
+    release_port_reservation mockup "$mockup_port" "$slug" || true
+    exit 1
+fi
 ```
 
 ### 6. Huashu generates mockups
@@ -66,14 +72,25 @@ Invoke the bundled `huashu-design` skill for each pick (`bundle/huashu-design/SK
 ### 7. Mockup server (probe-before-announce)
 
 ```bash
+. scripts/lib/vm.sh
+. scripts/lib/verifier.sh
+. scripts/lib/static_server.sh
 . scripts/lib/probe.sh
 . scripts/lib/runtime_gate.sh
 
 slug=$(yq -r .project.slug docs/larv/STATE.yaml)
+mockup_port="$(yq -r '.execution.allocations[] | select(.kind == "mockup-port") | .value' docs/larv/STATE.yaml | tail -1)"
+test -n "$mockup_port" && [ "$mockup_port" != "null" ]
+ssh_target="${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}"
 project_root="$(pwd -P)"
 mockups_dir="$project_root/docs/larv/03-design/mockups"
 test -d "$mockups_dir"
+trap 'release_port_reservation mockup "$mockup_port" "$slug" || true' EXIT
 
+if ! verify_allocation "$mockup_port" mockup "$slug"; then
+    echo "ERROR: mockup port $mockup_port was taken before server start" >&2
+    exit 1
+fi
 static_server_start "$ssh_target" "$mockup_port" \
     "$mockups_dir" \
     "larv-mockups-$slug"
@@ -93,6 +110,8 @@ if ! probe_with_retries "$mockup_url" static; then
     echo "ERROR: external probe failed" >&2
     exit 1
 fi
+release_port_reservation mockup "$mockup_port" "$slug" || true
+trap - EXIT
 printf "%s\n" "$mockup_url" > docs/larv/03-design/mockup-url.txt
 runtime_gate_require_phase_url . design "$LARV_VM_HOST"
 echo "Mockups ready at $mockup_url"
@@ -103,13 +122,15 @@ echo "Mockups ready at $mockup_url"
 The mockup server is not optional. Do not proceed to brand finalization, `design-decision.md`, `brand-spec.md`, `ui-design.md`, auto-commit, or `status: complete` until all of these are true:
 
 - At least one HTML mockup exists under `docs/larv/03-design/mockups/`.
-- `mockup_port` was allocated through `allocate_port mockup` and recorded as `mockup-port` in `STATE.yaml.execution.allocations`.
-- `static_server_check_remote_deps "$ssh_target"` passed for `php`, `tmux`, and `curl` on the local VM runtime.
+- `mockup_port` was allocated through `allocate_port mockup "$slug"` and recorded as `mockup-port` in `STATE.yaml.execution.allocations`.
+- `verify_allocation "$mockup_port" mockup "$slug"` succeeded immediately before server start.
+- `static_server_check_remote_deps "$ssh_target"` passed for `php`, `tmux`, `curl`, and `ss` on the local VM runtime.
 - `static_server_open_firewall "$ssh_target" "$mockup_port"` succeeded or no local `ufw` is installed.
 - The mockups are served from `docs/larv/03-design/mockups` in the current project.
 - `static_server_start` succeeded.
 - `probe_url_inside "$ssh_target" "$mockup_port" static` succeeded.
 - `probe_with_retries "$mockup_url" static` succeeded.
+- `release_port_reservation mockup "$mockup_port" "$slug"` ran after the server bound and probes succeeded.
 - `docs/larv/03-design/mockup-url.txt` exists and contains the external URL.
 - `runtime_gate_require_phase_url . design "$LARV_VM_HOST"` succeeded.
 - The URL was printed to the user.

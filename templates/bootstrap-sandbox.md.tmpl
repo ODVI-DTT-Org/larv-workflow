@@ -40,8 +40,8 @@ if [ ! -x docs/larv/07-runtime/deploy-sandbox.sh ]; then
     exit 1
 fi
 
-if ! command -v php >/dev/null || ! command -v tmux >/dev/null || ! command -v curl >/dev/null || ! command -v ss >/dev/null || ! command -v yq >/dev/null; then
-    echo "ERROR: php, tmux, curl, ss, and yq are required on this VM" >&2
+if ! command -v php >/dev/null || ! command -v tmux >/dev/null || ! command -v curl >/dev/null || ! command -v ss >/dev/null || ! command -v yq >/dev/null || ! command -v flock >/dev/null; then
+    echo "ERROR: php, tmux, curl, ss, yq, and flock are required on this VM" >&2
     exit 1
 fi
 
@@ -102,11 +102,39 @@ upsert_env DB_DATABASE "$DB_NAME"
 upsert_env DB_USERNAME "$DB_USERNAME"
 upsert_env DB_PASSWORD "$DB_PASSWORD"
 
+PORT_RESERVATION_BASE="${LARV_PORT_RESERVATION_DIR:-/tmp/larv-port-reservations}"
+PORT_RESERVATION_DIR="$PORT_RESERVATION_BASE/app"
+PORT_RESERVATION_LOCK="$PORT_RESERVATION_BASE/.lock"
+PORT_RESERVATION_TTL_SECONDS="${LARV_PORT_RESERVATION_TTL_SECONDS:-21600}"
+mkdir -p "$PORT_RESERVATION_DIR"
+
+reservation_is_stale() {
+    local file="$1" created_at now
+    [ -f "$file" ] || return 0
+    created_at="$(awk -F= '$1 == "created_at" {print $2}' "$file" 2>/dev/null | head -1)"
+    case "$created_at" in
+        ''|*[!0-9]*) return 0 ;;
+    esac
+    now="$(date +%s)"
+    [ $((now - created_at)) -gt "$PORT_RESERVATION_TTL_SECONDS" ]
+}
+
 listening="$(ss -tlnp 2>/dev/null | awk '{print $4}' | awk -F: '{print $NF}' | sort -un)"
 
 APP_PORT=""
+exec 9>"$PORT_RESERVATION_LOCK"
+flock 9
 for port in $(seq 8000 8999); do
-    if ! grep -qx "$port" <<<"$listening"; then
+    reservation_file="$PORT_RESERVATION_DIR/$port"
+    if [ -f "$reservation_file" ] && reservation_is_stale "$reservation_file"; then
+        rm -f "$reservation_file"
+    fi
+    if ! grep -qx "$port" <<<"$listening" && [ ! -f "$reservation_file" ]; then
+        {
+            printf "owner=%s\n" "$SLUG"
+            printf "created_at=%s\n" "$(date +%s)"
+            printf "pid=%s\n" "$$"
+        } > "$reservation_file"
         APP_PORT="$port"
         break
     fi
@@ -116,6 +144,9 @@ if [ -z "$APP_PORT" ]; then
     echo "ERROR: no free app port in 8000-8999" >&2
     exit 1
 fi
+trap 'rm -f "$PORT_RESERVATION_DIR/${APP_PORT:-__none__}"' EXIT
+
+APP_URL="http://$VM_HOST:$APP_PORT/"
 
 if command -v ufw >/dev/null; then
     sudo ufw allow "$APP_PORT/tcp" >/dev/null
@@ -127,7 +158,6 @@ else
     echo "WARN: ufw not installed; confirm provider firewall allows TCP $APP_PORT before sharing $APP_URL" >&2
 fi
 
-APP_URL="http://$VM_HOST:$APP_PORT/"
 upsert_env APP_URL "$APP_URL"
 
 (cd "$APP_ROOT" && APP_PORT="$APP_PORT" DB_DATABASE="$DB_NAME" bash docs/larv/07-runtime/deploy-sandbox.sh)
@@ -153,6 +183,9 @@ for attempt in $(seq 1 6); do
     fi
     sleep 10
 done
+
+rm -f "$PORT_RESERVATION_DIR/$APP_PORT"
+trap - EXIT
 
 case "$APP_URL" in
     http://127.0.0.1:*|http://localhost:*)

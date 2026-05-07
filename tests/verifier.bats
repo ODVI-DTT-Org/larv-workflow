@@ -37,6 +37,8 @@ EOF
     chmod +x "$BIN/ssh"
     PATH_ORIG="$PATH"
     export PATH="$BIN:$PATH_ORIG"
+    export LARV_PORT_RESERVATION_DIR="$TMP/port-reservations"
+    export LARV_PORT_RESERVATION_TTL_SECONDS=21600
 }
 
 teardown() {
@@ -71,6 +73,34 @@ LISTEN 0 4096 0.0.0.0:9001 0.0.0.0:* users:((\"a\",pid=1,fd=1))" \
         run bash -c "source scripts/lib/vm.sh && source scripts/lib/verifier.sh && allocate_port docsite"
     [ "$status" -eq 0 ]
     [ "$output" = "9500" ]
+}
+
+@test "allocate_port reserves selected ports across parallel runs" {
+    LARV_TEST_SS_OUTPUT="" \
+        run bash -c "source scripts/lib/vm.sh && source scripts/lib/verifier.sh && first=\$(allocate_port mockup alpha) && second=\$(allocate_port mockup beta) && printf '%s %s\n' \"\$first\" \"\$second\""
+    [ "$status" -eq 0 ]
+    [ "$output" = "9000 9001" ]
+}
+
+@test "allocate_port ignores stale reservations" {
+    mkdir -p "$LARV_PORT_RESERVATION_DIR/mockup"
+    old_ts=$(( $(date +%s) - 10 ))
+    {
+        printf "owner=old\n"
+        printf "created_at=%s\n" "$old_ts"
+        printf "pid=1\n"
+    } > "$LARV_PORT_RESERVATION_DIR/mockup/9000"
+    LARV_PORT_RESERVATION_TTL_SECONDS=1 LARV_TEST_SS_OUTPUT="" \
+        run bash -c "source scripts/lib/vm.sh && source scripts/lib/verifier.sh && allocate_port mockup fresh"
+    [ "$status" -eq 0 ]
+    [ "$output" = "9000" ]
+}
+
+@test "release_port_reservation frees an allocated port" {
+    LARV_TEST_SS_OUTPUT="" \
+        run bash -c "source scripts/lib/vm.sh && source scripts/lib/verifier.sh && port=\$(allocate_port mockup alpha) && release_port_reservation mockup \"\$port\" alpha && allocate_port mockup beta"
+    [ "$status" -eq 0 ]
+    [ "$output" = "9000" ]
 }
 
 @test "allocate_port rejects an unknown role" {
@@ -126,4 +156,16 @@ LISTEN 0 4096 0.0.0.0:9001 0.0.0.0:* users:((\"a\",pid=1,fd=1))" \
     LARV_TEST_SS_OUTPUT="LISTEN 0 4096 0.0.0.0:9001" \
         run bash -c "source scripts/lib/vm.sh && source scripts/lib/verifier.sh && verify_allocation 9001 mockup"
     [ "$status" -ne 0 ]
+}
+
+@test "verify_allocation fails for a port reserved by another owner" {
+    LARV_TEST_SS_OUTPUT="" \
+        run bash -c "source scripts/lib/vm.sh && source scripts/lib/verifier.sh && port=\$(allocate_port mockup alpha) && verify_allocation \"\$port\" mockup beta"
+    [ "$status" -ne 0 ]
+}
+
+@test "verify_allocation allows a port reserved by the same owner" {
+    LARV_TEST_SS_OUTPUT="" \
+        run bash -c "source scripts/lib/vm.sh && source scripts/lib/verifier.sh && port=\$(allocate_port mockup alpha) && verify_allocation \"\$port\" mockup alpha"
+    [ "$status" -eq 0 ]
 }

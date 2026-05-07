@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.12 (next) - Parallel port reservation hardening
+
+- Adds VM-local port reservations under a shared flock so parallel larv runs cannot choose the same app, mockup, or doc-site port before servers bind.
+- Updates Phase 3 mockup and Phase 6.5 Docsify flows to allocate ports with the project slug, re-verify before start, and release reservations only after probe-confirmed bind.
+- Hardens generated sandbox bootstrap with the same app-port reservation logic for handoff implementation runs.
+- Makes static server startup fail if the tmux session exists but the requested port never actually binds.
+
 ## 0.4.11 (next) - PRD-assisted DDD interview guard
 
 - Clarifies that a complete PRD reduces Phase 0a question count but never replaces the DDD interview.

@@ -19,12 +19,12 @@ static_server_compose_command() {
 static_server_check_remote_deps() {
     local ssh_target="$1"
     if [ "${LARV_RUNTIME_MODE:-local}" = "local" ]; then
-        command -v php >/dev/null && command -v tmux >/dev/null && command -v curl >/dev/null
+        command -v php >/dev/null && command -v tmux >/dev/null && command -v curl >/dev/null && command -v ss >/dev/null
         return
     fi
     [ -n "$ssh_target" ] || { echo "ERROR: ssh_target required" >&2; return 1; }
     ssh -o BatchMode=yes -o ConnectTimeout=5 "$ssh_target" \
-        "command -v php >/dev/null && command -v tmux >/dev/null && command -v curl >/dev/null && command -v rsync >/dev/null"
+        "command -v php >/dev/null && command -v tmux >/dev/null && command -v curl >/dev/null && command -v ss >/dev/null && command -v rsync >/dev/null"
 }
 
 # static_server_url <port>
@@ -33,6 +33,18 @@ static_server_url() {
     local port="$1"
     [ -n "$port" ] || { echo "ERROR: port required" >&2; return 1; }
     echo "http://${LARV_VM_HOST}:$port"
+}
+
+static_server_wait_for_port() {
+    local port="$1" attempt listening
+    for attempt in $(seq 1 10); do
+        listening="$(ss -tlnp 2>/dev/null | awk '{print $4}' | awk -F: '{print $NF}' | sort -un || true)"
+        if grep -qx "$port" <<<"$listening"; then
+            return 0
+        fi
+        sleep 0.2
+    done
+    return 1
 }
 
 # static_server_start <ssh_target> <port> <doc_root> <session_name>
@@ -48,11 +60,12 @@ static_server_start() {
         tmux kill-session -t "$session" 2>/dev/null || true
         tmux new-session -d -s "$session" "$cmd"
         tmux has-session -t "$session"
+        static_server_wait_for_port "$port"
         return
     fi
     [ -n "$ssh_target" ] || { echo "ERROR: ssh_target required" >&2; return 1; }
     ssh -o BatchMode=yes -o ConnectTimeout=5 "$ssh_target" \
-        "test -d '$doc_root' && tmux kill-session -t '$session' 2>/dev/null || true; tmux new-session -d -s '$session' '$cmd'; tmux has-session -t '$session'"
+        "test -d '$doc_root' || exit 1; tmux kill-session -t '$session' 2>/dev/null || true; tmux new-session -d -s '$session' '$cmd'; tmux has-session -t '$session' && for attempt in \$(seq 1 10); do ss -tlnp 2>/dev/null | awk '{print \$4}' | awk -F: '{print \$NF}' | sort -un | grep -qx '$port' && exit 0; sleep 0.2; done; exit 1"
 }
 
 # static_server_stop <ssh_target> <session_name>

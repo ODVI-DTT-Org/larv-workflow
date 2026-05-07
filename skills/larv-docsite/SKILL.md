@@ -35,14 +35,18 @@ ssh_target="${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}"
 project_root="$(pwd -P)"
 docsite_root="/tmp/larv-$slug-docsite"
 if ! static_server_check_remote_deps "$ssh_target"; then
-    echo "ERROR: runtime missing required static-server tools: php, tmux, or curl" >&2
+    echo "ERROR: runtime missing required static-server tools: php, tmux, curl, or ss" >&2
     exit 1
 fi
 
 # 1. Allocate port from docsite range (9500-9999)
-docsite_port=$(allocate_port docsite)
+docsite_port=$(allocate_port docsite "$slug")
 bash scripts/state.sh record-allocation . docsite-port "$docsite_port"
-static_server_open_firewall "$ssh_target" "$docsite_port"
+trap 'release_port_reservation docsite "$docsite_port" "$slug" || true' EXIT
+if ! static_server_open_firewall "$ssh_target" "$docsite_port"; then
+    echo "ERROR: firewall rule for doc-site port $docsite_port was not confirmed" >&2
+    exit 1
+fi
 
 # 2. Stage docs/larv plus generated handoff docs and a Docsify index.html on the local VM
 rm -rf "$docsite_root"
@@ -75,6 +79,10 @@ cat > "$docsite_root/index.html" <<'HTML'
 HTML
 
 # 3. Start static server. Docsify is client-side only; static server is enough.
+if ! verify_allocation "$docsite_port" docsite "$slug"; then
+    echo "ERROR: doc-site port $docsite_port was taken before server start" >&2
+    exit 1
+fi
 static_server_start "$ssh_target" "$docsite_port" "$docsite_root" \
     "larv-docsite-$slug"
 
@@ -94,6 +102,8 @@ if ! probe_with_retries "$docsite_url" static; then
     echo "ERROR: external probe failed" >&2
     exit 1
 fi
+release_port_reservation docsite "$docsite_port" "$slug" || true
+trap - EXIT
 
 # 5. Announce
 printf "%s\n" "$docsite_url" > docs/larv/docsite-url.txt
@@ -105,8 +115,9 @@ echo "Plan available for review at $docsite_url"
 
 The doc-site server is not optional. Do not advance to the Phase 8 routing menu, auto-commit, or return `status: complete` until all of these are true:
 
-- `docsite_port` was allocated through `allocate_port docsite` and recorded as `docsite-port` in `STATE.yaml.execution.allocations`.
-- `static_server_check_remote_deps "$ssh_target"` passed for `php`, `tmux`, and `curl` on the local VM runtime.
+- `docsite_port` was allocated through `allocate_port docsite "$slug"` and recorded as `docsite-port` in `STATE.yaml.execution.allocations`.
+- `verify_allocation "$docsite_port" docsite "$slug"` succeeded immediately before server start.
+- `static_server_check_remote_deps "$ssh_target"` passed for `php`, `tmux`, `curl`, and `ss` on the local VM runtime.
 - `static_server_open_firewall "$ssh_target" "$docsite_port"` succeeded or no local `ufw` is installed.
 - `docs/larv/` was copied to `$docsite_root` on the local VM.
 - `docs/Handsoff.md` and `docs/Handsoff/` were copied to `$docsite_root` on the local VM.
@@ -114,6 +125,7 @@ The doc-site server is not optional. Do not advance to the Phase 8 routing menu,
 - `static_server_start` succeeded.
 - `probe_url_inside "$ssh_target" "$docsite_port" static` succeeded.
 - `probe_with_retries "$docsite_url" static` succeeded.
+- `release_port_reservation docsite "$docsite_port" "$slug"` ran after the server bound and probes succeeded.
 - `docs/larv/docsite-url.txt` exists and contains the external URL.
 - `runtime_gate_require_phase_url . docsite "$LARV_VM_HOST"` succeeded.
 - The URL was printed to the user.
