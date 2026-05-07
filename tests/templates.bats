@@ -81,6 +81,15 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "DB_DATABASE" templates/env-guide.md.tmpl
     grep -q "DB_USERNAME" templates/env-guide.md.tmpl
     grep -q "MAIL_" templates/env-guide.md.tmpl
+    grep -q "STRIPE_WEBHOOK_SECRET" templates/env-guide.md.tmpl
+    grep -q "PADDLE_WEBHOOK_SECRET" templates/env-guide.md.tmpl
+    grep -q "REVERB_APP_KEY" templates/env-guide.md.tmpl
+    grep -q "MEILISEARCH_HOST" templates/env-guide.md.tmpl
+    grep -q "TYPESENSE_API_KEY" templates/env-guide.md.tmpl
+    grep -q "AWS_BUCKET" templates/env-guide.md.tmpl
+    grep -q "<PROVIDER>_CLIENT_ID" templates/env-guide.md.tmpl
+    grep -q "REDIS_HOST" templates/env-guide.md.tmpl
+    grep -q "OCTANE_SERVER" templates/env-guide.md.tmpl
     grep -q "Install" templates/operations-guide.md.tmpl
     grep -q "Troubleshooting" templates/operations-guide.md.tmpl
 }

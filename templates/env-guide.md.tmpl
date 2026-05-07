@@ -57,6 +57,98 @@ MAIL_FROM_ADDRESS=<verified-sender>
 MAIL_FROM_NAME="{{project_name}}"
 ```
 
+## Package-specific values
+
+Only collect values for packages selected in `docs/larv/03-design/package-decisions.md`.
+
+### Cashier / payments
+
+Stripe:
+
+```dotenv
+STRIPE_KEY=<stripe-publishable-key>
+STRIPE_SECRET=<stripe-secret-key>
+STRIPE_WEBHOOK_SECRET=<stripe-webhook-signing-secret>
+CASHIER_CURRENCY=usd
+```
+
+Paddle:
+
+```dotenv
+PADDLE_CLIENT_SIDE_TOKEN=<paddle-client-side-token>
+PADDLE_API_KEY=<paddle-api-key>
+PADDLE_WEBHOOK_SECRET=<paddle-webhook-secret>
+```
+
+### Reverb / realtime
+
+```dotenv
+REVERB_APP_ID=<reverb-app-id>
+REVERB_APP_KEY=<reverb-app-key>
+REVERB_APP_SECRET=<reverb-app-secret>
+REVERB_HOST=<reverb-host>
+REVERB_PORT=443
+REVERB_SCHEME=https
+```
+
+### Scout / search
+
+Meilisearch:
+
+```dotenv
+SCOUT_DRIVER=meilisearch
+MEILISEARCH_HOST=<meilisearch-host>
+MEILISEARCH_KEY=<meilisearch-key>
+```
+
+Typesense:
+
+```dotenv
+SCOUT_DRIVER=typesense
+TYPESENSE_HOST=<typesense-host>
+TYPESENSE_API_KEY=<typesense-api-key>
+```
+
+### Filesystem / uploads
+
+S3-compatible storage:
+
+```dotenv
+FILESYSTEM_DISK=s3
+AWS_ACCESS_KEY_ID=<access-key>
+AWS_SECRET_ACCESS_KEY=<secret-key>
+AWS_DEFAULT_REGION=<region>
+AWS_BUCKET=<bucket-name>
+AWS_URL=<optional-public-url>
+```
+
+### Socialite / OAuth
+
+Repeat per provider selected by the app plan:
+
+```dotenv
+<PROVIDER>_CLIENT_ID=<oauth-client-id>
+<PROVIDER>_CLIENT_SECRET=<oauth-client-secret>
+<PROVIDER>_REDIRECT_URI=https://<production-domain>/auth/<provider>/callback
+```
+
+### Horizon / Redis queues
+
+```dotenv
+QUEUE_CONNECTION=redis
+REDIS_HOST=<redis-host>
+REDIS_PASSWORD=<redis-password-or-null>
+REDIS_PORT=6379
+```
+
+### Octane
+
+Use only when the deploy target supports long-running PHP workers:
+
+```dotenv
+OCTANE_SERVER=<frankenphp|swoole|roadrunner>
+```
+
 ## Secret handling
 
 - Put production secrets only in Laravel Cloud environment variables or the selected secret manager.
