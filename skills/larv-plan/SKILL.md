@@ -57,6 +57,7 @@ The script runs locally on the VM from the current project root and must:
 
 - Use `APP_PORT` from the environment.
 - Use `DB_DATABASE` from the environment when database configuration is needed.
+- Assume `docs/Handsoff/bootstrap-sandbox.md` may create a bare Laravel scaffold first when `artisan` is missing in a greenfield docs-only project.
 - Start or restart the app process so `http://127.0.0.1:$APP_PORT/` responds.
 - Fail fast with useful errors (`set -euo pipefail`).
 - Avoid placeholders such as `TODO`, `TBD`, or "deployment commands here".
@@ -71,7 +72,7 @@ set -euo pipefail
 : "${DB_DATABASE:?DB_DATABASE is required}"
 
 if [ ! -f artisan ]; then
-    echo "ERROR: artisan not found in $(pwd); project was not copied correctly" >&2
+    echo "ERROR: artisan not found in $(pwd); rerun docs/Handsoff/bootstrap-sandbox.md so it can create the Laravel scaffold first" >&2
     exit 1
 fi
 

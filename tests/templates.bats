@@ -62,6 +62,9 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
 @test "bootstrap-sandbox template is self-contained and writes runtime URL" {
     grep -q "does not require the larv plugin" templates/bootstrap-sandbox.md.tmpl
     grep -q "docs/larv/07-runtime/deploy-sandbox.sh" templates/bootstrap-sandbox.md.tmpl
+    grep -q "ensure_laravel_scaffold" templates/bootstrap-sandbox.md.tmpl
+    grep -q "composer create-project laravel/laravel" templates/bootstrap-sandbox.md.tmpl
+    grep -q "LARV_SCAFFOLD_ON_BOOTSTRAP" templates/bootstrap-sandbox.md.tmpl
     grep -q "docs/larv/07-runtime/sandbox-url.txt" templates/bootstrap-sandbox.md.tmpl
     grep -q "ufw allow" templates/bootstrap-sandbox.md.tmpl
     grep -q "ufw status" templates/bootstrap-sandbox.md.tmpl

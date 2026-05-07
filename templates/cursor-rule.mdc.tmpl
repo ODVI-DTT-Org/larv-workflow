@@ -4,7 +4,7 @@ globs: ["**/*.php", "**/*.blade.php", "**/*.md"]
 alwaysApply: true
 ---
 
-This project is managed by the larv plugin. See `docs/Handsoff.md` for the execution contract. Before the first slice, run `docs/Handsoff/bootstrap-sandbox.md` top to bottom. Execute slices from `docs/Handsoff/slice-NN-*.md` only — never improvise.
+This project is managed by the larv plugin. See `docs/Handsoff.md` for the execution contract. Before the first slice, run `docs/Handsoff/bootstrap-sandbox.md` top to bottom; on greenfield docs-only repos it creates the bare Laravel scaffold if `artisan` is missing. Execute slices from `docs/Handsoff/slice-NN-*.md` only — never improvise.
 
 Runtime mode is local on the sandbox VM. Do not SSH to `{{vm_host}}` for the normal larv flow.
 

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.14 (next) - Greenfield handoff scaffold bootstrap
+
+- Fixes greenfield handoff bootstrap ordering by creating a bare Laravel scaffold when `artisan` is missing before starting the sandbox.
+- Clarifies handoff, AI starting-point, Cursor, routing menu, implementation, provision, and plan guidance so bootstrap-before-slice is not contradicted by a docs-only repo.
+- Updates the deploy-script fallback error to point back to `docs/Handsoff/bootstrap-sandbox.md` instead of implying a copy failure.
+
 ## 0.4.13 (next) - Doc-site and handoff render hardening
 
 - Fixes Docsify review sites that could stay stuck on `Loading...` by always generating a root `README.md`, `_sidebar.md`, explicit HTTPS CDN URLs, and a served markdown probe.

@@ -3,7 +3,7 @@
 This project is managed by the **larv** Laravel workflow plugin. The full plan and execution contract live in:
 
 - `docs/Handsoff.md` — index + project context (start here)
-- `docs/Handsoff/bootstrap-sandbox.md` — starts and probes the app sandbox before the first slice
+- `docs/Handsoff/bootstrap-sandbox.md` — creates a bare Laravel scaffold if `artisan` is missing, then starts and probes the app sandbox before the first slice
 - `docs/Handsoff/production-deploy.md` — production deploy checklist, defaults to Laravel Cloud + Namecheap
 - `docs/Handsoff/env-guide.md` — sandbox and production environment variable guide
 - `docs/Handsoff/operations-guide.md` — install, run, verify, and troubleshooting guide
@@ -16,7 +16,7 @@ This project is managed by the **larv** Laravel workflow plugin. The full plan a
 ## How to work in this project
 
 1. Read `docs/Handsoff.md` end to end before changing anything.
-2. Before the first slice, run `docs/Handsoff/bootstrap-sandbox.md` top to bottom. Do not implement slices until it prints the sandbox URL and writes `docs/larv/07-runtime/sandbox-url.txt`.
+2. Before the first slice, run `docs/Handsoff/bootstrap-sandbox.md` top to bottom. If this is a docs-only greenfield repo, that bootstrap creates the bare Laravel scaffold first. Do not implement slices until it prints the sandbox URL and writes `docs/larv/07-runtime/sandbox-url.txt`.
 3. To implement a slice, open the matching `docs/Handsoff/slice-NN-<name>.md` and execute it top to bottom.
 4. Probe-before-announce: never tell the user a URL until you have curl-confirmed the service responds.
 5. Recommendation-with-every-question: when you ask the user a question, pair it with a recommendation block:
@@ -39,7 +39,7 @@ When opening a new AI session because context is high or the previous session en
 1. Read `docs/Handsoff.md`.
 2. Read `docs/larv/STATE.yaml`.
 3. Read `docs/larv/implementation-tracker.yaml` and `docs/larv/implementation-tracker.md` if present.
-4. Read `docs/larv/07-runtime/sandbox-url.txt` if it exists. If it is missing and implementation has started, run `docs/Handsoff/bootstrap-sandbox.md` before app code edits.
+4. Read `docs/larv/07-runtime/sandbox-url.txt` if it exists. If it is missing, run `docs/Handsoff/bootstrap-sandbox.md` before app code edits; it handles missing `artisan` by scaffolding Laravel first.
 5. Find the first slice whose STATE status is not completed.
 6. Open the matching `docs/Handsoff/slice-NN-<name>.md` and continue from its next unchecked Definition of Done item.
 7. If all slices are complete, run verification or deployment depending on the user's request.

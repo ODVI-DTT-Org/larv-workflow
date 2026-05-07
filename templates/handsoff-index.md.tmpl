@@ -50,7 +50,7 @@ Brand spec: `docs/larv/03-design/brand-spec.md`
 
 {{slice_plan_inlined}}
 
-Before the first slice, run `docs/Handsoff/bootstrap-sandbox.md` to start and probe the app sandbox. Then implement slices from `docs/Handsoff/slice-NN-<name>.md` in dependency order.
+Before the first slice, run `docs/Handsoff/bootstrap-sandbox.md` to create the bare Laravel scaffold if this is still a docs-only greenfield repo, start the app sandbox, and probe the public URL. Then implement slices from `docs/Handsoff/slice-NN-<name>.md` in dependency order.
 
 Before coding a package-backed slice, check `docs/Handsoff/package-guide.md` so approved Laravel packages become concrete implementation, test, env, and deploy work.
 
@@ -58,7 +58,7 @@ After implementation is complete and the user is satisfied, use `docs/Handsoff/p
 
 ## 11. Sandbox Bootstrap
 
-The app sandbox is started by the implementation venue, not during planning.
+The app sandbox is started by the implementation venue, not during planning. For greenfield projects where this repo contains only `docs/` and `adr/`, the bootstrap file creates the bare Laravel scaffold first; Slice 01 then adds the app-specific packages, runtime choices, and domain code from the slice handoff.
 
 Start here: `docs/Handsoff/bootstrap-sandbox.md`
 
@@ -97,7 +97,7 @@ If context is nearly full, stop after the current atomic step and tell the user 
 1. Read this file: `docs/Handsoff.md`.
 2. Read `docs/larv/STATE.yaml`.
 3. Read `docs/larv/implementation-tracker.yaml` and `docs/larv/implementation-tracker.md` if present.
-4. Read `docs/larv/07-runtime/sandbox-url.txt` if it exists. If it is missing, run `docs/Handsoff/bootstrap-sandbox.md` before app code edits.
+4. Read `docs/larv/07-runtime/sandbox-url.txt` if it exists. If it is missing, run `docs/Handsoff/bootstrap-sandbox.md` before app code edits; on greenfield projects this also creates the bare Laravel scaffold if `artisan` is missing.
 5. Find the first slice whose STATE status is not completed.
 6. Open the matching `docs/Handsoff/slice-NN-<name>.md` and continue from its next unchecked Definition of Done item.
 7. If every slice is complete, run verification or deployment depending on the user's request.

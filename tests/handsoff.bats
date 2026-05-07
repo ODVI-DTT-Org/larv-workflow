@@ -99,6 +99,8 @@ EOF
     [ -f "$TMP/docs/Handsoff/bootstrap-sandbox.md" ]
     grep -q "Bootstrap Sandbox" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     grep -q "deploy-sandbox.sh" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+    grep -q "ensure_laravel_scaffold" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+    grep -q "composer create-project laravel/laravel" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     grep -q "DB_CONNECTION" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     grep -q "createdb" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     grep -q "CREATE DATABASE" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
@@ -109,6 +111,12 @@ EOF
     grep -q '"kind":"project-root","value": strenv(APP_ROOT)' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     ! grep -q 'rsync -a --delete' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     ! grep -E 'scripts/lib/[a-z_]+\.sh' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+}
+
+@test "handsoff index explains greenfield scaffold before sandbox" {
+    bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_index '$TMP'"
+    grep -q "creates the bare Laravel scaffold first" "$TMP/docs/Handsoff.md"
+    grep -q "docs-only greenfield" "$TMP/docs/Handsoff.md"
 }
 
 @test "handsoff_render_runtime_guides writes deploy env and ops guides" {
@@ -128,6 +136,7 @@ EOF
 @test "starting-point files require bootstrap before slices" {
     bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_starting_points '$TMP'"
     grep -q "bootstrap-sandbox.md" "$TMP/CLAUDE.md"
+    grep -q "bare Laravel scaffold" "$TMP/CLAUDE.md"
     grep -q "bootstrap-sandbox.md" "$TMP/AGENTS.md"
     grep -q "bootstrap-sandbox.md" "$TMP/GEMINI.md"
     grep -q "bootstrap-sandbox.md" "$TMP/.cursor/rules/larv.mdc"

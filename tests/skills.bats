@@ -203,6 +203,7 @@ yaml.safe_load(parts[1])
     grep -q "Do not dispatch this during" skills/larv-provision/SKILL.md
     grep -q "app sandbox belongs to implementation handoff" skills/larv-provision/SKILL.md
     grep -q "docs/Handsoff/bootstrap-sandbox.md" skills/larv-provision/SKILL.md
+    grep -q "Create a bare Laravel scaffold" skills/larv-provision/SKILL.md
     grep -q "Print the sandbox URL only after both probes pass" skills/larv-provision/SKILL.md
     grep -q "not from larv-provision during /larv:full" skills/larv-provision/SKILL.md
 }
@@ -213,6 +214,8 @@ yaml.safe_load(parts[1])
     grep -q "APP_PORT" skills/larv-plan/SKILL.md
     grep -q "DB_DATABASE" skills/larv-plan/SKILL.md
     grep -q "Handoff bootstrap refuses" skills/larv-plan/SKILL.md
+    grep -q "bare Laravel scaffold" skills/larv-plan/SKILL.md
+    grep -q "rerun docs/Handsoff/bootstrap-sandbox.md" skills/larv-plan/SKILL.md
 }
 
 @test "larv-orchestrator describes Phase 0a and Phase 6.5 in greenfield sequence" {
@@ -243,6 +246,7 @@ yaml.safe_load(parts[1])
     grep -q "Bootstrap — mandatory before first slice" skills/larv-implement/SKILL.md
     grep -q "docs/Handsoff/bootstrap-sandbox.md" skills/larv-implement/SKILL.md
     grep -q "docs/larv/07-runtime/sandbox-url.txt" skills/larv-implement/SKILL.md
+    grep -q "creates the bare Laravel scaffold" skills/larv-implement/SKILL.md
 }
 
 @test "larv-handoff renders production and user guide documents" {

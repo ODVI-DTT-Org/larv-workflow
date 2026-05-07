@@ -13,6 +13,7 @@ The app sandbox belongs to implementation handoff so another AI tool can execute
 2. `larv-handoff` writes `docs/Handsoff/bootstrap-sandbox.md`.
 3. `larv-docsite` serves the plan and generated handoff for review.
 4. The selected implementation venue runs `docs/Handsoff/bootstrap-sandbox.md` before the first slice.
+5. In greenfield docs-only repos, that bootstrap creates the bare Laravel scaffold first when `artisan` is missing; Slice 01 then applies app-specific packages and domain work.
 
 Keep this skill only as a reference for the required invariants in the bootstrap document.
 
@@ -22,6 +23,7 @@ Keep this skill only as a reference for the required invariants in the bootstrap
 
 - Be self-contained and not require plugin libraries.
 - Refuse to continue unless `docs/larv/07-runtime/deploy-sandbox.sh` exists and is executable.
+- Create a bare Laravel scaffold in the current project root when `artisan` is missing, unless `LARV_SCAFFOLD_ON_BOOTSTRAP=never`.
 - Allocate a free app port from the app range.
 - Open the selected app port in the VM firewall before the external probe.
 - Allocate a database name from the project slug.

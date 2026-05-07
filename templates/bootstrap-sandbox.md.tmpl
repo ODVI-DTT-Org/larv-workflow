@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Allocate local VM runtime resources, run `docs/larv/07-runtime/deploy-sandbox.sh` from the current project directory, probe the app from inside and outside the VM, then write the sandbox URL back into project docs. This assumes the AI is already running on the sandbox VM and that this file is being executed from the project root.
+Allocate local VM runtime resources, create a bare Laravel scaffold when this is a greenfield docs-only project, run `docs/larv/07-runtime/deploy-sandbox.sh` from the current project directory, probe the app from inside and outside the VM, then write the sandbox URL back into project docs. This assumes the AI is already running on the sandbox VM and that this file is being executed from the project root.
 
 ## Required local files
 
@@ -44,6 +44,41 @@ if ! command -v php >/dev/null || ! command -v tmux >/dev/null || ! command -v c
     echo "ERROR: php, tmux, curl, ss, yq, and flock are required on this VM" >&2
     exit 1
 fi
+
+ensure_laravel_scaffold() {
+    if [ -f artisan ]; then
+        return 0
+    fi
+    if [ "${LARV_SCAFFOLD_ON_BOOTSTRAP:-auto}" = "never" ]; then
+        echo "ERROR: artisan is missing and LARV_SCAFFOLD_ON_BOOTSTRAP=never. Create the Laravel scaffold, then rerun this bootstrap." >&2
+        exit 1
+    fi
+    if ! command -v composer >/dev/null; then
+        echo "ERROR: artisan is missing and composer is not installed. Install composer or create the Laravel scaffold, then rerun this bootstrap." >&2
+        exit 1
+    fi
+
+    echo "Laravel scaffold not found; creating a bare Laravel app in $APP_ROOT before sandbox startup."
+    scaffold_tmp="$(mktemp -d)"
+    cleanup_scaffold_tmp() { rm -rf "$scaffold_tmp"; }
+    trap cleanup_scaffold_tmp RETURN
+
+    composer create-project laravel/laravel "$scaffold_tmp/app" --no-interaction --prefer-dist
+    if command -v rsync >/dev/null; then
+        rsync -a --exclude='.git' "$scaffold_tmp/app/" "$APP_ROOT/"
+    else
+        (cd "$scaffold_tmp/app" && tar cf - .) | (cd "$APP_ROOT" && tar xf -)
+    fi
+    rm -rf "$scaffold_tmp"
+    trap - RETURN
+
+    if [ ! -f artisan ]; then
+        echo "ERROR: Laravel scaffold completed but artisan is still missing in $APP_ROOT" >&2
+        exit 1
+    fi
+}
+
+ensure_laravel_scaffold
 
 if [ "$DB_CONNECTION" = "pgsql" ]; then
     DB_PORT="${DB_PORT:-5432}"
