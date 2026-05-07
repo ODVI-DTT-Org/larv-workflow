@@ -25,9 +25,103 @@ Questions:
 6. Which mail provider should production use?
 7. Which queue/cache/session drivers should production use?
 8. Are file uploads needed in production? If yes, which storage provider?
+9. Deployment mode: guide-only, Laravel Cloud CLI automation, Laravel Cloud API automation, or mixed?
+10. DNS mode: guide-only or DNS automation through Namecheap API?
 ```
 
 Do not deploy until the user answers the domain, Laravel Cloud project/environment, database, and required secrets.
+
+## 1.1 Deployment mode chooser
+
+Offer these choices before any production-affecting action:
+
+```text
+Recommendation: guide-only for the first production deploy, then Laravel Cloud CLI automation once the user confirms the Cloud project/environment.
+Why: guide-only avoids accidental production changes; CLI automation is the safest automated path because the user authenticates locally with Laravel Cloud.
+Tradeoffs: API automation is better for CI/CD, but requires a bearer token and stricter secret handling.
+
+Choices:
+1. guide-only — no automated production changes. The AI walks the user through this guide.
+2. Laravel Cloud CLI automation — user runs `cloud auth` or `cloud auth:token --add`; AI prints and runs approved `cloud` commands.
+3. Laravel Cloud API automation — user exports `LARAVEL_CLOUD_API_TOKEN`; AI uses HTTPS API calls with `Authorization: Bearer $LARAVEL_CLOUD_API_TOKEN`.
+4. mixed — automate Laravel Cloud deploy, but keep DNS as guide-only.
+```
+
+Never ask the user to paste secrets into chat if they can export them in the shell or enter them in the provider UI.
+
+### Laravel Cloud CLI automation requirements
+
+Required on the deploying machine:
+
+```bash
+php -v
+composer --version
+git --version
+command -v cloud
+cloud auth
+```
+
+If `cloud` is missing:
+
+```bash
+composer global require laravel/cloud-cli
+```
+
+Use browser authentication with `cloud auth` when possible. For token authentication, ask the user to run:
+
+```bash
+cloud auth:token --add
+```
+
+Then confirm the selected organization, application, and environment before running deploy commands.
+
+### Laravel Cloud API automation requirements
+
+Ask the user to create an API token in Laravel Cloud organization settings, then export it outside git:
+
+```bash
+export LARAVEL_CLOUD_API_TOKEN="..."
+```
+
+Before using it, verify it is present without printing it:
+
+```bash
+test -n "${LARAVEL_CLOUD_API_TOKEN:-}" || { echo "Missing LARAVEL_CLOUD_API_TOKEN"; exit 1; }
+```
+
+Use API calls only after the user confirms the target organization, application, environment, branch, domain, and database resource.
+
+Example header shape:
+
+```bash
+curl -fsS \
+  -H "Authorization: Bearer ${LARAVEL_CLOUD_API_TOKEN}" \
+  -H "Accept: application/json" \
+  https://cloud.laravel.com/api/...
+```
+
+### DNS automation requirements
+
+Default DNS mode is guide-only. For Namecheap API automation, ask the user to export credentials outside git:
+
+```bash
+export NAMECHEAP_API_USER="..."
+export NAMECHEAP_API_KEY="..."
+export NAMECHEAP_USERNAME="${NAMECHEAP_API_USER}"
+export NAMECHEAP_CLIENT_IP="<whitelisted-public-ipv4>"
+```
+
+Namecheap requires API user, API key, username, and client IP on API requests. The `NAMECHEAP_CLIENT_IP` must be whitelisted in Namecheap API Access before automation can work.
+
+Do not automate DNS unless the user confirms the exact record to create or update:
+
+```text
+Domain:
+Host:
+Type: A or CNAME
+Value:
+TTL:
+```
 
 ## 2. Pre-deploy verification
 
@@ -134,6 +228,15 @@ TLS/SSL status:
 ```
 
 ## 6. Deploy and verify
+
+If the user selected Laravel Cloud CLI automation, print the commands first, then run only after approval:
+
+```bash
+cloud deploy
+cloud deploy:monitor
+```
+
+If the user selected guide-only, ask them to trigger the deployment in Laravel Cloud and report when it finishes.
 
 After deployment:
 

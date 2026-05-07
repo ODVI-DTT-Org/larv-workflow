@@ -275,4 +275,9 @@ yaml.safe_load(parts[1])
     grep -q "guide-only" skills/larv-deploy/SKILL.md
     grep -q "automation mode" skills/larv-deploy/SKILL.md
     grep -q "Laravel Cloud CLI" skills/larv-deploy/SKILL.md
+    grep -q "Laravel Cloud API" skills/larv-deploy/SKILL.md
+    grep -q "LARAVEL_CLOUD_API_TOKEN" skills/larv-deploy/SKILL.md
+    grep -q "Namecheap API" skills/larv-deploy/SKILL.md
+    grep -q "NAMECHEAP_CLIENT_IP" skills/larv-deploy/SKILL.md
+    grep -q "automation choice" skills/larv-deploy/SKILL.md
 }

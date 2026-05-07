@@ -32,6 +32,29 @@ This project is managed by the **larv** Laravel workflow plugin. The full plan a
    - Run the slice's Definition of Done checklist before claiming completion.
    - Identify yourself accurately when filling `created_by.tool` and `created_by.model` in the tracker.
 
+## Fresh session recovery
+
+When opening a new AI session because context is high or the previous session ended:
+
+1. Read `docs/Handsoff.md`.
+2. Read `docs/larv/STATE.yaml`.
+3. Read `docs/larv/implementation-tracker.yaml` and `docs/larv/implementation-tracker.md` if present.
+4. Read `docs/larv/07-runtime/sandbox-url.txt` if it exists. If it is missing and implementation has started, run `docs/Handsoff/bootstrap-sandbox.md` before app code edits.
+5. Find the first slice whose STATE status is not completed.
+6. Open the matching `docs/Handsoff/slice-NN-<name>.md` and continue from its next unchecked Definition of Done item.
+7. If all slices are complete, run verification or deployment depending on the user's request.
+
+If larv commands are available, `/larv:resume` can do the same state lookup for a managed project.
+
+## New feature requests
+
+When the user asks for a new feature in a managed project:
+
+1. If larv commands are available, run `/larv:feature <feature-name>`.
+2. If larv commands are not available, read `docs/Handsoff.md`, `docs/larv/STATE.yaml`, `docs/larv/implementation-tracker.yaml`, `adr/`, and `docs/larv/01-domain/`.
+3. Create `docs/larv/features/<feature-slug>/` with the feature brief, domain delta, design delta, test delta, premortem, and implementation slices.
+4. Append tracker entries with `type: feature`.
+
 ## Code conventions
 
 - Format: Pint (`vendor/bin/pint`)

@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.8 (next) - Deployment automation and continuation
+
+- Adds a production deployment mode chooser for `guide-only`, Laravel Cloud CLI automation, Laravel Cloud API automation, mixed automation, and Namecheap DNS automation.
+- Documents required Laravel Cloud and Namecheap automation credentials while keeping secrets out of git-tracked handoff files.
+- Adds fresh-session recovery instructions to generated handoff and AI starting-point files so Codex CLI, Claude Code, Cursor, Gemini, or another AI can continue from `STATE.yaml`, tracker, reports, and slice handoffs instead of chat history.
+- Adds new-feature guidance for fresh sessions through `/larv:feature` when commands are available, with a file-based fallback for external AI tools.
+
 ## 0.4.7 (next) - Package env expansion
 
 - Expands the handoff environment guide with package-specific production values for Cashier/Stripe, Cashier/Paddle, Reverb, Scout/Meilisearch, Scout/Typesense, S3 uploads, Socialite/OAuth, Horizon/Redis queues, and Octane.

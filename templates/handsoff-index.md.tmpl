@@ -89,11 +89,35 @@ Smoke-test URL (after each slice): read base URL from `docs/larv/07-runtime/sand
 - Append discoveries worth saving to `docs/larv/local-learnings.md` (snippet in slice handsoff).
 - Identify yourself accurately when filling `created_by.tool` and `created_by.model`.
 
-## 14. Foreign-AI notes
+## 14. Fresh session recovery
+
+If context is nearly full, stop after the current atomic step and tell the user to open a fresh session in the same repo. A fresh AI session must recover from files, not chat history:
+
+1. Read this file: `docs/Handsoff.md`.
+2. Read `docs/larv/STATE.yaml`.
+3. Read `docs/larv/implementation-tracker.yaml` and `docs/larv/implementation-tracker.md` if present.
+4. Read `docs/larv/07-runtime/sandbox-url.txt` if it exists. If it is missing, run `docs/Handsoff/bootstrap-sandbox.md` before app code edits.
+5. Find the first slice whose STATE status is not completed.
+6. Open the matching `docs/Handsoff/slice-NN-<name>.md` and continue from its next unchecked Definition of Done item.
+7. If every slice is complete, run verification or deployment depending on the user's request.
+
+Do not rely on previous chat context. The docs, tracker, reports, and STATE file are the source of truth.
+
+## 15. New feature in a fresh session
+
+If the user asks for a new feature after the original implementation:
+
+1. If larv commands are available, run `/larv:feature <feature-name>`.
+2. If larv commands are not available, read `docs/Handsoff.md`, `docs/larv/STATE.yaml`, `docs/larv/implementation-tracker.yaml`, `adr/`, and `docs/larv/01-domain/`.
+3. Create `docs/larv/features/<feature-slug>/` with the feature brief, domain delta, design delta, test delta, premortem, and implementation slices.
+4. Append feature work to `docs/larv/implementation-tracker.yaml` with `type: feature`.
+5. Refresh the relevant handoff docs before implementation.
+
+## 16. Foreign-AI notes
 
 If you are not Claude Code: ignore any references to "superpowers" or "skills" outside this document. Treat this Handsoff and the per-slice files as a complete plain-language spec. You do not need to install the larv plugin; everything you need to do is encoded inline.
 
-## 15. Production handoff
+## 17. Production handoff
 
 - Production deploy guide: `docs/Handsoff/production-deploy.md`
 - Environment guide: `docs/Handsoff/env-guide.md`

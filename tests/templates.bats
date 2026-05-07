@@ -77,6 +77,26 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "A record" templates/production-deploy.md.tmpl
 }
 
+@test "production deploy template offers guide cli api and dns automation choices" {
+    grep -q "guide-only" templates/production-deploy.md.tmpl
+    grep -q "Laravel Cloud CLI automation" templates/production-deploy.md.tmpl
+    grep -q "Laravel Cloud API automation" templates/production-deploy.md.tmpl
+    grep -q "DNS automation" templates/production-deploy.md.tmpl
+    grep -q "LARAVEL_CLOUD_API_TOKEN" templates/production-deploy.md.tmpl
+    grep -q "cloud auth" templates/production-deploy.md.tmpl
+    grep -q "Authorization: Bearer" templates/production-deploy.md.tmpl
+    grep -q "NAMECHEAP_API_KEY" templates/production-deploy.md.tmpl
+    grep -q "NAMECHEAP_CLIENT_IP" templates/production-deploy.md.tmpl
+}
+
+@test "handoff and starting point templates explain fresh context continuation" {
+    grep -q "Fresh session recovery" templates/handsoff-index.md.tmpl
+    grep -q "first slice whose STATE status is not completed" templates/handsoff-index.md.tmpl
+    grep -q "Fresh session recovery" templates/ai-starting-point.md.tmpl
+    grep -q "/larv:resume" templates/ai-starting-point.md.tmpl
+    grep -q "/larv:feature" templates/ai-starting-point.md.tmpl
+}
+
 @test "env and operations guide templates cover setup values" {
     grep -q "DB_DATABASE" templates/env-guide.md.tmpl
     grep -q "DB_USERNAME" templates/env-guide.md.tmpl
