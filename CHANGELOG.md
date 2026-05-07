@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.7 (next) - Package env expansion
+
+- Expands the handoff environment guide with package-specific production values for Cashier/Stripe, Cashier/Paddle, Reverb, Scout/Meilisearch, Scout/Typesense, S3 uploads, Socialite/OAuth, Horizon/Redis queues, and Octane.
+- Adds template coverage so future changes keep the package env guide visible in generated handoff docs.
+
 ## 0.4.6 (next) - Guardrails and simulation hardening
 
 - Adds Claude Code hooks for session reminders, secret-edit blocking, implementation-before-bootstrap blocking, and tracker/STATE/report reminders after app edits.
