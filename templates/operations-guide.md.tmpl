@@ -2,6 +2,8 @@
 
 This is the user-facing manual for installing, running, checking, and troubleshooting the app.
 
+User-facing guides are organized under `docs/user-manual/`. When sharing instructions with the user, always show the exact guide path.
+
 ## Install
 
 ```bash
@@ -57,6 +59,30 @@ Smoke test:
 
 ```bash
 curl -fsS "$(cat docs/larv/07-runtime/sandbox-url.txt)" >/dev/null
+```
+
+## End-to-end testing guides
+
+Per-slice browser QA guides live in:
+
+```text
+docs/user-manual/testing/
+```
+
+Each guide explains how to navigate the app, what seeded records should be visible, which credentials to use, and what can be tested after that slice.
+
+## Seed data and reset
+
+Seed data, demo credentials, reset commands, and demo-data removal guidance live in:
+
+```text
+docs/user-manual/seed-data.md
+```
+
+Reset sandbox data with:
+
+```bash
+php artisan migrate:fresh --seed
 ```
 
 ## Troubleshooting

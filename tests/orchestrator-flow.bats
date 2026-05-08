@@ -54,6 +54,9 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
     [ -f docs/Handsoff/env-guide.md ]
     [ -f docs/Handsoff/operations-guide.md ]
     [ -f docs/Handsoff/package-guide.md ]
+    [ -f docs/user-manual/README.md ]
+    [ -f docs/user-manual/seed-data.md ]
+    [ -d docs/user-manual/testing ]
     [ -f docs/Handsoff/slice-01-auth-scaffold.md ]
     [ -f docs/Handsoff/slice-02-todos-crud.md ]
     [ -f CLAUDE.md ]
@@ -81,6 +84,9 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
     grep -q "env-guide.md" docs/Handsoff.md
     grep -q "operations-guide.md" docs/Handsoff.md
     grep -q "package-guide.md" docs/Handsoff.md
+    grep -q "docs/user-manual/README.md" docs/Handsoff.md
+    grep -q "docs/user-manual/testing" docs/Handsoff/slice-01-auth-scaffold.md
+    grep -q "docs/user-manual/seed-data.md" docs/Handsoff/slice-01-auth-scaffold.md
     grep -q "Bootstrap Sandbox" docs/Handsoff/bootstrap-sandbox.md
     grep -q "Laravel Cloud" docs/Handsoff/production-deploy.md
     grep -q "Namecheap" docs/Handsoff/production-deploy.md

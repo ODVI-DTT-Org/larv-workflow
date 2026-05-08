@@ -44,6 +44,9 @@ teardown() { teardown_tmp_project "$TMP"; }
     grep -q "Review Gate" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "auto-all" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "manual-slice" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "docs/user-manual/testing/slice-01-auth.md" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "docs/user-manual/seed-data.md" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "at least 10 realistic records" "$TMP/docs/Handsoff/slice-01-auth.md"
 }
 
 @test "handsoff slice commands start in local app root" {
@@ -129,11 +132,19 @@ EOF
     [ -f "$TMP/docs/Handsoff/env-guide.md" ]
     [ -f "$TMP/docs/Handsoff/operations-guide.md" ]
     [ -f "$TMP/docs/Handsoff/package-guide.md" ]
+    [ -f "$TMP/docs/user-manual/README.md" ]
+    [ -f "$TMP/docs/user-manual/installation.md" ]
+    [ -f "$TMP/docs/user-manual/environment.md" ]
+    [ -f "$TMP/docs/user-manual/seed-data.md" ]
+    [ -d "$TMP/docs/user-manual/testing" ]
     grep -q "Laravel Cloud" "$TMP/docs/Handsoff/production-deploy.md"
     grep -q "Namecheap" "$TMP/docs/Handsoff/production-deploy.md"
     grep -q "DB_DATABASE" "$TMP/docs/Handsoff/env-guide.md"
     grep -q "Install" "$TMP/docs/Handsoff/operations-guide.md"
     grep -q "Filament" "$TMP/docs/Handsoff/package-guide.md"
+    grep -q "Per-slice testing guides" "$TMP/docs/user-manual/README.md"
+    grep -q "migrate:fresh --seed" "$TMP/docs/user-manual/seed-data.md"
+    grep -q "Required Seeder Policy" "$TMP/docs/user-manual/seed-data.md"
 }
 
 @test "starting-point files require bootstrap before slices" {

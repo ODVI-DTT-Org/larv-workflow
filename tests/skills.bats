@@ -191,6 +191,8 @@ yaml.safe_load(parts[1])
     grep -q "runtime_gate_require_phase_url . docsite" skills/larv-docsite/SKILL.md
     grep -q "docs/Handsoff.md" skills/larv-docsite/SKILL.md
     grep -q "docs/Handsoff/" skills/larv-docsite/SKILL.md
+    grep -q "docs/user-manual/" skills/larv-docsite/SKILL.md
+    grep -q "user-manual/seed-data.md" skills/larv-docsite/SKILL.md
     grep -q "README.md" skills/larv-docsite/SKILL.md
     grep -q "_sidebar.md" skills/larv-docsite/SKILL.md
     grep -q "https://cdn.jsdelivr.net/npm/docsify@4" skills/larv-docsite/SKILL.md
@@ -219,6 +221,8 @@ yaml.safe_load(parts[1])
     grep -q "Handoff bootstrap refuses" skills/larv-plan/SKILL.md
     grep -q "bare Laravel scaffold" skills/larv-plan/SKILL.md
     grep -q "rerun docs/Handsoff/bootstrap-sandbox.md" skills/larv-plan/SKILL.md
+    grep -q "at least 10 realistic records" skills/larv-plan/SKILL.md
+    grep -q "php artisan db:seed --force" skills/larv-plan/SKILL.md
 }
 
 @test "larv-orchestrator describes Phase 0a and Phase 6.5 in greenfield sequence" {
@@ -252,6 +256,8 @@ yaml.safe_load(parts[1])
     grep -q "creates the bare Laravel scaffold" skills/larv-implement/SKILL.md
     grep -q "auto-all" skills/larv-implement/SKILL.md
     grep -q "manual-slice" skills/larv-implement/SKILL.md
+    grep -q "docs/user-manual/testing" skills/larv-implement/SKILL.md
+    grep -q "docs/user-manual/seed-data.md" skills/larv-implement/SKILL.md
 }
 
 @test "larv-handoff renders production and user guide documents" {
@@ -260,6 +266,8 @@ yaml.safe_load(parts[1])
     grep -q "docs/Handsoff/env-guide.md" skills/larv-handoff/SKILL.md
     grep -q "docs/Handsoff/operations-guide.md" skills/larv-handoff/SKILL.md
     grep -q "docs/Handsoff/package-guide.md" skills/larv-handoff/SKILL.md
+    grep -q "docs/user-manual/README.md" skills/larv-handoff/SKILL.md
+    grep -q "docs/user-manual/seed-data.md" skills/larv-handoff/SKILL.md
 }
 
 @test "larv-deploy is filled with Laravel Cloud and Namecheap handoff guidance" {

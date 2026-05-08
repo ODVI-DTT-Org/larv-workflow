@@ -9,6 +9,9 @@ This project is managed by the **larv** Laravel workflow plugin. The full plan a
 - `docs/Handsoff/operations-guide.md` — install, run, verify, and troubleshooting guide
 - `docs/Handsoff/package-guide.md` — Laravel package implementation/test/env/deploy matrix
 - `docs/Handsoff/slice-NN-<name>.md` — per-slice execution contract
+- `docs/user-manual/README.md` — user-facing guide index
+- `docs/user-manual/testing/` — per-slice end-to-end testing guides
+- `docs/user-manual/seed-data.md` — seeded records, credentials, reset, and demo-data removal guide
 - `docs/larv/implementation-tracker.yaml` — tracker (append on every change)
 - `docs/larv/local-learnings.md` — learnings staging (append when you discover something worth saving)
 - `adr/` — architecture decision records
@@ -29,6 +32,8 @@ This project is managed by the **larv** Laravel workflow plugin. The full plan a
 7. After every change:
    - Append a tracker entry (snippet in the slice handsoff).
    - Update `STATE.yaml.slices.<slice-id>.status` (snippet in the slice handsoff).
+   - Write or update the per-slice guide in `docs/user-manual/testing/`.
+   - Update `docs/user-manual/seed-data.md` with seeded records, credentials, reset commands, and demo-data removal notes.
    - Append to `docs/larv/local-learnings.md` if you discovered something.
    - Run the slice's Definition of Done checklist before claiming completion.
    - Identify yourself accurately when filling `created_by.tool` and `created_by.model` in the tracker.
@@ -41,9 +46,10 @@ When opening a new AI session because context is high or the previous session en
 2. Read `docs/larv/STATE.yaml`.
 3. Read `docs/larv/implementation-tracker.yaml` and `docs/larv/implementation-tracker.md` if present.
 4. Read `docs/larv/07-runtime/sandbox-url.txt` if it exists. If it is missing, run `docs/Handsoff/bootstrap-sandbox.md` before app code edits; it handles missing `artisan` by scaffolding Laravel first.
-5. Find the first slice whose STATE status is not completed.
-6. Open the matching `docs/Handsoff/slice-NN-<name>.md` and continue from its next unchecked Definition of Done item.
-7. If all slices are complete, run verification or deployment depending on the user's request.
+5. Read `docs/user-manual/README.md` and `docs/user-manual/seed-data.md`.
+6. Find the first slice whose STATE status is not completed.
+7. Open the matching `docs/Handsoff/slice-NN-<name>.md` and continue from its next unchecked Definition of Done item.
+8. If all slices are complete, run verification or deployment depending on the user's request.
 
 If larv commands are available, `/larv:resume` can do the same state lookup for a managed project.
 

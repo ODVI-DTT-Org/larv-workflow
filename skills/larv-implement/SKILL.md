@@ -38,11 +38,13 @@ For each `slice-NN-<name>.md`:
 1. Read it from top to bottom.
 2. Execute every bash block in section 12 (Implementation commands).
 3. Run section 10's Definition of Done checklist.
-4. Run section 13's tracker append snippet.
-5. Run section 14's local-learnings append snippet if you discovered something.
-6. Run section 15's STATE.yaml update snippet.
-7. Write `IMPLEMENTATION-REPORT-<slice-id>.md` per section 16.
-8. Apply the execution cadence above. Always print the public sandbox URL and what can be tested when pausing for user review.
+4. Write or update the hard-required user testing guide at `docs/user-manual/testing/<slice-id>-<slice-slug>.md`.
+5. Update `docs/user-manual/seed-data.md` with seeded records, demo credentials, reset commands, and demo-data removal notes.
+6. Run section 13's tracker append snippet.
+7. Run section 14's local-learnings append snippet if you discovered something.
+8. Run section 15's STATE.yaml update snippet.
+9. Write `IMPLEMENTATION-REPORT-<slice-id>.md` per section 16.
+10. Apply the execution cadence above. Always print the public sandbox URL and exact guide paths when pausing for user review.
 
 ## Failure handling
 

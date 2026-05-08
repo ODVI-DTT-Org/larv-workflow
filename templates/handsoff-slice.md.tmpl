@@ -26,6 +26,16 @@
 
 {{tests_list_with_acceptance_criteria}}
 
+## 6.1 Seed data to create
+
+Every user-facing feature in this slice must include realistic seed data so the sandbox is demonstrable, not blank.
+
+- Create or update Laravel seeder classes for this slice.
+- Seed at least 10 realistic records for each feature introduced or changed by this slice, unless the domain has fewer valid states.
+- Seed every role/persona required to test this slice's flow.
+- Include enough record states to make the UI obvious during review, such as draft, active, approved, rejected, overdue, archived, failed, or escalated where applicable.
+- Update `docs/user-manual/seed-data.md` with seeded records, credentials, reset commands, and removal/production notes.
+
 ## 7. API endpoints
 
 {{api_endpoints_with_examples}}
@@ -44,7 +54,11 @@ parallel: {{parallel_flag}}
 - [ ] All tests in section 6 pass: `docker compose exec app vendor/bin/pest --filter='{{test_filter}}'`
 - [ ] Migration runs forward: `docker compose exec app php artisan migrate`
 - [ ] Migration runs backward: `docker compose exec app php artisan migrate:rollback`
+- [ ] Seeders run successfully: `php artisan db:seed` or `docker compose exec app php artisan db:seed`
+- [ ] At least 10 realistic records per feature are visible in the sandbox UI or documented with a justified exception.
 - [ ] No N+1 queries on listed endpoints (verified with Telescope or similar)
+- [ ] `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md` written with end-to-end browser testing instructions.
+- [ ] `docs/user-manual/seed-data.md` updated with credentials, seeded records, reset commands, and demo-data removal notes.
 - [ ] `IMPLEMENTATION-REPORT-{{slice_id}}.md` written
 - [ ] Tracker entry appended (see section 13)
 - [ ] Learnings appended if any (see section 14)
@@ -133,20 +147,49 @@ Pest: {{passed}}/{{total}}
 - ...
 ```
 
-## 17. Review Gate
+## 17. User Testing Guide (hard required)
+
+Write `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md` before marking this slice complete.
+
+The guide must be written for an end user doing browser QA and must include:
+
+- Sandbox URL: read from `docs/larv/07-runtime/sandbox-url.txt`
+- Login credentials and roles needed for this slice
+- Seeded records the user should see, including at least 10 records per feature or a justified exception
+- Step-by-step navigation from login to the screens touched by this slice
+- What can be tested now
+- What should not be expected yet
+- Terminal verification commands run by the AI
+- How to reset demo data with `php artisan migrate:fresh --seed` or the Docker equivalent
+- How to remove/disable demo seed data before production
+
+Run this verifier before continuing:
+
+```bash
+test -s docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
+test -s docs/user-manual/seed-data.md
+grep -qi "Sandbox URL" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
+grep -qi "Seeded records" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
+grep -qi "migrate:fresh --seed" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
+grep -qi "{{slice_id}}" docs/user-manual/seed-data.md
+```
+
+## 18. Review Gate
 
 After this slice, read `STATE.yaml.execution.review_mode`.
 
 - If `auto-all`, continue to the next eligible slice after the Definition of Done passes.
 - If `manual-slice`, stop here and show the user:
   - Sandbox URL: `$(cat docs/larv/07-runtime/sandbox-url.txt)`
+  - Testing guide path: `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md`
+  - Seed/reset guide path: `docs/user-manual/seed-data.md`
   - Terminal verification commands run for this slice
-  - Browser paths or actions from the "How to QA" section of `IMPLEMENTATION-REPORT-{{slice_id}}.md`
+  - Browser paths or actions from `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md`
   - Files changed and tests passed
   Wait for explicit approval before continuing.
 - If `manual-adr`, stop only if this slice created or changed ADRs listed in the tracker entry.
 - If `manual-phase`, stop only if this slice completes a major feature group or final verification boundary.
 
-## 18. Foreign-AI notes
+## 19. Foreign-AI notes
 
 If you are not Claude Code or are unfamiliar with the larv plugin: this document is self-contained. Do not look for plugin scripts to call; every action above is plain bash. Identify yourself accurately in section 13's tracker append snippet.

@@ -163,6 +163,19 @@ handsoff_render_runtime_guides() {
         > "$dir/docs/Handsoff/operations-guide.md"
     __handsoff_render_template "$plugin_root/templates/package-matrix.md.tmpl" "$tokens" \
         > "$dir/docs/Handsoff/package-guide.md"
+    mkdir -p "$dir/docs/user-manual/testing"
+    __handsoff_render_template "$plugin_root/templates/user-manual-index.md.tmpl" "$tokens" \
+        > "$dir/docs/user-manual/README.md"
+    __handsoff_render_template "$plugin_root/templates/operations-guide.md.tmpl" "$tokens" \
+        > "$dir/docs/user-manual/installation.md"
+    __handsoff_render_template "$plugin_root/templates/env-guide.md.tmpl" "$tokens" \
+        > "$dir/docs/user-manual/environment.md"
+    __handsoff_render_template "$plugin_root/templates/production-deploy.md.tmpl" "$tokens" \
+        > "$dir/docs/user-manual/production-deploy.md"
+    __handsoff_render_template "$plugin_root/templates/package-matrix.md.tmpl" "$tokens" \
+        > "$dir/docs/user-manual/package-guide.md"
+    __handsoff_render_template "$plugin_root/templates/seed-data-guide.md.tmpl" "$tokens" \
+        > "$dir/docs/user-manual/seed-data.md"
     rm -f "$tokens"
 }
 

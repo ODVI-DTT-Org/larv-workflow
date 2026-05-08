@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.16 (next) - User manual testing guides and seed data gates
+
+- Adds `docs/user-manual/` generation for user-facing install, environment, production, package, seed/reset, and per-slice testing guides.
+- Makes each slice hard-require `docs/user-manual/testing/<slice>.md` with end-to-end browser QA instructions before completion, including sandbox URL, navigation, testable features, and terminal verification.
+- Makes seeders a hard slice obligation: at least 10 realistic records per feature, seeded personas/roles, reset commands, demo credentials, and demo-data removal notes in `docs/user-manual/seed-data.md`.
+- Updates doc-site staging to include `docs/user-manual/` so guides are browsable alongside handoff docs.
+
 ## 0.4.15 (next) - Feature workflow and execution cadence
 
 - Makes `/larv:feature` a full mini-flow: Laravel Superpowers brainstorming, saved feature design, Laravel Superpowers writing plan, saved feature plan, deltas, handoff, tracker, STATE, learnings, doc-site, and implementation routing.

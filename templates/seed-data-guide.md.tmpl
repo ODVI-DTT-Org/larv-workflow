@@ -1,0 +1,61 @@
+# Seed Data and Reset Guide — {{project_slug}}
+
+The app must not look empty in sandbox review. Every implemented feature must have representative demo data.
+
+## Required Seeder Policy
+
+- Each user-facing feature slice must add or update Laravel seeders.
+- Seed at least 10 realistic records for each feature unless the feature naturally has fewer valid states.
+- Seed all roles/personas needed to test the planned flows.
+- Seed edge cases where useful: draft, active, approved, rejected, overdue, archived, failed, or escalated records.
+- Keep demo credentials and reset commands documented here after every slice.
+
+## Demo Credentials
+
+Update this table as users/roles are created.
+
+| Role | Email | Password | Purpose |
+|---|---|---|---|
+| Admin | admin@example.com | password | Default administrative review account |
+
+## Reset Sandbox Data
+
+Use this when you want a clean demo database with seeded records:
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+If the app runs through Docker, use the project-specific equivalent:
+
+```bash
+docker compose exec app php artisan migrate:fresh --seed
+```
+
+## Remove Demo Data
+
+Demo seed data is for sandbox and review. For production:
+
+1. Do not run demo seeders in production.
+2. Keep demo seeders guarded by environment checks or explicit seeder class names.
+3. Remove or disable sample credentials before production deployment.
+4. Confirm production deployment uses real admin provisioning from `docs/user-manual/production-deploy.md`.
+
+## Feature Seed Inventory
+
+Append one section per slice:
+
+```markdown
+### slice-NN — Feature Name
+
+- Seeder classes:
+  - `Database\\Seeders\\...`
+- Records seeded:
+  - 10 ...
+- Demo users:
+  - ...
+- Test flows unlocked:
+  - ...
+- Reset notes:
+  - ...
+```

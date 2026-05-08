@@ -5,7 +5,7 @@ description: Generate the universal Handsoff.md index, sandbox bootstrap handoff
 
 # larv-handoff
 
-Generate the documents that every execution venue (same-session, subagents, foreign AI) reads to implement the slice plan. These are the only artifacts the implementation phase consumes.
+Generate the documents that every execution venue (same-session, subagents, foreign AI) reads to implement the slice plan. These are the only artifacts the implementation phase consumes. Also generate `docs/user-manual/` for user-facing install, testing, seed data, reset, and deployment guides.
 
 ## Inputs
 
@@ -68,6 +68,13 @@ safe_commit_docs "[larv] handsoff documents generated for $(yq -r .project.slug 
 - `docs/Handsoff/env-guide.md`
 - `docs/Handsoff/operations-guide.md`
 - `docs/Handsoff/package-guide.md`
+- `docs/user-manual/README.md`
+- `docs/user-manual/installation.md`
+- `docs/user-manual/environment.md`
+- `docs/user-manual/seed-data.md`
+- `docs/user-manual/production-deploy.md`
+- `docs/user-manual/package-guide.md`
+- `docs/user-manual/testing/` (directory; per-slice guides are written during implementation)
 - `docs/Handsoff/slice-NN-<name>.md` for every slice in the plan
 - `docs/larv/implementation-tracker.yaml` and `.md`
 - `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `.cursor/rules/larv.mdc`, `.codex/AGENTS.md`
@@ -85,6 +92,8 @@ files_written:
   - docs/Handsoff/env-guide.md
   - docs/Handsoff/operations-guide.md
   - docs/Handsoff/package-guide.md
+  - docs/user-manual/README.md
+  - docs/user-manual/seed-data.md
   - docs/Handsoff/slice-NN-<name>.md  (one per slice)
   - docs/larv/implementation-tracker.yaml
   - docs/larv/implementation-tracker.md

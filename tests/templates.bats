@@ -2,9 +2,9 @@
 
 load helpers
 
-TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report ddd-interview-questions bootstrap-sandbox.md.tmpl production-deploy.md.tmpl env-guide.md.tmpl operations-guide.md.tmpl package-matrix.md.tmpl package-slice-snippets.md.tmpl happy-path.md.tmpl)
+TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report ddd-interview-questions bootstrap-sandbox.md.tmpl production-deploy.md.tmpl env-guide.md.tmpl operations-guide.md.tmpl package-matrix.md.tmpl package-slice-snippets.md.tmpl happy-path.md.tmpl user-manual-index.md.tmpl seed-data-guide.md.tmpl)
 
-@test "all 13 templates exist" {
+@test "all 15 templates exist" {
     for t in "${TEMPLATES[@]}"; do
         if [[ "$t" == *.tmpl ]]; then
             [ -f "templates/${t}" ] || { echo "missing templates/${t}"; return 1; }
@@ -136,6 +136,18 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "OCTANE_SERVER" templates/env-guide.md.tmpl
     grep -q "Install" templates/operations-guide.md.tmpl
     grep -q "Troubleshooting" templates/operations-guide.md.tmpl
+    grep -q "docs/user-manual/testing" templates/operations-guide.md.tmpl
+    grep -q "docs/user-manual/seed-data.md" templates/operations-guide.md.tmpl
+    grep -q "migrate:fresh --seed" templates/operations-guide.md.tmpl
+}
+
+@test "user manual templates cover testing and seed reset" {
+    grep -q "Per-slice testing guides" templates/user-manual-index.md.tmpl
+    grep -q "docs/larv/07-runtime/sandbox-url.txt" templates/user-manual-index.md.tmpl
+    grep -q "Required Seeder Policy" templates/seed-data-guide.md.tmpl
+    grep -q "at least 10 realistic records" templates/seed-data-guide.md.tmpl
+    grep -q "migrate:fresh --seed" templates/seed-data-guide.md.tmpl
+    grep -q "Demo Credentials" templates/seed-data-guide.md.tmpl
 }
 
 @test "package matrix template covers Laravel ecosystem package propagation" {

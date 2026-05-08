@@ -26,6 +26,7 @@ Turn the approved design, architecture, and test strategy into implementation sl
 3. Produce `docs/larv/06-implementation/token-budget.md` with slice-level token/minute estimates.
 4. Initialize or update `STATE.yaml.slices` with the planned slice IDs.
 5. Write the executable sandbox deployment script at `docs/larv/07-runtime/deploy-sandbox.sh`.
+6. For every user-facing slice, include seeder obligations: at least 10 realistic records per feature, all roles/personas needed for browser QA, and the expected testing guide path under `docs/user-manual/testing/`.
 
 ## Package slice requirements
 
@@ -59,6 +60,7 @@ The script runs locally on the VM from the current project root and must:
 - Use `DB_DATABASE` from the environment when database configuration is needed.
 - Assume `docs/Handsoff/bootstrap-sandbox.md` may create a bare Laravel scaffold first when `artisan` is missing in a greenfield docs-only project.
 - Start or restart the app process so `http://127.0.0.1:$APP_PORT/` responds.
+- Run migrations and seeders so the sandbox has demo data visible immediately.
 - Fail fast with useful errors (`set -euo pipefail`).
 - Avoid placeholders such as `TODO`, `TBD`, or "deployment commands here".
 
@@ -86,6 +88,7 @@ fi
 
 php artisan key:generate --force >/dev/null 2>&1 || true
 php artisan migrate --force
+php artisan db:seed --force
 
 session="larv-app-${APP_PORT}"
 tmux kill-session -t "$session" 2>/dev/null || true

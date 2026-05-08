@@ -54,7 +54,7 @@ Before the first slice, run `docs/Handsoff/bootstrap-sandbox.md` to create the b
 
 Before coding a package-backed slice, check `docs/Handsoff/package-guide.md` so approved Laravel packages become concrete implementation, test, env, and deploy work.
 
-After implementation is complete and the user is satisfied, use `docs/Handsoff/production-deploy.md` for production deployment. Use `docs/Handsoff/env-guide.md` for configuration values and `docs/Handsoff/operations-guide.md` for install/run/troubleshooting guidance.
+After implementation is complete and the user is satisfied, use `docs/Handsoff/production-deploy.md` for production deployment. User-facing guides are organized under `docs/user-manual/`; always show those exact paths when referencing install, testing, seed data, reset, or deployment guidance.
 
 ## 11. Sandbox Bootstrap
 
@@ -86,6 +86,8 @@ Smoke-test URL (after each slice): read base URL from `docs/larv/07-runtime/sand
 
 - Do not change schema without consulting the slice handsoff's migration field.
 - Do not skip tests. If a test in DoD does not pass, mark `STATE.yaml.slices.NN.status: failed` and stop.
+- Do not mark a slice complete until its testing guide exists at `docs/user-manual/testing/<slice-id>-<slice-slug>.md`.
+- Do not mark a slice complete until `docs/user-manual/seed-data.md` documents the slice's seeded records, credentials, reset command, and demo-data removal notes.
 - After each slice, append to `docs/larv/implementation-tracker.yaml` (snippet in slice handsoff).
 - Append discoveries worth saving to `docs/larv/local-learnings.md` (snippet in slice handsoff).
 - Identify yourself accurately when filling `created_by.tool` and `created_by.model`.
@@ -95,9 +97,9 @@ Smoke-test URL (after each slice): read base URL from `docs/larv/07-runtime/sand
 Read `STATE.yaml.execution.review_mode` before implementing:
 
 - `auto-all`: implement all slices continuously until every slice is complete, the app is fully tested, or a blocker/failing test requires user input. Still write reports, tracker entries, STATE updates, and learnings after every slice.
-- `manual-slice`: after each slice, print the public sandbox URL from `docs/larv/07-runtime/sandbox-url.txt`, list the exact terminal commands run, list what the user can test in the browser, and wait for explicit approval before the next slice.
-- `manual-adr`: pause when a slice creates or changes an ADR/significant decision boundary. Show the ADR path, sandbox URL, tests run, and browser QA checklist.
-- `manual-phase`: pause after major phases such as bootstrap, a feature group, final verification, and deployment prep. Show the sandbox URL and phase test checklist.
+- `manual-slice`: after each slice, print the public sandbox URL from `docs/larv/07-runtime/sandbox-url.txt`, show the testing guide path under `docs/user-manual/testing/`, list the exact terminal commands run, list what the user can test in the browser, and wait for explicit approval before the next slice.
+- `manual-adr`: pause when a slice creates or changes an ADR/significant decision boundary. Show the ADR path, sandbox URL, testing guide path, tests run, and browser QA checklist.
+- `manual-phase`: pause after major phases such as bootstrap, a feature group, final verification, and deployment prep. Show the sandbox URL, relevant `docs/user-manual/` guide paths, and phase test checklist.
 
 If `review_mode` is missing or `not-yet-decided`, default to `manual-slice`.
 
@@ -137,3 +139,6 @@ If you are not Claude Code: ignore any references to "superpowers" or "skills" o
 - Environment guide: `docs/Handsoff/env-guide.md`
 - Operations guide: `docs/Handsoff/operations-guide.md`
 - Laravel package guide: `docs/Handsoff/package-guide.md`
+- User manual: `docs/user-manual/README.md`
+- Per-slice testing guides: `docs/user-manual/testing/`
+- Seed data and reset guide: `docs/user-manual/seed-data.md`
