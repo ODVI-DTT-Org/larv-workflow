@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.15 (next) - Feature workflow and execution cadence
+
+- Makes `/larv:feature` a full mini-flow: Laravel Superpowers brainstorming, saved feature design, Laravel Superpowers writing plan, saved feature plan, deltas, handoff, tracker, STATE, learnings, doc-site, and implementation routing.
+- Adds execution review cadence to routing and STATE: `auto-all`, `manual-slice`, `manual-adr`, and `manual-phase`.
+- Updates handoff and slice docs so manual modes show sandbox URL, terminal verification, and browser QA before continuing; auto mode proceeds until full verification or a blocker.
+- Hardens sandbox bootstrap with VM package auto-install checks for PHP/composer/tmux/curl/rsync/system tools and Docker/Compose when the deploy script needs Docker.
+
 ## 0.4.14 (next) - Greenfield handoff scaffold bootstrap
 
 - Fixes greenfield handoff bootstrap ordering by creating a bare Laravel scaffold when `artisan` is missing before starting the sandbox.

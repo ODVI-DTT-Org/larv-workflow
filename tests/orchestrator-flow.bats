@@ -101,11 +101,13 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
     cd "$REPO"
     run bash -c "
         . '$PROJECT_ROOT'/scripts/lib/gate.sh
-        echo subagents | routing_menu '.'
+        printf 'subagents\nauto\n' | routing_menu '.'
     "
     [ "$status" -eq 0 ]
     run yq -r '.execution.mode' docs/larv/STATE.yaml
     [ "$output" = "executing-subagents" ]
+    run yq -r '.execution.review_mode' docs/larv/STATE.yaml
+    [ "$output" = "auto-all" ]
 }
 
 @test "integration: safe_commit_docs commits only docs/ and adr/" {

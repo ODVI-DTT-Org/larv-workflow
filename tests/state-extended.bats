@@ -9,6 +9,8 @@ teardown() { teardown_tmp_project "$TMP"; }
     bash scripts/state.sh init "$TMP" my-app greenfield
     run yq -r '.execution.mode // "missing"' "$TMP/docs/larv/STATE.yaml"
     [ "$output" = "not-yet-decided" ]
+    run yq -r '.execution.review_mode // "missing"' "$TMP/docs/larv/STATE.yaml"
+    [ "$output" = "not-yet-decided" ]
     run yq -r '.execution.allocations | length' "$TMP/docs/larv/STATE.yaml"
     [ "$output" = "0" ]
     run yq -r '.features | length' "$TMP/docs/larv/STATE.yaml"
@@ -27,6 +29,19 @@ teardown() { teardown_tmp_project "$TMP"; }
 @test "state set-mode rejects an invalid mode" {
     bash scripts/state.sh init "$TMP" my-app greenfield
     run bash scripts/state.sh set-mode "$TMP" not-a-real-mode
+    [ "$status" -ne 0 ]
+}
+
+@test "state set-review-mode writes a valid review cadence" {
+    bash scripts/state.sh init "$TMP" my-app greenfield
+    bash scripts/state.sh set-review-mode "$TMP" manual-slice
+    run yq -r '.execution.review_mode' "$TMP/docs/larv/STATE.yaml"
+    [ "$output" = "manual-slice" ]
+}
+
+@test "state set-review-mode rejects an invalid review cadence" {
+    bash scripts/state.sh init "$TMP" my-app greenfield
+    run bash scripts/state.sh set-review-mode "$TMP" chaos
     [ "$status" -ne 0 ]
 }
 

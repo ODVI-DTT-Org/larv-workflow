@@ -29,24 +29,37 @@ teardown() { teardown_tmp_project "$TMP"; }
 }
 
 @test "routing_menu accepts 'same-session' and updates STATE.yaml mode" {
-    run bash -c "source $PROJECT_ROOT/scripts/lib/gate.sh && echo same-session | routing_menu '$TMP'"
+    run bash -c "source $PROJECT_ROOT/scripts/lib/gate.sh && printf 'same-session\nmanual-slice\n' | routing_menu '$TMP'"
     [ "$status" -eq 0 ]
     run yq -r '.execution.mode' "$TMP/docs/larv/STATE.yaml"
     [ "$output" = "executing-same-session" ]
+    run yq -r '.execution.review_mode' "$TMP/docs/larv/STATE.yaml"
+    [ "$output" = "manual-slice" ]
 }
 
 @test "routing_menu accepts 'subagents'" {
-    run bash -c "source $PROJECT_ROOT/scripts/lib/gate.sh && echo subagents | routing_menu '$TMP'"
+    run bash -c "source $PROJECT_ROOT/scripts/lib/gate.sh && printf 'subagents\nauto\n' | routing_menu '$TMP'"
     [ "$status" -eq 0 ]
     run yq -r '.execution.mode' "$TMP/docs/larv/STATE.yaml"
     [ "$output" = "executing-subagents" ]
+    run yq -r '.execution.review_mode' "$TMP/docs/larv/STATE.yaml"
+    [ "$output" = "auto-all" ]
 }
 
 @test "routing_menu accepts 'handoff' and exits the orchestrator" {
-    run bash -c "source $PROJECT_ROOT/scripts/lib/gate.sh && echo handoff | routing_menu '$TMP'"
+    run bash -c "source $PROJECT_ROOT/scripts/lib/gate.sh && printf 'handoff\nmanual-phase\n' | routing_menu '$TMP'"
     [ "$status" -eq 0 ]
     run yq -r '.execution.mode' "$TMP/docs/larv/STATE.yaml"
     [ "$output" = "handed-off-external" ]
+    run yq -r '.execution.review_mode' "$TMP/docs/larv/STATE.yaml"
+    [ "$output" = "manual-phase" ]
+}
+
+@test "routing_menu defaults review cadence to manual-slice on EOF" {
+    run bash -c "source $PROJECT_ROOT/scripts/lib/gate.sh && echo same-session | routing_menu '$TMP'"
+    [ "$status" -eq 0 ]
+    run yq -r '.execution.review_mode' "$TMP/docs/larv/STATE.yaml"
+    [ "$output" = "manual-slice" ]
 }
 
 @test "routing_menu rejects an invalid choice" {

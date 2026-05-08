@@ -90,7 +90,18 @@ Smoke-test URL (after each slice): read base URL from `docs/larv/07-runtime/sand
 - Append discoveries worth saving to `docs/larv/local-learnings.md` (snippet in slice handsoff).
 - Identify yourself accurately when filling `created_by.tool` and `created_by.model`.
 
-## 14. Fresh session recovery
+## 14. Execution Review Cadence
+
+Read `STATE.yaml.execution.review_mode` before implementing:
+
+- `auto-all`: implement all slices continuously until every slice is complete, the app is fully tested, or a blocker/failing test requires user input. Still write reports, tracker entries, STATE updates, and learnings after every slice.
+- `manual-slice`: after each slice, print the public sandbox URL from `docs/larv/07-runtime/sandbox-url.txt`, list the exact terminal commands run, list what the user can test in the browser, and wait for explicit approval before the next slice.
+- `manual-adr`: pause when a slice creates or changes an ADR/significant decision boundary. Show the ADR path, sandbox URL, tests run, and browser QA checklist.
+- `manual-phase`: pause after major phases such as bootstrap, a feature group, final verification, and deployment prep. Show the sandbox URL and phase test checklist.
+
+If `review_mode` is missing or `not-yet-decided`, default to `manual-slice`.
+
+## 15. Fresh session recovery
 
 If context is nearly full, stop after the current atomic step and tell the user to open a fresh session in the same repo. A fresh AI session must recover from files, not chat history:
 
@@ -106,7 +117,7 @@ Do not rely on previous chat context. The docs, tracker, reports, and STATE file
 
 Runtime note: this handoff assumes the AI is already running on the sandbox VM. Do not SSH to `{{ssh_user}}@{{vm_host}}`; execute the bootstrap, mockup server, doc-site server, and app sandbox commands locally.
 
-## 15. New feature in a fresh session
+## 16. New feature in a fresh session
 
 If the user asks for a new feature after the original implementation:
 
@@ -116,11 +127,11 @@ If the user asks for a new feature after the original implementation:
 4. Append feature work to `docs/larv/implementation-tracker.yaml` with `type: feature`.
 5. Refresh the relevant handoff docs before implementation.
 
-## 16. Foreign-AI notes
+## 17. Foreign-AI notes
 
 If you are not Claude Code: ignore any references to "superpowers" or "skills" outside this document. Treat this Handsoff and the per-slice files as a complete plain-language spec. You do not need to install the larv plugin; everything you need to do is encoded inline.
 
-## 17. Production handoff
+## 18. Production handoff
 
 - Production deploy guide: `docs/Handsoff/production-deploy.md`
 - Environment guide: `docs/Handsoff/env-guide.md`

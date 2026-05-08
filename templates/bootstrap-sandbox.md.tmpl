@@ -28,7 +28,8 @@ DB_HOST="${DB_HOST:-127.0.0.1}"
 DB_PORT="${DB_PORT:-}"
 DB_USERNAME="${DB_USERNAME:-larv}"
 DB_PASSWORD="${DB_PASSWORD:-}"
-DB_INSTALL_MODE="${DB_INSTALL_MODE:-fail}"
+DB_INSTALL_MODE="${DB_INSTALL_MODE:-apt}"
+LARV_VM_INSTALL_MODE="${LARV_VM_INSTALL_MODE:-apt}"
 
 if [ "${LARV_RUNTIME_MODE:-local}" != "local" ]; then
     echo "ERROR: this handoff expects local execution on the sandbox VM. Do not SSH to $VM_HOST unless a separate remote-mode runbook was generated." >&2
@@ -40,8 +41,62 @@ if [ ! -x docs/larv/07-runtime/deploy-sandbox.sh ]; then
     exit 1
 fi
 
-if ! command -v php >/dev/null || ! command -v tmux >/dev/null || ! command -v curl >/dev/null || ! command -v ss >/dev/null || ! command -v yq >/dev/null || ! command -v flock >/dev/null; then
-    echo "ERROR: php, tmux, curl, ss, yq, and flock are required on this VM" >&2
+install_vm_packages_if_missing() {
+    missing_runtime=()
+    command -v php >/dev/null || missing_runtime+=(php-cli php-xml php-mbstring php-curl php-zip php-sqlite3 php-mysql php-pgsql)
+    command -v composer >/dev/null || missing_runtime+=(composer unzip)
+    command -v tmux >/dev/null || missing_runtime+=(tmux)
+    command -v curl >/dev/null || missing_runtime+=(curl)
+    command -v ss >/dev/null || missing_runtime+=(iproute2)
+    command -v flock >/dev/null || missing_runtime+=(util-linux)
+    command -v rsync >/dev/null || missing_runtime+=(rsync)
+    if [ "${#missing_runtime[@]}" -gt 0 ]; then
+        if [ "$LARV_VM_INSTALL_MODE" = "apt" ]; then
+            sudo apt-get update
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y "${missing_runtime[@]}"
+        else
+            echo "ERROR: missing runtime tools/packages: ${missing_runtime[*]}. Rerun with LARV_VM_INSTALL_MODE=apt to auto-install." >&2
+            exit 1
+        fi
+    fi
+
+    if ! command -v yq >/dev/null; then
+        if [ "$LARV_VM_INSTALL_MODE" = "apt" ]; then
+            arch="$(uname -m)"
+            case "$arch" in
+                x86_64|amd64) yq_arch=amd64 ;;
+                aarch64|arm64) yq_arch=arm64 ;;
+                *) echo "ERROR: unsupported architecture for yq auto-install: $arch" >&2; exit 1 ;;
+            esac
+            sudo curl -fsSL "https://github.com/mikefarah/yq/releases/download/v4.44.3/yq_linux_${yq_arch}" -o /usr/local/bin/yq
+            sudo chmod +x /usr/local/bin/yq
+        else
+            echo "ERROR: yq is missing. Rerun with LARV_VM_INSTALL_MODE=apt to auto-install mikefarah/yq." >&2
+            exit 1
+        fi
+    fi
+
+    if grep -Eq '(^|[[:space:]])docker([[:space:]]|$)|docker compose|docker-compose' docs/larv/07-runtime/deploy-sandbox.sh; then
+        if ! command -v docker >/dev/null || ! docker compose version >/dev/null 2>&1; then
+            if [ "$LARV_VM_INSTALL_MODE" = "apt" ]; then
+                sudo apt-get update
+                sudo DEBIAN_FRONTEND=noninteractive apt-get install -y docker.io docker-compose-plugin || \
+                    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y docker.io docker-compose
+                if command -v systemctl >/dev/null; then sudo systemctl start docker || true; fi
+                sudo usermod -aG docker "$(whoami)" || true
+                sudo chmod 666 /var/run/docker.sock 2>/dev/null || true
+            else
+                echo "ERROR: deploy-sandbox.sh uses Docker, but docker/compose is unavailable. Rerun with LARV_VM_INSTALL_MODE=apt to auto-install." >&2
+                exit 1
+            fi
+        fi
+    fi
+}
+
+install_vm_packages_if_missing
+
+if ! command -v php >/dev/null || ! command -v composer >/dev/null || ! command -v tmux >/dev/null || ! command -v curl >/dev/null || ! command -v ss >/dev/null || ! command -v yq >/dev/null || ! command -v flock >/dev/null; then
+    echo "ERROR: php, composer, tmux, curl, ss, yq, and flock are required on this VM after auto-install. Install missing tools or set LARV_VM_INSTALL_MODE=apt." >&2
     exit 1
 fi
 

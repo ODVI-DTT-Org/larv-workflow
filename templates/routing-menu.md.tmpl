@@ -20,3 +20,14 @@ Where do you want to execute these slices?
 Recommendation: subagents
 Why: keeps your conversation buffer clean while preserving Claude Code's tool access.
 Tradeoffs: subagent failures are slightly harder to debug.
+
+After choosing the venue, choose the review cadence:
+
+  auto          — AI implements all slices or the entire app without stopping until the app is done and fully tested, unless a blocker/failing test requires user input
+  manual-slice  — AI stops after every slice, prints the public sandbox URL, lists exactly what to test, waits for approval, then moves to the next slice
+  manual-adr    — AI stops after each ADR/significant decision boundary with URL and tests before continuing
+  manual-phase  — AI stops after major phases such as bootstrap, feature group, verification, and deployment prep
+
+Recommendation: manual-slice for first builds; auto for trusted repeat runs after the plan is stable.
+Why: manual-slice gives visible checkpoints while still allowing the AI to do the heavy implementation work.
+Tradeoffs: auto is faster but delays user review until the full implementation or a failure.

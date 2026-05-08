@@ -65,6 +65,12 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "ensure_laravel_scaffold" templates/bootstrap-sandbox.md.tmpl
     grep -q "composer create-project laravel/laravel" templates/bootstrap-sandbox.md.tmpl
     grep -q "LARV_SCAFFOLD_ON_BOOTSTRAP" templates/bootstrap-sandbox.md.tmpl
+    grep -q "install_vm_packages_if_missing" templates/bootstrap-sandbox.md.tmpl
+    grep -q "LARV_VM_INSTALL_MODE" templates/bootstrap-sandbox.md.tmpl
+    grep -q "mikefarah/yq" templates/bootstrap-sandbox.md.tmpl
+    grep -q "php-sqlite3" templates/bootstrap-sandbox.md.tmpl
+    grep -q "docker-compose-plugin" templates/bootstrap-sandbox.md.tmpl
+    grep -q 'DB_INSTALL_MODE="${DB_INSTALL_MODE:-apt}"' templates/bootstrap-sandbox.md.tmpl
     grep -q "docs/larv/07-runtime/sandbox-url.txt" templates/bootstrap-sandbox.md.tmpl
     grep -q "ufw allow" templates/bootstrap-sandbox.md.tmpl
     grep -q "ufw status" templates/bootstrap-sandbox.md.tmpl
@@ -110,6 +116,9 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "Fresh session recovery" templates/ai-starting-point.md.tmpl
     grep -q "/larv:resume" templates/ai-starting-point.md.tmpl
     grep -q "/larv:feature" templates/ai-starting-point.md.tmpl
+    grep -q "execution.review_mode" templates/ai-starting-point.md.tmpl
+    grep -q "auto-all" templates/handsoff-index.md.tmpl
+    grep -q "manual-slice" templates/handsoff-index.md.tmpl
 }
 
 @test "env and operations guide templates cover setup values" {

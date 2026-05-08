@@ -12,6 +12,7 @@ Commands:
   read <dir>
   update <dir> <yq-expr>
   set-mode <dir> <mode>
+  set-review-mode <dir> <review-mode>
   record-allocation <dir> <kind> <value>
 EOF
     exit 64
@@ -123,6 +124,7 @@ policies:
     default_action: halt_and_ask
 execution:
   mode: not-yet-decided
+  review_mode: not-yet-decided
   allocations: []
 features: []
 debugs: []
@@ -159,6 +161,17 @@ cmd_set_mode() {
     cmd_update "$dir" ".execution.mode = \"$mode\""
 }
 
+cmd_set_review_mode() {
+    local dir="$1"
+    local mode="$2"
+    case "$mode" in
+        auto-all|manual-slice|manual-adr|manual-phase|not-yet-decided)
+            ;;
+        *) echo "ERROR: invalid review mode: $mode" >&2; return 1 ;;
+    esac
+    cmd_update "$dir" ".execution.review_mode = \"$mode\""
+}
+
 cmd_record_allocation() {
     local dir="$1"
     local kind="$2"
@@ -175,6 +188,7 @@ main() {
         read) [ "$#" -eq 1 ] || usage; cmd_read "$@" ;;
         update) [ "$#" -eq 2 ] || usage; cmd_update "$@" ;;
         set-mode) [ "$#" -eq 2 ] || usage; cmd_set_mode "$@" ;;
+        set-review-mode) [ "$#" -eq 2 ] || usage; cmd_set_review_mode "$@" ;;
         record-allocation) [ "$#" -eq 3 ] || usage; cmd_record_allocation "$@" ;;
         *) usage ;;
     esac

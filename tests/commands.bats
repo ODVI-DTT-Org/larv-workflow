@@ -52,9 +52,12 @@ yaml.safe_load(parts[1])
 }
 
 @test "larv-feature command describes mini-flow with gates" {
-    grep -q "Mini DDD interview" commands/larv-feature.md
+    grep -q "Laravel Superpowers brainstorming" commands/larv-feature.md
+    grep -q "Laravel Superpowers writing plan" commands/larv-feature.md
+    grep -q "docs/larv/features/<feature-slug>/design.md" commands/larv-feature.md
+    grep -q "docs/superpowers/specs" commands/larv-feature.md
     grep -q "Per-slice handsoff" commands/larv-feature.md
-    grep -q "Tracker entries" commands/larv-feature.md
+    grep -q "Tracker + STATE updates" commands/larv-feature.md
     grep -q "Routing-menu hard gate" commands/larv-feature.md
 }
 

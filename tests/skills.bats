@@ -118,6 +118,9 @@ yaml.safe_load(parts[1])
     grep -q "executing-same-session" skills/larv-orchestrator/SKILL.md
     grep -q "executing-subagents" skills/larv-orchestrator/SKILL.md
     grep -q "handed-off-external" skills/larv-orchestrator/SKILL.md
+    grep -q "Laravel Superpowers brainstorming" skills/larv-orchestrator/SKILL.md
+    grep -q "docs/larv/features/<feature-slug>/design.md" skills/larv-orchestrator/SKILL.md
+    grep -q "docs/superpowers/plans" skills/larv-orchestrator/SKILL.md
 }
 
 @test "larv-domain-interview SKILL.md exists with valid frontmatter" {
@@ -247,6 +250,8 @@ yaml.safe_load(parts[1])
     grep -q "docs/Handsoff/bootstrap-sandbox.md" skills/larv-implement/SKILL.md
     grep -q "docs/larv/07-runtime/sandbox-url.txt" skills/larv-implement/SKILL.md
     grep -q "creates the bare Laravel scaffold" skills/larv-implement/SKILL.md
+    grep -q "auto-all" skills/larv-implement/SKILL.md
+    grep -q "manual-slice" skills/larv-implement/SKILL.md
 }
 
 @test "larv-handoff renders production and user guide documents" {

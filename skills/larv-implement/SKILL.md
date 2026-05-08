@@ -20,6 +20,17 @@ When Claude Code executes this phase directly, use bundled Laravel guidance from
 
 Before executing any slice, read `docs/Handsoff/bootstrap-sandbox.md` and execute its bash block top to bottom. For greenfield docs-only projects, this bootstrap creates the bare Laravel scaffold first when `artisan` is missing; that is not considered slice implementation. Do not proceed to slice implementation until it prints the sandbox URL and writes `docs/larv/07-runtime/sandbox-url.txt`.
 
+## Execution cadence
+
+Before the loop, read `STATE.yaml.execution.review_mode`.
+
+- `auto-all`: implement every eligible slice without stopping until all slices pass verification, the app is fully tested, or a blocker/failing test requires user input.
+- `manual-slice`: after every slice, show `docs/larv/07-runtime/sandbox-url.txt`, list terminal commands run, list browser QA actions from the implementation report, and wait for user approval.
+- `manual-adr`: pause only after slices that create or change ADRs/significant decisions.
+- `manual-phase`: pause after major boundaries such as bootstrap, feature group, final verification, and deployment prep.
+
+If missing or `not-yet-decided`, default to `manual-slice`.
+
 ## Loop body — do this for every slice in dependency order
 
 For each `slice-NN-<name>.md`:
@@ -31,7 +42,7 @@ For each `slice-NN-<name>.md`:
 5. Run section 14's local-learnings append snippet if you discovered something.
 6. Run section 15's STATE.yaml update snippet.
 7. Write `IMPLEMENTATION-REPORT-<slice-id>.md` per section 16.
-8. Soft-gate to user: print one-line slice summary, list files changed.
+8. Apply the execution cadence above. Always print the public sandbox URL and what can be tested when pausing for user review.
 
 ## Failure handling
 

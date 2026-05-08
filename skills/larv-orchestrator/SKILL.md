@@ -10,7 +10,7 @@ Drive the larv workflow. Read `STATE.yaml`, decide the next phase, dispatch the 
 ## Invocation modes
 
 - **greenfield** — full flow (Phase −1 → 11). Invoked by `/larv:full`.
-- **feature** — `/larv:feature <name>` mini-flow. Reuses existing docs; appends new ADRs and slices.
+- **feature** — `/larv:feature <name>` mini-flow. Mandatory Laravel Superpowers brainstorming + writing-plan first; saves feature design/plan artifacts, then appends deltas, ADRs, handoff slices, tracker, STATE, doc-site, and implementation cadence.
 - **debug** — `/larv:debug <issue>` mini-flow. Adds a single fix slice.
 
 ## On entry
@@ -74,6 +74,21 @@ The greenfield mode dispatches phases in this exact order:
 14. **Phase 9**: dispatch `larv-verify`
 15. **Phase 10**: dispatch `larv-deploy`
 16. **Phase 11**: dispatch `larv-learn`
+
+## Feature sequence
+
+For `/larv:feature <name>`, do not run the greenfield phases and do not implement immediately.
+
+1. Verify `docs/larv/STATE.yaml` exists and the working tree is clean outside `docs/` and `adr/`.
+2. Create `docs/larv/features/<feature-slug>/`.
+3. Invoke Laravel Superpowers brainstorming from `bundle/superpowers-laravel/skills/brainstorming/SKILL.md`; save the approved design to `docs/larv/features/<feature-slug>/design.md` and `docs/superpowers/specs/YYYY-MM-DD-<feature-slug>-design.md`.
+4. Update `STATE.yaml.features[]` with `status: design-approved`, `design_path`, and timestamps.
+5. Produce DDD/package/design/architecture deltas only where the feature requires them. Save durable feature-local files under `docs/larv/features/<feature-slug>/` and append stable project decisions to existing `docs/larv/` docs or `adr/`.
+6. Invoke Laravel Superpowers writing-plans from `bundle/superpowers-laravel/skills/writing-plans/SKILL.md`; save to `docs/larv/features/<feature-slug>/plan.md` and `docs/superpowers/plans/YYYY-MM-DD-<feature-slug>-plan.md`.
+7. Append feature slices to `docs/larv/06-implementation/elephant-carpaccio.md` and update `STATE.yaml.slices`.
+8. Regenerate per-slice handoff, `docs/Handsoff.md`, AI starting-point files, and doc-site.
+9. Append tracker entries with `type: feature_planning` for planning and `type: feature` for implementation slices. Append `docs/larv/local-learnings.md` if anything useful was learned.
+10. Call `routing_menu "$dir"` so the user chooses venue and review cadence (`auto`, `manual-slice`, `manual-adr`, or `manual-phase`) before implementation.
 
 ## Hard gates
 

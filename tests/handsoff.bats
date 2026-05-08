@@ -41,6 +41,9 @@ teardown() { teardown_tmp_project "$TMP"; }
     [ "$status" -eq 0 ]
     [ -f "$TMP/docs/Handsoff/slice-01-auth.md" ]
     grep -q "slice-01" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "Review Gate" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "auto-all" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "manual-slice" "$TMP/docs/Handsoff/slice-01-auth.md"
 }
 
 @test "handsoff slice commands start in local app root" {

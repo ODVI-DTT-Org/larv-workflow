@@ -133,6 +133,20 @@ Pest: {{passed}}/{{total}}
 - ...
 ```
 
-## 17. Foreign-AI notes
+## 17. Review Gate
+
+After this slice, read `STATE.yaml.execution.review_mode`.
+
+- If `auto-all`, continue to the next eligible slice after the Definition of Done passes.
+- If `manual-slice`, stop here and show the user:
+  - Sandbox URL: `$(cat docs/larv/07-runtime/sandbox-url.txt)`
+  - Terminal verification commands run for this slice
+  - Browser paths or actions from the "How to QA" section of `IMPLEMENTATION-REPORT-{{slice_id}}.md`
+  - Files changed and tests passed
+  Wait for explicit approval before continuing.
+- If `manual-adr`, stop only if this slice created or changed ADRs listed in the tracker entry.
+- If `manual-phase`, stop only if this slice completes a major feature group or final verification boundary.
+
+## 18. Foreign-AI notes
 
 If you are not Claude Code or are unfamiliar with the larv plugin: this document is self-contained. Do not look for plugin scripts to call; every action above is plain bash. Identify yourself accurately in section 13's tracker append snippet.
