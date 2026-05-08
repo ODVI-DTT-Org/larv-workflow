@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.18 (next) - Design-to-implementation visual parity gates
+
+- Makes Huashu design output a mandatory `docs/larv/03-design/visual-implementation-contract.md` that bridges approved mockups to production UI.
+- Requires UI implementation slices to read the approved design contract and mockups, capture desktop/mobile screenshots, and document visual parity before completion.
+- Updates `/larv:feature`, handoff, implementation, planning, docs index, and AI starting-point guidance so UI work cannot silently fall back to plain starter screens.
+
 ## 0.4.17 (next) - Organized implementation reports and docs index
 
 - Moves per-slice implementation reports from the project root to `docs/larv/08-implementation/reports/`.

@@ -48,6 +48,9 @@ teardown() { teardown_tmp_project "$TMP"; }
     grep -q "docs/user-manual/seed-data.md" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "at least 10 realistic records" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-slice-01.md" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "Visual implementation contract" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "docs/larv/03-design/visual-implementation-contract.md" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "default Tailwind panels" "$TMP/docs/Handsoff/slice-01-auth.md"
     ! grep -q "Write \`IMPLEMENTATION-REPORT-slice-01.md\` at the project root" "$TMP/docs/Handsoff/slice-01-auth.md"
 }
 

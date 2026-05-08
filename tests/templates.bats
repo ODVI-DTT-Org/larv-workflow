@@ -155,6 +155,7 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "docs/Handsoff.md" templates/docs-index.md.tmpl
     grep -q "docs/user-manual/README.md" templates/docs-index.md.tmpl
     grep -q "docs/larv/08-implementation/reports/" templates/docs-index.md.tmpl
+    grep -q "docs/larv/03-design/visual-implementation-contract.md" templates/docs-index.md.tmpl
     grep -q "docs/larv/09-verification/final-report.md" templates/docs-index.md.tmpl
     grep -q "docs/larv/07-runtime/sandbox-url.txt" templates/docs-index.md.tmpl
 }

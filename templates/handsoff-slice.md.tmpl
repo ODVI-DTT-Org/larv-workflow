@@ -44,6 +44,26 @@ Every user-facing feature in this slice must include realistic seed data so the 
 
 {{ui_screens_list}}
 
+## 8.1 Visual implementation contract
+
+If this slice creates or modifies any UI screen, the implementation must match the approved design artifacts. Do not build generic Laravel starter UI, default Tailwind panels, or plain CRUD screens when a mockup/design contract exists.
+
+Read these files before UI work:
+
+- `docs/larv/03-design/design-decision.md`
+- `docs/larv/03-design/brand-spec.md`
+- `docs/larv/03-design/ui-design.md`
+- `docs/larv/03-design/visual-implementation-contract.md`
+- chosen mockups under `docs/larv/03-design/mockups/`
+
+For every screen listed in section 8:
+
+- implement the layout shell, typography, color tokens, spacing, radius, icons, table density, cards, forms, empty states, loading states, and responsive behavior from the visual implementation contract
+- use the seeded records from section 6.1 so the screen looks populated during browser review
+- capture desktop and mobile screenshots after implementation
+- compare those screenshots to the chosen mockup and fix obvious visual drift before marking the slice complete
+- document the screenshot paths and remaining visual differences in `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md`
+
 ## 9. Dependencies
 
 depends_on: {{depends_on_list}}
@@ -59,6 +79,7 @@ parallel: {{parallel_flag}}
 - [ ] No N+1 queries on listed endpoints (verified with Telescope or similar)
 - [ ] `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md` written with end-to-end browser testing instructions.
 - [ ] `docs/user-manual/seed-data.md` updated with credentials, seeded records, reset commands, and demo-data removal notes.
+- [ ] If UI was touched, screenshots were captured and checked against `docs/larv/03-design/visual-implementation-contract.md` and chosen mockups.
 - [ ] `docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md` written
 - [ ] Tracker entry appended (see section 13)
 - [ ] Learnings appended if any (see section 14)
@@ -145,6 +166,15 @@ Pest: {{passed}}/{{total}}
 
 ## Notes for the next implementer
 - ...
+
+## Visual parity
+Design contract: docs/larv/03-design/visual-implementation-contract.md
+Mockup references:
+- docs/larv/03-design/mockups/...
+Screenshots captured:
+- ...
+Remaining visual differences:
+- ...
 ```
 
 ## 17. User Testing Guide (hard required)
@@ -160,6 +190,7 @@ The guide must be written for an end user doing browser QA and must include:
 - What can be tested now
 - What should not be expected yet
 - Terminal verification commands run by the AI
+- Screenshot paths and visual parity notes for screens touched by this slice
 - How to reset demo data with `php artisan migrate:fresh --seed` or the Docker equivalent
 - How to remove/disable demo seed data before production
 

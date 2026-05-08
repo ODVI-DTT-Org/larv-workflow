@@ -15,6 +15,8 @@ When Claude Code executes this phase directly, use bundled Laravel guidance from
 - `docs/Handsoff.md`
 - `docs/Handsoff/bootstrap-sandbox.md`
 - `docs/Handsoff/slice-NN-<name>.md` (one per slice)
+- `docs/larv/03-design/visual-implementation-contract.md`
+- chosen mockups under `docs/larv/03-design/mockups/`
 
 ## Bootstrap — mandatory before first slice
 
@@ -37,14 +39,15 @@ For each `slice-NN-<name>.md`:
 
 1. Read it from top to bottom.
 2. Execute every bash block in section 12 (Implementation commands).
-3. Run section 10's Definition of Done checklist.
-4. Write `docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-<slice-id>.md` per section 16; never write implementation reports at the project root.
-5. Write or update the hard-required user testing guide at `docs/user-manual/testing/<slice-id>-<slice-slug>.md`.
-6. Update `docs/user-manual/seed-data.md` with seeded records, demo credentials, reset commands, and demo-data removal notes.
-7. Run section 13's tracker append snippet.
-8. Run section 14's local-learnings append snippet if you discovered something.
-9. Run section 15's STATE.yaml update snippet.
-10. Apply the execution cadence above. Always print the public sandbox URL and exact guide paths when pausing for user review.
+3. If the slice touches UI, read `docs/larv/03-design/visual-implementation-contract.md`, `brand-spec.md`, `ui-design.md`, and the chosen mockups before styling. Capture desktop and mobile screenshots after implementation and fix obvious drift from the approved mockups.
+4. Run section 10's Definition of Done checklist.
+5. Write `docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-<slice-id>.md` per section 16; never write implementation reports at the project root.
+6. Write or update the hard-required user testing guide at `docs/user-manual/testing/<slice-id>-<slice-slug>.md`.
+7. Update `docs/user-manual/seed-data.md` with seeded records, demo credentials, reset commands, and demo-data removal notes.
+8. Run section 13's tracker append snippet.
+9. Run section 14's local-learnings append snippet if you discovered something.
+10. Run section 15's STATE.yaml update snippet.
+11. Apply the execution cadence above. Always print the public sandbox URL and exact guide paths when pausing for user review.
 
 ## Failure handling
 

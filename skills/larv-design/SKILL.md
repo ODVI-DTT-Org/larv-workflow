@@ -65,7 +65,9 @@ fi
 
 ### 6. Huashu generates mockups
 
-Invoke the bundled `huashu-design` skill for each pick (`bundle/huashu-design/SKILL.md`). Render 5-7 key screens per pick at `docs/larv/03-design/mockups/<pick-slug>/<screen>.html`.
+Read and follow the bundled `huashu-design` skill for each pick (`bundle/huashu-design/SKILL.md`). Render 5-7 key screens per pick at `docs/larv/03-design/mockups/<pick-slug>/<screen>.html`.
+
+The mockups must be high-fidelity product screens for this app's actual domain, not generic landing pages. Each mockup set must include realistic navigation, dense states, representative data, and the primary workflows from the domain docs.
 
 **Feasibility fallback (per spec section 9.1 step 6):** if huashu cannot sustain consistency across all picks x screens, degrade to one mockup per pick (hero/dashboard only). Record the decision in `docs/larv/03-design/recommendations.md`.
 
@@ -152,10 +154,21 @@ Record decision at `docs/larv/03-design/design-decision.md` with rationale (free
 
 ### 9. Finalize brand spec
 
-Invoke huashu-design with the chosen pick only. Outputs:
+Read and follow `bundle/huashu-design/SKILL.md` with the chosen pick only. Outputs:
 
 - `docs/larv/03-design/brand-spec.md`
 - `docs/larv/03-design/ui-design.md`
+- `docs/larv/03-design/visual-implementation-contract.md`
+
+`visual-implementation-contract.md` is mandatory. It is the bridge from mockups to production implementation and must include:
+
+- chosen mockup path(s) and the exact screens each app route should match
+- typography scale, font choices, color tokens, spacing, radius, borders, shadows, and icon rules
+- layout shell requirements: navigation, sidebar/header behavior, max widths, density, empty/loading/error states
+- component inventory: buttons, cards, tables, forms, filters, badges, charts, modals, toasts, and their visual states
+- implementation notes for Laravel Blade/Livewire/Inertia/Filament as applicable
+- screenshot parity checklist for desktop and mobile
+- forbidden generic defaults, including unstyled starter pages, default Tailwind gray panels, oversized marketing heroes for app dashboards, and placeholder-only empty screens
 
 ### 10. Server lifetime
 
@@ -175,6 +188,7 @@ safe_commit_docs "[larv] phase 3: design approved (pick=$(grep -oE 'pick: [^ ]+'
 - Do not announce `127.0.0.1` or `localhost`; always print the external URL `http://31.220.79.31:<port>/`.
 - Do not pick the design for the user. Provide recommendations, never decisions.
 - Do not mark Phase 3 complete without a probe-confirmed `mockup_url`.
+- Do not mark Phase 3 complete without `docs/larv/03-design/visual-implementation-contract.md`.
 
 ## Subagent return contract
 
@@ -189,6 +203,7 @@ files_written:
   - docs/larv/03-design/design-decision.md
   - docs/larv/03-design/brand-spec.md
   - docs/larv/03-design/ui-design.md
+  - docs/larv/03-design/visual-implementation-contract.md
 state_updates:
   execution.allocations: [..., { kind: mockup-port, value: "<port>" }]
 plugin_improvement_notes: (none)

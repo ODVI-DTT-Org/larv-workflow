@@ -97,6 +97,8 @@ yaml.safe_load(parts[1])
     ! grep -q "STUB — sub-project A scaffolding only" skills/larv-plan/SKILL.md
     grep -q "Elephant Carpaccio" skills/larv-plan/SKILL.md
     grep -q "deploy-sandbox.sh" skills/larv-plan/SKILL.md
+    grep -q "visual-implementation-contract.md" skills/larv-plan/SKILL.md
+    grep -q "screenshot parity acceptance criteria" skills/larv-plan/SKILL.md
 }
 
 @test "larv-implement does not reference plugin lib scripts" {
@@ -157,6 +159,9 @@ yaml.safe_load(parts[1])
     grep -q "getdesign.md" skills/larv-design/SKILL.md
     grep -q "allocate_port mockup" skills/larv-design/SKILL.md
     grep -qi "probe-before-announce" skills/larv-design/SKILL.md
+    grep -q "bundle/huashu-design/SKILL.md" skills/larv-design/SKILL.md
+    grep -q "visual-implementation-contract.md" skills/larv-design/SKILL.md
+    grep -q "forbidden generic defaults" skills/larv-design/SKILL.md
 }
 
 @test "larv-design makes mockup URL a mandatory completion gate" {
@@ -261,6 +266,8 @@ yaml.safe_load(parts[1])
     grep -q "docs/user-manual/seed-data.md" skills/larv-implement/SKILL.md
     grep -q "docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT" skills/larv-implement/SKILL.md
     grep -q "never write implementation reports at the project root" skills/larv-implement/SKILL.md
+    grep -q "visual-implementation-contract.md" skills/larv-implement/SKILL.md
+    grep -q "desktop and mobile screenshots" skills/larv-implement/SKILL.md
 }
 
 @test "larv-handoff renders production and user guide documents" {
