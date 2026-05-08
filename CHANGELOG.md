@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.23 (next) - PostgreSQL-only sandbox bootstrap
+
+- Makes generated sandbox bootstrap PostgreSQL-only with `DB_CONNECTION=pgsql`, port `5432`, and a default `larv` database password.
+- Removes MySQL/MariaDB bootstrap branches so agents cannot silently choose the wrong database engine.
+- Updates environment, production, README, allocation checks, and regression tests to treat PostgreSQL as the required larv database.
+
 ## 0.4.22 (next) - AI-owned Laravel runtime refresh
 
 - Requires `/larv:full`, `/larv:feature`, `/larv:debug`, and handoff implementation to run necessary Laravel commands instead of asking the user to do them manually.

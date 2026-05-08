@@ -11,9 +11,16 @@ setup() {
 #!/usr/bin/env bash
 printf "%s\n" "${LARV_TEST_SS_OUTPUT:-}"
 EOF
-    cat >"$BIN/mysql" <<'EOF'
+    cat >"$BIN/psql" <<'EOF'
 #!/usr/bin/env bash
 printf "%s\n" "${LARV_TEST_DB_OUTPUT:-}"
+EOF
+    cat >"$BIN/sudo" <<'EOF'
+#!/usr/bin/env bash
+if [ "$1" = "-u" ]; then
+    shift 2
+fi
+exec "$@"
 EOF
     cat >"$BIN/ls" <<'EOF'
 #!/usr/bin/env bash
@@ -22,7 +29,7 @@ case "$*" in
     *) /usr/bin/ls "$@" ;;
 esac
 EOF
-    chmod +x "$BIN/ss" "$BIN/mysql" "$BIN/ls"
+    chmod +x "$BIN/ss" "$BIN/psql" "$BIN/sudo" "$BIN/ls"
     # fake ssh remains available for explicit remote-mode tests
     cat >"$BIN/ssh" <<'EOF'
 #!/usr/bin/env bash
@@ -31,7 +38,7 @@ EOF
 case "$*" in
     *"ss -tlnp"*)  printf "%s\n" "${LARV_TEST_SS_OUTPUT:-}" ;;
     *"ls /srv/larv"*) printf "%s\n" "${LARV_TEST_LS_OUTPUT:-}" ;;
-    *"SHOW DATABASES"*) printf "%s\n" "${LARV_TEST_DB_OUTPUT:-}" ;;
+    *"pg_database"*) printf "%s\n" "${LARV_TEST_DB_OUTPUT:-}" ;;
 esac
 EOF
     chmod +x "$BIN/ssh"
@@ -133,7 +140,7 @@ LISTEN 0 4096 0.0.0.0:9001 0.0.0.0:* users:((\"a\",pid=1,fd=1))" \
 }
 
 @test "allocate_db returns normalized db name when free" {
-    LARV_TEST_DB_OUTPUT="mysql information_schema" \
+    LARV_TEST_DB_OUTPUT="postgres template1" \
         run bash -c "source scripts/lib/vm.sh && source scripts/lib/verifier.sh && allocate_db my-app-2026-05"
     [ "$status" -eq 0 ]
     [ "$output" = "larv_my_app_2026_05" ]

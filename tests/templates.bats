@@ -68,9 +68,11 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "install_vm_packages_if_missing" templates/bootstrap-sandbox.md.tmpl
     grep -q "LARV_VM_INSTALL_MODE" templates/bootstrap-sandbox.md.tmpl
     grep -q "mikefarah/yq" templates/bootstrap-sandbox.md.tmpl
-    grep -q "php-sqlite3" templates/bootstrap-sandbox.md.tmpl
+    grep -q "php-pgsql" templates/bootstrap-sandbox.md.tmpl
     grep -q "docker-compose-plugin" templates/bootstrap-sandbox.md.tmpl
     grep -q 'DB_INSTALL_MODE="${DB_INSTALL_MODE:-apt}"' templates/bootstrap-sandbox.md.tmpl
+    grep -q 'DB_CONNECTION="${DB_CONNECTION:-pgsql}"' templates/bootstrap-sandbox.md.tmpl
+    grep -q "PostgreSQL-only" templates/bootstrap-sandbox.md.tmpl
     grep -q "docs/larv/07-runtime/sandbox-url.txt" templates/bootstrap-sandbox.md.tmpl
     grep -q "ufw allow" templates/bootstrap-sandbox.md.tmpl
     grep -q "ufw status" templates/bootstrap-sandbox.md.tmpl
@@ -79,7 +81,8 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "export APP_PORT DB_NAME PROJECT_ROOT APP_ROOT APP_URL" templates/bootstrap-sandbox.md.tmpl
     grep -q "DB_CONNECTION" templates/bootstrap-sandbox.md.tmpl
     grep -q "createdb" templates/bootstrap-sandbox.md.tmpl
-    grep -q "CREATE DATABASE" templates/bootstrap-sandbox.md.tmpl
+    ! grep -qi "mariadb" templates/bootstrap-sandbox.md.tmpl
+    ! grep -qi "mysql" templates/bootstrap-sandbox.md.tmpl
     grep -q "DB_INSTALL_MODE" templates/bootstrap-sandbox.md.tmpl
     grep -q "Sandbox ready at" templates/bootstrap-sandbox.md.tmpl
     grep -q "LARV_RUNTIME_MODE" templates/bootstrap-sandbox.md.tmpl
@@ -126,6 +129,7 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
 
 @test "env and operations guide templates cover setup values" {
     grep -q "DB_DATABASE" templates/env-guide.md.tmpl
+    grep -q "DB_CONNECTION=pgsql" templates/env-guide.md.tmpl
     grep -q "DB_USERNAME" templates/env-guide.md.tmpl
     grep -q "MAIL_" templates/env-guide.md.tmpl
     grep -q "STRIPE_WEBHOOK_SECRET" templates/env-guide.md.tmpl

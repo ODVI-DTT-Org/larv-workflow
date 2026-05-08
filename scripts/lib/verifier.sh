@@ -145,13 +145,13 @@ allocate_port() {
 
 # allocate_db <slug>
 # Returns "larv_<slug-with-dashes-as-underscores>". Verifies it does not exist
-# on the VM's MySQL instance (or returns non-zero if it does).
+# on the VM's PostgreSQL instance (or returns non-zero if it does).
 allocate_db() {
     local slug="$1"
     local db_name
     db_name="larv_$(echo "$slug" | tr '-' '_')"
     local existing
-    existing="$(verifier_run "mysql -N -B -e 'SHOW DATABASES' 2>/dev/null" 2>/dev/null || true)"
+    existing="$(verifier_run "sudo -u postgres psql -At -d postgres -c 'SELECT datname FROM pg_database' 2>/dev/null" 2>/dev/null || true)"
     if grep -qx "$db_name" <<<"$existing"; then
         echo "ERROR: database $db_name already exists on VM" >&2
         return 1

@@ -23,16 +23,21 @@ SLUG="{{project_slug}}"
 PROJECT_ROOT="$(pwd -P)"
 APP_ROOT="$PROJECT_ROOT"
 DB_NAME="larv_${SLUG//-/_}"
-DB_CONNECTION="${DB_CONNECTION:-mysql}"
+DB_CONNECTION="${DB_CONNECTION:-pgsql}"
 DB_HOST="${DB_HOST:-127.0.0.1}"
-DB_PORT="${DB_PORT:-}"
+DB_PORT="${DB_PORT:-5432}"
 DB_USERNAME="${DB_USERNAME:-larv}"
-DB_PASSWORD="${DB_PASSWORD:-}"
+DB_PASSWORD="${DB_PASSWORD:-larv}"
 DB_INSTALL_MODE="${DB_INSTALL_MODE:-apt}"
 LARV_VM_INSTALL_MODE="${LARV_VM_INSTALL_MODE:-apt}"
 
 if [ "${LARV_RUNTIME_MODE:-local}" != "local" ]; then
     echo "ERROR: this handoff expects local execution on the sandbox VM. Do not SSH to $VM_HOST unless a separate remote-mode runbook was generated." >&2
+    exit 1
+fi
+
+if [ "$DB_CONNECTION" != "pgsql" ]; then
+    echo "ERROR: larv sandbox bootstrap is PostgreSQL-only. Set DB_CONNECTION=pgsql or leave it unset." >&2
     exit 1
 fi
 
@@ -43,7 +48,7 @@ fi
 
 install_vm_packages_if_missing() {
     missing_runtime=()
-    command -v php >/dev/null || missing_runtime+=(php-cli php-xml php-mbstring php-curl php-zip php-sqlite3 php-mysql php-pgsql)
+    command -v php >/dev/null || missing_runtime+=(php-cli php-xml php-mbstring php-curl php-zip php-pgsql)
     command -v composer >/dev/null || missing_runtime+=(composer unzip)
     command -v tmux >/dev/null || missing_runtime+=(tmux)
     command -v curl >/dev/null || missing_runtime+=(curl)
@@ -135,39 +140,21 @@ ensure_laravel_scaffold() {
 
 ensure_laravel_scaffold
 
-if [ "$DB_CONNECTION" = "pgsql" ]; then
-    DB_PORT="${DB_PORT:-5432}"
-    if ! command -v psql >/dev/null || ! command -v createdb >/dev/null; then
-        if [ "$DB_INSTALL_MODE" = "apt" ]; then
-            sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql postgresql-contrib
-        else
-            echo "ERROR: PostgreSQL tools are missing. Install PostgreSQL or rerun with DB_INSTALL_MODE=apt." >&2
-            exit 1
-        fi
+if ! command -v psql >/dev/null || ! command -v createdb >/dev/null; then
+    if [ "$DB_INSTALL_MODE" = "apt" ]; then
+        sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y postgresql postgresql-contrib
+    else
+        echo "ERROR: PostgreSQL tools are missing. Install PostgreSQL or rerun with DB_INSTALL_MODE=apt." >&2
+        exit 1
     fi
-    if command -v systemctl >/dev/null && systemctl list-unit-files | grep -q '^postgresql'; then sudo systemctl start postgresql; fi
-    command -v psql >/dev/null && command -v createdb >/dev/null
-    sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DB_USERNAME'" | grep -q 1 || sudo -u postgres psql -c "CREATE ROLE $DB_USERNAME LOGIN PASSWORD '$DB_PASSWORD'"
-    sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" | grep -q 1 || sudo -u postgres createdb "$DB_NAME"
-    sudo -u postgres psql -c "ALTER DATABASE $DB_NAME OWNER TO $DB_USERNAME"
-elif [ "$DB_CONNECTION" = "mysql" ] || [ "$DB_CONNECTION" = "mariadb" ]; then
-    DB_PORT="${DB_PORT:-3306}"
-    if ! command -v mysql >/dev/null; then
-        if [ "$DB_INSTALL_MODE" = "apt" ]; then
-            sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y mariadb-server
-        else
-            echo "ERROR: MySQL/MariaDB client/server tools are missing. Install MariaDB/MySQL or rerun with DB_INSTALL_MODE=apt." >&2
-            exit 1
-        fi
-    fi
-    if command -v systemctl >/dev/null; then
-        if systemctl list-unit-files | grep -q '^mysql'; then sudo systemctl start mysql; elif systemctl list-unit-files | grep -q '^mariadb'; then sudo systemctl start mariadb; fi
-    fi
-    command -v mysql >/dev/null
-    mysql -N -B -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; CREATE USER IF NOT EXISTS '$DB_USERNAME'@'localhost' IDENTIFIED BY '$DB_PASSWORD'; CREATE USER IF NOT EXISTS '$DB_USERNAME'@'%' IDENTIFIED BY '$DB_PASSWORD'; GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USERNAME'@'localhost'; GRANT ALL PRIVILEGES ON \`$DB_NAME\`.* TO '$DB_USERNAME'@'%'; FLUSH PRIVILEGES;"
+fi
+if command -v systemctl >/dev/null && systemctl list-unit-files | grep -q '^postgresql'; then sudo systemctl start postgresql; fi
+command -v psql >/dev/null && command -v createdb >/dev/null
+sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DB_USERNAME'" | grep -q 1 || sudo -u postgres psql -c "CREATE ROLE \"$DB_USERNAME\" LOGIN PASSWORD '$DB_PASSWORD'"
+if ! sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" | grep -q 1; then
+    sudo -u postgres createdb -O "$DB_USERNAME" "$DB_NAME"
 else
-    echo "ERROR: DB_CONNECTION must be mysql, mariadb, or pgsql" >&2
-    exit 1
+    sudo -u postgres psql -c "ALTER DATABASE \"$DB_NAME\" OWNER TO \"$DB_USERNAME\""
 fi
 
 if [ ! -f .env ] && [ -f .env.example ]; then

@@ -237,7 +237,7 @@ You read the briefs. You: `approved`.
 The agent moves through:
 
 - **Phase 1 — Domain.** Flat model: `User`, `List`, `Todo`, `Invite`. Output: `docs/larv/01-domain/`.
-- **Phase 2 — Architecture.** C4 levels 1–3. Library policy locked: Laravel 12, Filament 4, Sanctum, MySQL, Redis, no Horizon for v1, Cashier deferred to billing slice. ADRs: 0001-laravel-12, 0002-filament-vs-nova (chose Filament), 0003-defer-billing. Output: `docs/larv/02-architecture/`.
+- **Phase 2 — Architecture.** C4 levels 1–3. Library policy locked: Laravel 12, Filament 4, Sanctum, PostgreSQL, Redis, no Horizon for v1, Cashier deferred to billing slice. ADRs: 0001-laravel-12, 0002-filament-vs-nova (chose Filament), 0003-defer-billing. Output: `docs/larv/02-architecture/`.
 - **Phase 3 — Design.** Data model (4 tables, 3 pivots), API surface (REST + Filament), 7 UI screens, brand spec drafted via huashu (you upload your logo, agent extracts palette). Output: `docs/larv/03-design/`.
 - **Phase 4 — Test strategy.** Pest unit + feature, Playwright for invite flow, 12 acceptance criteria. Output: `docs/larv/04-test-strategy/`.
 - **Phase 5 — Premortem.** Two showstoppers found:
@@ -279,7 +279,7 @@ The implementation AI must run:
 docs/Handsoff/bootstrap-sandbox.md
 ```
 
-That bootstrap runs locally on the VM. It checks/starts MySQL, MariaDB, or PostgreSQL, creates the app database if missing, writes `.env` database/app values, starts the app sandbox, probes it from inside and outside the VM, and writes:
+That bootstrap runs locally on the VM. It checks/starts PostgreSQL, creates the app database if missing, writes `.env` database/app values with `DB_CONNECTION=pgsql`, starts the app sandbox, probes it from inside and outside the VM, and writes:
 
 ```
 docs/larv/07-runtime/sandbox-url.txt
@@ -693,7 +693,7 @@ Playwright:  ✅ 4/4
 # Generated guides
 
 - docs/Handsoff/bootstrap-sandbox.md
-  Starts/probes the app sandbox during implementation. Checks MySQL/MariaDB/PostgreSQL, creates the app database when missing, writes `.env`, and records the sandbox URL.
+  Starts/probes the app sandbox during implementation. Checks PostgreSQL, creates the app database when missing, writes `.env` with `DB_CONNECTION=pgsql`, and records the sandbox URL.
 
 - docs/Handsoff/env-guide.md
   Explains sandbox and production `.env` values, including APP_KEY, APP_URL, DB_*, MAIL_*, queue, cache, and session settings.
