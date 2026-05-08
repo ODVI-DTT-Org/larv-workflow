@@ -41,6 +41,8 @@ This project is managed by the **larv** Laravel workflow plugin. The full plan a
    - Write or update the per-slice guide in `docs/user-manual/testing/`.
    - Update `docs/user-manual/seed-data.md` with seeded records, credentials, reset commands, and demo-data removal notes.
    - Preserve sandbox `DEMO_MODE=true`, populated demo seeders, and the navbar User Switcher. When `DEMO_MODE=false`, require normal login and hide the switcher.
+   - Run required Laravel commands yourself: migrations, seeders, cache clears, asset builds, queue/runtime restarts, package-specific commands, and sandbox restarts/probes when code changes require them. Do not ask the user to run sandbox commands manually.
+   - Keep the sandbox current after app code changes and show the user the public URL from `docs/larv/07-runtime/sandbox-url.txt` only after probing it.
    - Append to `docs/larv/local-learnings.md` if you discovered something.
    - Run the slice's Definition of Done checklist before claiming completion.
    - Identify yourself accurately when filling `created_by.tool` and `created_by.model` in the tracker.

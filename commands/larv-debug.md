@@ -29,6 +29,7 @@ Invoke the `larv-orchestrator` skill in debug mode with the provided issue text.
 
 - No design phase; reuse existing UI/brand.
 - Test-strategy phase is replaced with a single regression-test requirement in the slice's DoD.
+- The AI must implement the fix, run the regression tests, run required Laravel commands, restart/probe the sandbox when needed, and show the public URL where the user can verify the bug is fixed. Do not ask the user to run migrations, seeders, cache clears, build commands, queue/runtime restarts, or server restarts for sandbox review.
 
 ## Subagent return contract
 

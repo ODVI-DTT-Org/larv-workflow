@@ -49,6 +49,7 @@ Invoke the `larv-orchestrator` skill in feature mode with the provided name. Fea
 - Every user-facing feature slice must preserve demo seeders, `DEMO_MODE=true` sandbox access, and the navbar User Switcher; production must use `DEMO_MODE=false`.
 - Every feature slice must write implementation reports under `docs/larv/08-implementation/reports/`, never at the project root.
 - Every UI feature slice must preserve visual parity with `docs/larv/03-design/visual-implementation-contract.md` and the approved mockups. The production screen should look like the selected mockup unless a difference is explicitly approved.
+- The AI must run required Laravel commands, restart/probe the sandbox when needed, and show the public test URL. Do not ask the user to run migrations, seeders, cache clears, build commands, queue/runtime restarts, or server restarts for sandbox review.
 
 ## Subagent return contract
 

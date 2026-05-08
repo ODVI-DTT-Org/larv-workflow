@@ -68,6 +68,8 @@ yaml.safe_load(parts[1])
     grep -q "DEMO_MODE=true" commands/larv-feature.md
     grep -q "User Switcher" commands/larv-feature.md
     grep -q "DEMO_MODE=false" commands/larv-feature.md
+    grep -q "restart/probe the sandbox" commands/larv-feature.md
+    grep -q "Do not ask the user to run migrations" commands/larv-feature.md
 }
 
 @test "larv-debug command describes mini-flow with regression test" {
@@ -75,4 +77,12 @@ yaml.safe_load(parts[1])
     grep -q "regression test" commands/larv-debug.md
     grep -q "Tracker entry" commands/larv-debug.md
     grep -q "Implementation hard gate" commands/larv-debug.md
+    grep -q "restart/probe the sandbox" commands/larv-debug.md
+    grep -q "Do not ask the user to run migrations" commands/larv-debug.md
+}
+
+@test "larv-full command requires AI-owned sandbox runtime work" {
+    grep -q "AI owns sandbox execution" commands/larv-full.md
+    grep -q "restart/probe the sandbox" commands/larv-full.md
+    grep -q "Do not ask the user to run migrations" commands/larv-full.md
 }

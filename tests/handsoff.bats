@@ -60,6 +60,14 @@ teardown() { teardown_tmp_project "$TMP"; }
     grep -q "visual source of truth" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "docs/larv/08-implementation/screenshots/slice-01/" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "approved deviations" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "Apply Laravel runtime changes" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "Do not ask the user to run migrations" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "php artisan migrate --force" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "php artisan db:seed --force" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "npm run build" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "deploy-sandbox.sh" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "Sandbox ready" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "Laravel runtime commands run by the AI" "$TMP/docs/Handsoff/slice-01-auth.md"
     ! grep -q "Write \`IMPLEMENTATION-REPORT-slice-01.md\` at the project root" "$TMP/docs/Handsoff/slice-01-auth.md"
 }
 

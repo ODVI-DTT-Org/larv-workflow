@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.22 (next) - AI-owned Laravel runtime refresh
+
+- Requires `/larv:full`, `/larv:feature`, `/larv:debug`, and handoff implementation to run necessary Laravel commands instead of asking the user to do them manually.
+- Adds a per-slice runtime section covering migrations, seeders, cache clears, asset builds, queue/runtime restarts, sandbox refresh, and public URL probes.
+- Requires implementation reports and user testing guides to record runtime commands and sandbox probe status before pausing for browser QA.
+
 ## 0.4.21 (next) - Handoff design artifact links
 
 - Makes `larv-handoff` explicitly depend on the Huashu-derived `visual-implementation-contract.md` and approved mockups directory.

@@ -146,6 +146,9 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "DEMO_MODE=false" templates/env-guide.md.tmpl
     grep -q "User Switcher" templates/env-guide.md.tmpl
     grep -q "normal email/username" templates/operations-guide.md.tmpl
+    grep -q "AI is responsible for running Laravel commands" templates/operations-guide.md.tmpl
+    grep -q "queue/Horizon/runtime restarts" templates/operations-guide.md.tmpl
+    grep -q "docs/larv/07-runtime/deploy-sandbox.sh" templates/operations-guide.md.tmpl
 }
 
 @test "user manual templates cover testing and seed reset" {

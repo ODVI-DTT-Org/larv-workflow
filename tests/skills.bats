@@ -91,6 +91,9 @@ yaml.safe_load(parts[1])
     ! grep -q "STUB — sub-project A scaffolding only" skills/larv-implement/SKILL.md
     grep -q "Handsoff/slice-NN" skills/larv-implement/SKILL.md
     grep -q "self-contained" skills/larv-implement/SKILL.md
+    grep -q "section 12.1" skills/larv-implement/SKILL.md
+    grep -q "Never ask the user to run sandbox verification commands manually" skills/larv-implement/SKILL.md
+    grep -q "queue/runtime restarts" skills/larv-implement/SKILL.md
 }
 
 @test "larv-plan SKILL.md is no longer a stub" {

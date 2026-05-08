@@ -48,6 +48,8 @@ cat docs/larv/07-runtime/sandbox-url.txt
 cat docs/larv/07-runtime/sandbox-runbook.md
 ```
 
+During `/larv:full`, `/larv:feature`, `/larv:debug`, or handoff implementation, the AI is responsible for running Laravel commands and restarting/probing the sandbox. The user should only need to open the public URL and test the app.
+
 ## Verify
 
 ```bash
@@ -62,6 +64,8 @@ Smoke test:
 ```bash
 curl -fsS "$(cat docs/larv/07-runtime/sandbox-url.txt)" >/dev/null
 ```
+
+When the AI changes code, it must decide and run the needed runtime commands: migrations, seeders, `php artisan optimize:clear`, `npm run build`, queue/Horizon/runtime restarts, and `docs/larv/07-runtime/deploy-sandbox.sh` if the public sandbox needs refresh.
 
 ## End-to-end testing guides
 

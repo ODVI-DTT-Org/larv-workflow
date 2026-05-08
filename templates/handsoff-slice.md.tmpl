@@ -96,6 +96,8 @@ parallel: {{parallel_flag}}
 - [ ] Migration runs backward: `docker compose exec app php artisan migrate:rollback`
 - [ ] Seeders run successfully: `php artisan db:seed` or `docker compose exec app php artisan db:seed`
 - [ ] At least 10 realistic records per feature are visible in the sandbox UI or documented with a justified exception.
+- [ ] The AI ran every Laravel runtime command required by this slice: migrations, seeders, cache clears, asset builds, queue/runtime restarts, and other package-specific commands as applicable.
+- [ ] The AI restarted or reloaded the sandbox when code/runtime changes required it and verified the public URL with `curl` before announcing it.
 - [ ] `.env` contains `DEMO_MODE=true` in sandbox and `docs/user-manual/seed-data.md` explains how to set `DEMO_MODE=false` for normal login.
 - [ ] If this slice touches auth/navigation/users/roles/permissions/workflows, the navbar User Switcher works when `DEMO_MODE=true` and is hidden when `DEMO_MODE=false`.
 - [ ] No N+1 queries on listed endpoints (verified with Telescope or similar)
@@ -117,6 +119,55 @@ Tokens: {{est_tokens}} · Minutes: {{est_minutes}}
 ```bash
 cd {{project_root}}
 {{implementation_bash}}
+```
+
+## 12.1 Apply Laravel runtime changes and restart sandbox
+
+After code changes, you are responsible for applying all required Laravel runtime commands. Do not ask the user to run migrations, seeders, cache clears, builds, queue restarts, or sandbox restarts for sandbox review.
+
+Decide what is required from the files you changed:
+
+- migrations/schema changes: `php artisan migrate --force`
+- seeder/demo data changes: `php artisan db:seed --force`
+- config/env/routes/events/views/container changes: `php artisan optimize:clear`
+- frontend dependency changes: `npm install`
+- frontend asset changes: `npm run build`
+- queues/jobs/listeners/schedules: restart the queue worker, Horizon, scheduler, or the matching tmux process if present
+- Octane/Reverb/Horizon/Vite/runtime config changes: restart the affected process
+- route/controller/middleware/auth/layout changes: restart or reload the app server if the running sandbox will not pick them up automatically
+
+Safe baseline when the slice changed app code:
+
+```bash
+php artisan optimize:clear
+php artisan migrate --force
+php artisan db:seed --force
+npm run build
+```
+
+Then refresh the public sandbox from the current project root:
+
+```bash
+APP_PORT="$(awk -F: '/app_port:/ {gsub(/ /, "", $2); print $2}' docs/larv/STATE.yaml | tail -1)"
+DB_DATABASE="$(awk -F: '/db_name:/ {gsub(/ /, "", $2); print $2}' docs/larv/STATE.yaml | tail -1)"
+
+if [ -z "$APP_PORT" ] || [ "$APP_PORT" = "null" ]; then
+  APP_PORT="$(grep -oE ':[0-9]+' docs/larv/07-runtime/sandbox-url.txt 2>/dev/null | tail -1 | tr -d ':')"
+fi
+
+if [ -z "$DB_DATABASE" ] || [ "$DB_DATABASE" = "null" ]; then
+  DB_DATABASE="$(grep '^DB_DATABASE=' .env | cut -d= -f2-)"
+fi
+
+APP_PORT="$APP_PORT" DB_DATABASE="$DB_DATABASE" DEMO_MODE="${DEMO_MODE:-true}" bash docs/larv/07-runtime/deploy-sandbox.sh
+```
+
+Probe before announcing the URL:
+
+```bash
+SANDBOX_URL="$(cat docs/larv/07-runtime/sandbox-url.txt)"
+curl -fsS --max-time 10 "$SANDBOX_URL" >/dev/null
+printf "Sandbox ready: %s\n" "$SANDBOX_URL"
 ```
 
 ## 13. Tracker append snippet (run on completion)
@@ -188,6 +239,13 @@ Login: {{seeded_email}} / {{seeded_password}}
 ## Tests
 Pest: {{passed}}/{{total}}
 
+## Runtime commands run
+- migrations:
+- seeders:
+- cache/build:
+- server restart:
+- public URL probe: Sandbox ready: http://{{vm_host}}:{{app_port}}/{{smoke_path}}
+
 ## Notes for the next implementer
 - ...
 
@@ -216,6 +274,7 @@ The guide must be written for an end user doing browser QA and must include:
 - What can be tested now
 - What should not be expected yet
 - Terminal verification commands run by the AI
+- Laravel runtime commands run by the AI, including migrations, seeders, cache/build commands, queue/runtime restarts, and sandbox restart/probe status
 - Screenshot paths and visual parity notes for screens touched by this slice
 - How to reset demo data with `php artisan migrate:fresh --seed` or the Docker equivalent
 - How to remove/disable demo seed data before production
@@ -232,6 +291,8 @@ grep -qi "DEMO_MODE" docs/user-manual/seed-data.md
 grep -qi "User Switcher" docs/user-manual/seed-data.md
 grep -qi "Visual parity" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 grep -qi "migrate:fresh --seed" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
+grep -qi "Runtime commands" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
+grep -qi "Sandbox ready" docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md
 grep -qi "{{slice_id}}" docs/user-manual/seed-data.md
 ```
 
@@ -245,6 +306,8 @@ After this slice, read `STATE.yaml.execution.review_mode`.
   - Testing guide path: `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md`
   - Seed/reset guide path: `docs/user-manual/seed-data.md`
   - Terminal verification commands run for this slice
+  - Laravel runtime commands run by the AI and whether the sandbox was restarted
+  - Public URL probe result from `docs/larv/07-runtime/sandbox-url.txt`
   - Browser paths or actions from `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md`
   - Files changed and tests passed
   Wait for explicit approval before continuing.
