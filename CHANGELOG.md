@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.21 (next) - Handoff design artifact links
+
+- Makes `larv-handoff` explicitly depend on the Huashu-derived `visual-implementation-contract.md` and approved mockups directory.
+- Adds direct visual contract, UI design, and approved mockup links to the generated `docs/Handsoff.md` index.
+
 ## 0.4.20 (next) - Demo mode seeders and user switcher
 
 - Adds `DEMO_MODE=true` as a sandbox default and `DEMO_MODE=false` as the production default.

@@ -29,6 +29,8 @@ teardown() { teardown_tmp_project "$TMP"; }
     [ -f "$TMP/docs/Handsoff.md" ]
     grep -q "Handsoff — my-app" "$TMP/docs/Handsoff.md"
     grep -q "31.220.79.31" "$TMP/docs/Handsoff.md"
+    grep -q "docs/larv/03-design/visual-implementation-contract.md" "$TMP/docs/Handsoff.md"
+    grep -q "docs/larv/03-design/mockups/" "$TMP/docs/Handsoff.md"
 }
 
 @test "handsoff_render_index inlines C4 content (does not link only)" {

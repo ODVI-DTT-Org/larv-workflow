@@ -12,7 +12,8 @@ Generate the documents that every execution venue (same-session, subagents, fore
 - `docs/larv/STATE.yaml` (project + execution.allocations)
 - `docs/larv/01-domain/*.md`
 - `docs/larv/02-architecture/c4-*.md`
-- `docs/larv/03-design/{brand-spec,ui-design,design-decision}.md`
+- `docs/larv/03-design/{brand-spec,ui-design,design-decision,visual-implementation-contract}.md`
+- `docs/larv/03-design/mockups/`
 - `docs/larv/06-implementation/elephant-carpaccio.md`
 - `adr/*.md`
 - `docs/larv/decisions.md` (ADR aggregator)

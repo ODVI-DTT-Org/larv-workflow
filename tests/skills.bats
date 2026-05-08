@@ -287,6 +287,8 @@ yaml.safe_load(parts[1])
     grep -q "docs/Handsoff/package-guide.md" skills/larv-handoff/SKILL.md
     grep -q "docs/user-manual/README.md" skills/larv-handoff/SKILL.md
     grep -q "docs/user-manual/seed-data.md" skills/larv-handoff/SKILL.md
+    grep -q "visual-implementation-contract" skills/larv-handoff/SKILL.md
+    grep -q "docs/larv/03-design/mockups/" skills/larv-handoff/SKILL.md
     grep -q "DOCS.md" skills/larv-handoff/SKILL.md
     grep -q "docs/larv/08-implementation/reports/" skills/larv-handoff/SKILL.md
 }
