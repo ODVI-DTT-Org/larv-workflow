@@ -46,7 +46,9 @@ Every user-facing feature in this slice must include realistic seed data so the 
 
 ## 8.1 Visual implementation contract
 
-If this slice creates or modifies any UI screen, the implementation must match the approved design artifacts. Do not build generic Laravel starter UI, default Tailwind panels, or plain CRUD screens when a mockup/design contract exists.
+If this slice creates or modifies any UI screen, the implementation must match the approved design artifacts. The user chose the mockups and expects the production app to look like them. Treat the chosen mockup as the visual source of truth, not loose inspiration.
+
+Do not build generic Laravel starter UI, default Tailwind panels, or plain CRUD screens when a mockup/design contract exists.
 
 Read these files before UI work:
 
@@ -58,11 +60,13 @@ Read these files before UI work:
 
 For every screen listed in section 8:
 
-- implement the layout shell, typography, color tokens, spacing, radius, icons, table density, cards, forms, empty states, loading states, and responsive behavior from the visual implementation contract
+- map the app route to the exact chosen mockup file and viewport from `docs/larv/03-design/visual-implementation-contract.md`
+- implement the same layout composition, typography hierarchy, color tokens, spacing rhythm, radius, borders, icons, table density, cards, forms, empty states, loading states, and responsive behavior from the visual implementation contract
 - use the seeded records from section 6.1 so the screen looks populated during browser review
-- capture desktop and mobile screenshots after implementation
-- compare those screenshots to the chosen mockup and fix obvious visual drift before marking the slice complete
-- document the screenshot paths and remaining visual differences in `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md`
+- capture desktop and mobile screenshots after implementation under `docs/larv/08-implementation/screenshots/{{slice_id}}/`
+- compare those screenshots against the chosen mockup and fix visual drift before marking the slice complete
+- do not mark the slice complete with unexplained visual differences. Any remaining difference must be documented in the implementation report and must be caused by real data, accessibility, browser constraints, or an explicit user-approved deviation.
+- document reference mockup paths, screenshot paths, and approved remaining visual differences in `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md`
 
 ## 9. Dependencies
 
@@ -79,7 +83,9 @@ parallel: {{parallel_flag}}
 - [ ] No N+1 queries on listed endpoints (verified with Telescope or similar)
 - [ ] `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md` written with end-to-end browser testing instructions.
 - [ ] `docs/user-manual/seed-data.md` updated with credentials, seeded records, reset commands, and demo-data removal notes.
-- [ ] If UI was touched, screenshots were captured and checked against `docs/larv/03-design/visual-implementation-contract.md` and chosen mockups.
+- [ ] If UI was touched, each app route is mapped to a chosen mockup in `docs/larv/03-design/visual-implementation-contract.md`.
+- [ ] If UI was touched, desktop and mobile screenshots were saved under `docs/larv/08-implementation/screenshots/{{slice_id}}/`.
+- [ ] If UI was touched, screenshots were compared against chosen mockups and all non-trivial visual differences were fixed or explicitly documented as approved deviations.
 - [ ] `docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md` written
 - [ ] Tracker entry appended (see section 13)
 - [ ] Learnings appended if any (see section 14)
@@ -172,9 +178,10 @@ Design contract: docs/larv/03-design/visual-implementation-contract.md
 Mockup references:
 - docs/larv/03-design/mockups/...
 Screenshots captured:
-- ...
-Remaining visual differences:
-- ...
+- docs/larv/08-implementation/screenshots/{{slice_id}}/...
+Parity result: pass | blocked | approved-with-deviations
+Remaining visual differences and reason:
+- none, or list each user-approved/accessibility/framework/data-driven deviation
 ```
 
 ## 17. User Testing Guide (hard required)
@@ -202,6 +209,7 @@ test -s docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 test -s docs/user-manual/seed-data.md
 grep -qi "Sandbox URL" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 grep -qi "Seeded records" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
+grep -qi "Visual parity" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 grep -qi "migrate:fresh --seed" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 grep -qi "{{slice_id}}" docs/user-manual/seed-data.md
 ```

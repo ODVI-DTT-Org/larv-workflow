@@ -39,7 +39,7 @@ For each `slice-NN-<name>.md`:
 
 1. Read it from top to bottom.
 2. Execute every bash block in section 12 (Implementation commands).
-3. If the slice touches UI, read `docs/larv/03-design/visual-implementation-contract.md`, `brand-spec.md`, `ui-design.md`, and the chosen mockups before styling. Capture desktop and mobile screenshots after implementation and fix obvious drift from the approved mockups.
+3. If the slice touches UI, read `docs/larv/03-design/visual-implementation-contract.md`, `brand-spec.md`, `ui-design.md`, and the chosen mockups before styling. Implement the app route to match the chosen mockup as the visual source of truth. Capture desktop and mobile screenshots under `docs/larv/08-implementation/screenshots/<slice-id>/`, compare them to the reference mockups, and fix drift before completion. Remaining visual differences require explicit documentation and user approval.
 4. Run section 10's Definition of Done checklist.
 5. Write `docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-<slice-id>.md` per section 16; never write implementation reports at the project root.
 6. Write or update the hard-required user testing guide at `docs/user-manual/testing/<slice-id>-<slice-slug>.md`.

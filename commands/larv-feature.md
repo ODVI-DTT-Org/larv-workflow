@@ -30,7 +30,7 @@ Invoke the `larv-orchestrator` skill in feature mode with the provided name. Fea
 10. **Per-slice handsoff** generation via `larv-handoff`.
 11. **Tracker + STATE updates** — append planning and slice entries; update `STATE.yaml.features[]` with `{ name, slug, status, design_path, plan_path, slices, started_at, last_updated_at }`.
 12. **User manual and docs index updates** — ensure `DOCS.md`, `docs/user-manual/README.md`, `docs/user-manual/seed-data.md`, and feature testing guide requirements under `docs/user-manual/testing/` are updated.
-13. **Visual parity** — if the feature touches UI, update or extend `docs/larv/03-design/visual-implementation-contract.md`, reference the chosen mockups, and require desktop/mobile screenshot checks in the feature slice.
+13. **Visual parity** — if the feature touches UI, update or extend `docs/larv/03-design/visual-implementation-contract.md`, map routes to exact chosen mockup files, and require desktop/mobile screenshot checks in the feature slice.
 13. **Learning capture** — append useful findings to `docs/larv/local-learnings.md`.
 14. **AI starting-point files** regenerated.
 15. **Doc-site rebuild** so the feature design, plan, user manual, testing guides, and handoff are browsable.
@@ -47,7 +47,7 @@ Invoke the `larv-orchestrator` skill in feature mode with the provided name. Fea
 - Implementation honors `STATE.yaml.execution.review_mode`: auto completes all slices; manual modes pause by slice, ADR, or phase with URL and QA checklist.
 - Every feature slice must update `docs/user-manual/testing/` and `docs/user-manual/seed-data.md`, even when implementation runs in `auto-all`.
 - Every feature slice must write implementation reports under `docs/larv/08-implementation/reports/`, never at the project root.
-- Every UI feature slice must preserve visual parity with `docs/larv/03-design/visual-implementation-contract.md` and the approved mockups.
+- Every UI feature slice must preserve visual parity with `docs/larv/03-design/visual-implementation-contract.md` and the approved mockups. The production screen should look like the selected mockup unless a difference is explicitly approved.
 
 ## Subagent return contract
 

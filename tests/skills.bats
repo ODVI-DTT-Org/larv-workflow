@@ -162,6 +162,8 @@ yaml.safe_load(parts[1])
     grep -q "bundle/huashu-design/SKILL.md" skills/larv-design/SKILL.md
     grep -q "visual-implementation-contract.md" skills/larv-design/SKILL.md
     grep -q "forbidden generic defaults" skills/larv-design/SKILL.md
+    grep -q "route-to-mockup parity matrix" skills/larv-design/SKILL.md
+    grep -q "same visual output as the chosen mockups" skills/larv-design/SKILL.md
 }
 
 @test "larv-design makes mockup URL a mandatory completion gate" {
@@ -268,6 +270,8 @@ yaml.safe_load(parts[1])
     grep -q "never write implementation reports at the project root" skills/larv-implement/SKILL.md
     grep -q "visual-implementation-contract.md" skills/larv-implement/SKILL.md
     grep -q "desktop and mobile screenshots" skills/larv-implement/SKILL.md
+    grep -q "visual source of truth" skills/larv-implement/SKILL.md
+    grep -q "docs/larv/08-implementation/screenshots/<slice-id>/" skills/larv-implement/SKILL.md
 }
 
 @test "larv-handoff renders production and user guide documents" {

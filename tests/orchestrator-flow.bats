@@ -93,6 +93,7 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
     grep -q "docs/user-manual/seed-data.md" docs/Handsoff/slice-01-auth-scaffold.md
     grep -q "docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-slice-01.md" docs/Handsoff/slice-01-auth-scaffold.md
     grep -q "docs/larv/03-design/visual-implementation-contract.md" docs/Handsoff/slice-01-auth-scaffold.md
+    grep -q "docs/larv/08-implementation/screenshots/slice-01/" docs/Handsoff/slice-01-auth-scaffold.md
     grep -q "Bootstrap Sandbox" docs/Handsoff/bootstrap-sandbox.md
     grep -q "Laravel Cloud" docs/Handsoff/production-deploy.md
     grep -q "Namecheap" docs/Handsoff/production-deploy.md
@@ -103,6 +104,7 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
     grep -q "DOCS.md" CLAUDE.md
     grep -q "docs/larv/08-implementation/reports/" CLAUDE.md
     grep -q "docs/larv/03-design/visual-implementation-contract.md" CLAUDE.md
+    grep -q "docs/larv/08-implementation/screenshots/" CLAUDE.md
     grep -q "bootstrap-sandbox.md" CLAUDE.md
     grep -q "production-deploy.md" CLAUDE.md
     grep -q "package-guide.md" CLAUDE.md

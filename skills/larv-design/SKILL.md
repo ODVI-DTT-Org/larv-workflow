@@ -167,7 +167,8 @@ Read and follow `bundle/huashu-design/SKILL.md` with the chosen pick only. Outpu
 - layout shell requirements: navigation, sidebar/header behavior, max widths, density, empty/loading/error states
 - component inventory: buttons, cards, tables, forms, filters, badges, charts, modals, toasts, and their visual states
 - implementation notes for Laravel Blade/Livewire/Inertia/Filament as applicable
-- screenshot parity checklist for desktop and mobile
+- route-to-mockup parity matrix with columns: route, viewport, reference mockup file, required seeded state, screenshot output path, pass/fail criteria
+- screenshot parity checklist for desktop and mobile. The expectation is same visual output as the chosen mockups: same layout composition, typography hierarchy, color system, spacing rhythm, component styling, interaction states, and populated-data feel. Small differences are allowed only for real framework constraints, dynamic content, or accessibility fixes, and must be documented.
 - forbidden generic defaults, including unstyled starter pages, default Tailwind gray panels, oversized marketing heroes for app dashboards, and placeholder-only empty screens
 
 ### 10. Server lifetime

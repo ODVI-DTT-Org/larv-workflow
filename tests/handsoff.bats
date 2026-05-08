@@ -51,6 +51,9 @@ teardown() { teardown_tmp_project "$TMP"; }
     grep -q "Visual implementation contract" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "docs/larv/03-design/visual-implementation-contract.md" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "default Tailwind panels" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "visual source of truth" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "docs/larv/08-implementation/screenshots/slice-01/" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "approved deviations" "$TMP/docs/Handsoff/slice-01-auth.md"
     ! grep -q "Write \`IMPLEMENTATION-REPORT-slice-01.md\` at the project root" "$TMP/docs/Handsoff/slice-01-auth.md"
 }
 

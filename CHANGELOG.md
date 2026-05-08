@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.19 (next) - Strict mockup parity expectation
+
+- Tightens UI implementation from design inspiration to route-by-route mockup parity.
+- Requires UI slices to map routes to exact chosen mockup files, save desktop/mobile screenshots under `docs/larv/08-implementation/screenshots/<slice-id>/`, and fix or document every non-trivial visual difference.
+- Clarifies that selected mockups are the visual source of truth and production screens should look like them unless a difference is explicitly approved.
+
 ## 0.4.18 (next) - Design-to-implementation visual parity gates
 
 - Makes Huashu design output a mandatory `docs/larv/03-design/visual-implementation-contract.md` that bridges approved mockups to production UI.

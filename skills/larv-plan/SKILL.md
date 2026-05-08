@@ -27,7 +27,7 @@ Turn the approved design, architecture, and test strategy into implementation sl
 4. Initialize or update `STATE.yaml.slices` with the planned slice IDs.
 5. Write the executable sandbox deployment script at `docs/larv/07-runtime/deploy-sandbox.sh`.
 6. For every user-facing slice, include seeder obligations: at least 10 realistic records per feature, all roles/personas needed for browser QA, and the expected testing guide path under `docs/user-manual/testing/`.
-7. For every slice that creates or modifies UI, include visual implementation obligations copied from `docs/larv/03-design/visual-implementation-contract.md`, `brand-spec.md`, `ui-design.md`, and the chosen mockup paths. UI slices must include screenshot parity acceptance criteria for desktop and mobile.
+7. For every slice that creates or modifies UI, include visual implementation obligations copied from `docs/larv/03-design/visual-implementation-contract.md`, `brand-spec.md`, `ui-design.md`, and the chosen mockup paths. UI slices must map each app route to an exact mockup file and include screenshot parity acceptance criteria for desktop and mobile.
 
 ## Package slice requirements
 
