@@ -176,6 +176,9 @@ handsoff_render_runtime_guides() {
         > "$dir/docs/user-manual/package-guide.md"
     __handsoff_render_template "$plugin_root/templates/seed-data-guide.md.tmpl" "$tokens" \
         > "$dir/docs/user-manual/seed-data.md"
+    mkdir -p "$dir/docs/larv/08-implementation/reports"
+    __handsoff_render_template "$plugin_root/templates/docs-index.md.tmpl" "$tokens" \
+        > "$dir/DOCS.md"
     rm -f "$tokens"
 }
 

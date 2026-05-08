@@ -13,13 +13,13 @@ Aggregate project lessons and plugin improvement signals after implementation, v
 - `docs/larv/local-learnings.md`
 - `docs/larv/09-verification/final-report.md`
 - `docs/larv/10-deploy/*.md`
-- `IMPLEMENTATION-REPORT-*.md`
+- `docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-*.md`
 - `docs/Handsoff/slice-NN-*.md` Plugin Improvement Notes sections
 - root `LEARNINGS.md`
 
 ## Modes
 
-- `--quick`: inspect latest five implementation reports and only high-confidence `[plugin]` notes.
+- `--quick`: inspect the latest five implementation reports under `docs/larv/08-implementation/reports/` and only high-confidence `[plugin]` notes.
 - `--full`: inspect all reports and local learnings.
 - `--since=YYYY-MM-DD`: inspect entries after a date.
 - `--dry-run`: print proposed `LEARNINGS.md` additions and plugin follow-up tasks without editing files.

@@ -75,6 +75,8 @@ safe_commit_docs "[larv] handsoff documents generated for $(yq -r .project.slug 
 - `docs/user-manual/production-deploy.md`
 - `docs/user-manual/package-guide.md`
 - `docs/user-manual/testing/` (directory; per-slice guides are written during implementation)
+- `DOCS.md`
+- `docs/larv/08-implementation/reports/` (directory; per-slice reports are written during implementation)
 - `docs/Handsoff/slice-NN-<name>.md` for every slice in the plan
 - `docs/larv/implementation-tracker.yaml` and `.md`
 - `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `.cursor/rules/larv.mdc`, `.codex/AGENTS.md`
@@ -94,6 +96,7 @@ files_written:
   - docs/Handsoff/package-guide.md
   - docs/user-manual/README.md
   - docs/user-manual/seed-data.md
+  - DOCS.md
   - docs/Handsoff/slice-NN-<name>.md  (one per slice)
   - docs/larv/implementation-tracker.yaml
   - docs/larv/implementation-tracker.md

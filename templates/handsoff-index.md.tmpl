@@ -115,7 +115,7 @@ If context is nearly full, stop after the current atomic step and tell the user 
 6. Open the matching `docs/Handsoff/slice-NN-<name>.md` and continue from its next unchecked Definition of Done item.
 7. If every slice is complete, run verification or deployment depending on the user's request.
 
-Do not rely on previous chat context. The docs, tracker, reports, and STATE file are the source of truth.
+Do not rely on previous chat context. `DOCS.md`, the docs, tracker, reports, and STATE file are the source of truth.
 
 Runtime note: this handoff assumes the AI is already running on the sandbox VM. Do not SSH to `{{ssh_user}}@{{vm_host}}`; execute the bootstrap, mockup server, doc-site server, and app sandbox commands locally.
 
@@ -142,3 +142,5 @@ If you are not Claude Code: ignore any references to "superpowers" or "skills" o
 - User manual: `docs/user-manual/README.md`
 - Per-slice testing guides: `docs/user-manual/testing/`
 - Seed data and reset guide: `docs/user-manual/seed-data.md`
+- Root docs index: `DOCS.md`
+- Implementation reports: `docs/larv/08-implementation/reports/`

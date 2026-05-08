@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.17 (next) - Organized implementation reports and docs index
+
+- Moves per-slice implementation reports from the project root to `docs/larv/08-implementation/reports/`.
+- Adds generated root `DOCS.md` as the documentation index for users and fresh AI sessions.
+- Updates handoff, implementation, feature, learn, doc-site, and AI starting-point guidance to reference the organized report and docs-index paths.
+
 ## 0.4.16 (next) - User manual testing guides and seed data gates
 
 - Adds `docs/user-manual/` generation for user-facing install, environment, production, package, seed/reset, and per-slice testing guides.

@@ -29,7 +29,7 @@ Invoke the `larv-orchestrator` skill in feature mode with the provided name. Fea
 9. **Mini slice plan** — append 1–N new slices to `docs/larv/06-implementation/elephant-carpaccio.md`, with `depends_on` linking to completed/current slices.
 10. **Per-slice handsoff** generation via `larv-handoff`.
 11. **Tracker + STATE updates** — append planning and slice entries; update `STATE.yaml.features[]` with `{ name, slug, status, design_path, plan_path, slices, started_at, last_updated_at }`.
-12. **User manual updates** — ensure `docs/user-manual/README.md`, `docs/user-manual/seed-data.md`, and feature testing guide requirements under `docs/user-manual/testing/` are updated.
+12. **User manual and docs index updates** — ensure `DOCS.md`, `docs/user-manual/README.md`, `docs/user-manual/seed-data.md`, and feature testing guide requirements under `docs/user-manual/testing/` are updated.
 13. **Learning capture** — append useful findings to `docs/larv/local-learnings.md`.
 14. **AI starting-point files** regenerated.
 15. **Doc-site rebuild** so the feature design, plan, user manual, testing guides, and handoff are browsable.
@@ -45,6 +45,7 @@ Invoke the `larv-orchestrator` skill in feature mode with the provided name. Fea
 - Implementation tracker entries are tagged `type: feature`.
 - Implementation honors `STATE.yaml.execution.review_mode`: auto completes all slices; manual modes pause by slice, ADR, or phase with URL and QA checklist.
 - Every feature slice must update `docs/user-manual/testing/` and `docs/user-manual/seed-data.md`, even when implementation runs in `auto-all`.
+- Every feature slice must write implementation reports under `docs/larv/08-implementation/reports/`, never at the project root.
 
 ## Subagent return contract
 

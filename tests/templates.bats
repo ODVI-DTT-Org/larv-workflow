@@ -2,9 +2,9 @@
 
 load helpers
 
-TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report ddd-interview-questions bootstrap-sandbox.md.tmpl production-deploy.md.tmpl env-guide.md.tmpl operations-guide.md.tmpl package-matrix.md.tmpl package-slice-snippets.md.tmpl happy-path.md.tmpl user-manual-index.md.tmpl seed-data-guide.md.tmpl)
+TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report ddd-interview-questions bootstrap-sandbox.md.tmpl production-deploy.md.tmpl env-guide.md.tmpl operations-guide.md.tmpl package-matrix.md.tmpl package-slice-snippets.md.tmpl happy-path.md.tmpl user-manual-index.md.tmpl seed-data-guide.md.tmpl docs-index.md.tmpl)
 
-@test "all 15 templates exist" {
+@test "all 16 templates exist" {
     for t in "${TEMPLATES[@]}"; do
         if [[ "$t" == *.tmpl ]]; then
             [ -f "templates/${t}" ] || { echo "missing templates/${t}"; return 1; }
@@ -142,12 +142,21 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
 }
 
 @test "user manual templates cover testing and seed reset" {
+    grep -q "Root documentation index" templates/user-manual-index.md.tmpl
     grep -q "Per-slice testing guides" templates/user-manual-index.md.tmpl
     grep -q "docs/larv/07-runtime/sandbox-url.txt" templates/user-manual-index.md.tmpl
     grep -q "Required Seeder Policy" templates/seed-data-guide.md.tmpl
     grep -q "at least 10 realistic records" templates/seed-data-guide.md.tmpl
     grep -q "migrate:fresh --seed" templates/seed-data-guide.md.tmpl
     grep -q "Demo Credentials" templates/seed-data-guide.md.tmpl
+}
+
+@test "docs index template points AI and users to organized docs" {
+    grep -q "docs/Handsoff.md" templates/docs-index.md.tmpl
+    grep -q "docs/user-manual/README.md" templates/docs-index.md.tmpl
+    grep -q "docs/larv/08-implementation/reports/" templates/docs-index.md.tmpl
+    grep -q "docs/larv/09-verification/final-report.md" templates/docs-index.md.tmpl
+    grep -q "docs/larv/07-runtime/sandbox-url.txt" templates/docs-index.md.tmpl
 }
 
 @test "package matrix template covers Laravel ecosystem package propagation" {

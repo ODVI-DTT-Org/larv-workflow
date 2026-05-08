@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Auto-commit safety per spec §18. Operates only on docs/ and adr/ paths.
+# Auto-commit safety per spec §18. Operates only on documentation and generated AI starting-point paths.
 
 # git_default_branch
 # Detects the default branch. Tries: origin/HEAD symbolic ref, then init.defaultBranch.
@@ -18,50 +18,51 @@ git_default_branch() {
 
 # git_dirty_outside_docs
 # Returns 0 if all dirty paths (staged, unstaged, untracked) are inside
-# docs/ or adr/. Returns 1 if anything else is dirty.
+# docs/, adr/, root docs index, or generated AI starting-point files.
+# Returns 1 if anything else is dirty.
+git_is_allowed_generated_doc_path() {
+    local p="$1"
+    case "$p" in
+        docs/*|adr/*|DOCS.md|CLAUDE.md|AGENTS.md|GEMINI.md|.codex/AGENTS.md|.cursor/rules/larv.mdc) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
 git_dirty_outside_docs() {
     local dirty
-    dirty="$(git status --porcelain | awk '{print $2}')"
+    dirty="$(git status --porcelain -uall | awk '{print $2}')"
     [ -z "$dirty" ] && return 0
     local p
     while IFS= read -r p; do
-        case "$p" in
-            docs/*|adr/*) ;;
-            *) return 1 ;;
-        esac
+        git_is_allowed_generated_doc_path "$p" || return 1
     done <<<"$dirty"
     return 0
 }
 
 # safe_commit_docs <message>
-# Commits docs/ and adr/ to the default branch. Refuses if dirty paths exist
-# outside those directories. No-op if there are no docs/ or adr/ changes.
+# Commits docs/ plus generated AI documentation entry points to the default branch.
+# Refuses if dirty paths exist outside the allowlist. No-op if there are no allowed changes.
 safe_commit_docs() {
     local message="$1"
     if ! git_dirty_outside_docs; then
-        echo "ERROR: dirty path(s) outside docs/ or adr/ — commit those first:" >&2
-        git status --porcelain | grep -vE '^.. (docs/|adr/)' >&2
+        echo "ERROR: dirty path(s) outside generated docs allowlist — commit those first:" >&2
+        git status --porcelain -uall | while read -r status path; do
+            git_is_allowed_generated_doc_path "$path" || printf "%s %s\n" "$status" "$path"
+        done >&2
         return 1
     fi
 
-    local has_changes=0
-    if ! git diff --quiet -- docs/ adr/ 2>/dev/null; then
-        has_changes=1
-    fi
-    if ! git diff --cached --quiet -- docs/ adr/ 2>/dev/null; then
-        has_changes=1
-    fi
-    if git ls-files --others --exclude-standard -- docs/ adr/ | grep -q .; then
-        has_changes=1
-    fi
-
-    if [ "$has_changes" -eq 0 ]; then
-        echo "[larv] nothing to commit in docs/ or adr/"
+    local allowed_paths=(docs/ adr/ DOCS.md CLAUDE.md AGENTS.md GEMINI.md .codex/AGENTS.md .cursor/rules/larv.mdc)
+    if [ -z "$(git status --porcelain -uall)" ]; then
+        echo "[larv] nothing to commit in generated docs"
         return 0
     fi
 
-    git add docs/ adr/ 2>/dev/null || true
+    local p
+    for p in "${allowed_paths[@]}"; do
+        [ -e "$p" ] && git add "$p"
+    done
     # Commit without explicit pathspec: git_dirty_outside_docs already guarantees
-    # only docs/ and adr/ are staged, so no other changes can slip in.
+    # only generated docs allowlist paths are staged, so no other changes can slip in.
     git commit -m "$message"
 }

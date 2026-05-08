@@ -25,7 +25,7 @@ Before executing any slice, read `docs/Handsoff/bootstrap-sandbox.md` and execut
 Before the loop, read `STATE.yaml.execution.review_mode`.
 
 - `auto-all`: implement every eligible slice without stopping until all slices pass verification, the app is fully tested, or a blocker/failing test requires user input.
-- `manual-slice`: after every slice, show `docs/larv/07-runtime/sandbox-url.txt`, list terminal commands run, list browser QA actions from the implementation report, and wait for user approval.
+- `manual-slice`: after every slice, show `docs/larv/07-runtime/sandbox-url.txt`, list terminal commands run, list browser QA actions from `docs/user-manual/testing/<slice-id>-<slice-slug>.md`, show `docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-<slice-id>.md`, and wait for user approval.
 - `manual-adr`: pause only after slices that create or change ADRs/significant decisions.
 - `manual-phase`: pause after major boundaries such as bootstrap, feature group, final verification, and deployment prep.
 
@@ -38,12 +38,12 @@ For each `slice-NN-<name>.md`:
 1. Read it from top to bottom.
 2. Execute every bash block in section 12 (Implementation commands).
 3. Run section 10's Definition of Done checklist.
-4. Write or update the hard-required user testing guide at `docs/user-manual/testing/<slice-id>-<slice-slug>.md`.
-5. Update `docs/user-manual/seed-data.md` with seeded records, demo credentials, reset commands, and demo-data removal notes.
-6. Run section 13's tracker append snippet.
-7. Run section 14's local-learnings append snippet if you discovered something.
-8. Run section 15's STATE.yaml update snippet.
-9. Write `IMPLEMENTATION-REPORT-<slice-id>.md` per section 16.
+4. Write `docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-<slice-id>.md` per section 16; never write implementation reports at the project root.
+5. Write or update the hard-required user testing guide at `docs/user-manual/testing/<slice-id>-<slice-slug>.md`.
+6. Update `docs/user-manual/seed-data.md` with seeded records, demo credentials, reset commands, and demo-data removal notes.
+7. Run section 13's tracker append snippet.
+8. Run section 14's local-learnings append snippet if you discovered something.
+9. Run section 15's STATE.yaml update snippet.
 10. Apply the execution cadence above. Always print the public sandbox URL and exact guide paths when pausing for user review.
 
 ## Failure handling
@@ -51,7 +51,7 @@ For each `slice-NN-<name>.md`:
 If any step fails:
 
 1. Mark `STATE.yaml.slices.NN.status: failed`.
-2. Write the failed `IMPLEMENTATION-REPORT-<slice-id>.md` describing what broke.
+2. Write the failed `docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-<slice-id>.md` describing what broke.
 3. Stop the loop. The orchestrator prompts the user: retry · skip · stop.
 
 ## What you do not do

@@ -59,6 +59,8 @@ yaml.safe_load(parts[1])
     grep -q "Per-slice handsoff" commands/larv-feature.md
     grep -q "Tracker + STATE updates" commands/larv-feature.md
     grep -q "Routing-menu hard gate" commands/larv-feature.md
+    grep -q "DOCS.md" commands/larv-feature.md
+    grep -q "docs/larv/08-implementation/reports/" commands/larv-feature.md
 }
 
 @test "larv-debug command describes mini-flow with regression test" {

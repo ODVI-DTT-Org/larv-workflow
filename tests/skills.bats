@@ -192,6 +192,7 @@ yaml.safe_load(parts[1])
     grep -q "docs/Handsoff.md" skills/larv-docsite/SKILL.md
     grep -q "docs/Handsoff/" skills/larv-docsite/SKILL.md
     grep -q "docs/user-manual/" skills/larv-docsite/SKILL.md
+    grep -q "DOCS.md" skills/larv-docsite/SKILL.md
     grep -q "user-manual/seed-data.md" skills/larv-docsite/SKILL.md
     grep -q "README.md" skills/larv-docsite/SKILL.md
     grep -q "_sidebar.md" skills/larv-docsite/SKILL.md
@@ -258,6 +259,8 @@ yaml.safe_load(parts[1])
     grep -q "manual-slice" skills/larv-implement/SKILL.md
     grep -q "docs/user-manual/testing" skills/larv-implement/SKILL.md
     grep -q "docs/user-manual/seed-data.md" skills/larv-implement/SKILL.md
+    grep -q "docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT" skills/larv-implement/SKILL.md
+    grep -q "never write implementation reports at the project root" skills/larv-implement/SKILL.md
 }
 
 @test "larv-handoff renders production and user guide documents" {
@@ -268,6 +271,8 @@ yaml.safe_load(parts[1])
     grep -q "docs/Handsoff/package-guide.md" skills/larv-handoff/SKILL.md
     grep -q "docs/user-manual/README.md" skills/larv-handoff/SKILL.md
     grep -q "docs/user-manual/seed-data.md" skills/larv-handoff/SKILL.md
+    grep -q "DOCS.md" skills/larv-handoff/SKILL.md
+    grep -q "docs/larv/08-implementation/reports/" skills/larv-handoff/SKILL.md
 }
 
 @test "larv-deploy is filled with Laravel Cloud and Namecheap handoff guidance" {
@@ -307,6 +312,7 @@ yaml.safe_load(parts[1])
 @test "larv-learn aggregates implementation reports and supports dry run" {
     ! grep -q "STUB" skills/larv-learn/SKILL.md
     grep -q "IMPLEMENTATION-REPORT" skills/larv-learn/SKILL.md
+    grep -q "docs/larv/08-implementation/reports/" skills/larv-learn/SKILL.md
     grep -q "local-learnings.md" skills/larv-learn/SKILL.md
     grep -q -- "--dry-run" skills/larv-learn/SKILL.md
     grep -q "LEARNINGS.md" skills/larv-learn/SKILL.md

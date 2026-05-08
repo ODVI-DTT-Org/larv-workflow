@@ -47,6 +47,8 @@ teardown() { teardown_tmp_project "$TMP"; }
     grep -q "docs/user-manual/testing/slice-01-auth.md" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "docs/user-manual/seed-data.md" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "at least 10 realistic records" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-slice-01.md" "$TMP/docs/Handsoff/slice-01-auth.md"
+    ! grep -q "Write \`IMPLEMENTATION-REPORT-slice-01.md\` at the project root" "$TMP/docs/Handsoff/slice-01-auth.md"
 }
 
 @test "handsoff slice commands start in local app root" {
@@ -137,6 +139,8 @@ EOF
     [ -f "$TMP/docs/user-manual/environment.md" ]
     [ -f "$TMP/docs/user-manual/seed-data.md" ]
     [ -d "$TMP/docs/user-manual/testing" ]
+    [ -d "$TMP/docs/larv/08-implementation/reports" ]
+    [ -f "$TMP/DOCS.md" ]
     grep -q "Laravel Cloud" "$TMP/docs/Handsoff/production-deploy.md"
     grep -q "Namecheap" "$TMP/docs/Handsoff/production-deploy.md"
     grep -q "DB_DATABASE" "$TMP/docs/Handsoff/env-guide.md"
@@ -145,6 +149,8 @@ EOF
     grep -q "Per-slice testing guides" "$TMP/docs/user-manual/README.md"
     grep -q "migrate:fresh --seed" "$TMP/docs/user-manual/seed-data.md"
     grep -q "Required Seeder Policy" "$TMP/docs/user-manual/seed-data.md"
+    grep -q "docs/larv/08-implementation/reports/" "$TMP/DOCS.md"
+    grep -q "docs/user-manual/README.md" "$TMP/DOCS.md"
 }
 
 @test "starting-point files require bootstrap before slices" {

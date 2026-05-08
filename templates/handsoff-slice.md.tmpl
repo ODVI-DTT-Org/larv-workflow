@@ -59,7 +59,7 @@ parallel: {{parallel_flag}}
 - [ ] No N+1 queries on listed endpoints (verified with Telescope or similar)
 - [ ] `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md` written with end-to-end browser testing instructions.
 - [ ] `docs/user-manual/seed-data.md` updated with credentials, seeded records, reset commands, and demo-data removal notes.
-- [ ] `IMPLEMENTATION-REPORT-{{slice_id}}.md` written
+- [ ] `docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md` written
 - [ ] Tracker entry appended (see section 13)
 - [ ] Learnings appended if any (see section 14)
 
@@ -126,7 +126,7 @@ yq -i '.slices.status["{{slice_id}}"] = "completed" | .project.last_updated_at =
 
 ## 16. Implementation report
 
-Write `IMPLEMENTATION-REPORT-{{slice_id}}.md` at the project root with the following sections:
+Write `docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md` with the following sections. Do not write implementation reports at the project root.
 
 ```markdown
 # {{slice_id}} — {{slice_name}}
@@ -166,6 +166,7 @@ The guide must be written for an end user doing browser QA and must include:
 Run this verifier before continuing:
 
 ```bash
+test -s docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md
 test -s docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 test -s docs/user-manual/seed-data.md
 grep -qi "Sandbox URL" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md

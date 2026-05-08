@@ -57,6 +57,8 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
     [ -f docs/user-manual/README.md ]
     [ -f docs/user-manual/seed-data.md ]
     [ -d docs/user-manual/testing ]
+    [ -f DOCS.md ]
+    [ -d docs/larv/08-implementation/reports ]
     [ -f docs/Handsoff/slice-01-auth-scaffold.md ]
     [ -f docs/Handsoff/slice-02-todos-crud.md ]
     [ -f CLAUDE.md ]
@@ -85,8 +87,11 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
     grep -q "operations-guide.md" docs/Handsoff.md
     grep -q "package-guide.md" docs/Handsoff.md
     grep -q "docs/user-manual/README.md" docs/Handsoff.md
+    grep -q "DOCS.md" docs/Handsoff.md
+    grep -q "docs/larv/08-implementation/reports/" docs/Handsoff.md
     grep -q "docs/user-manual/testing" docs/Handsoff/slice-01-auth-scaffold.md
     grep -q "docs/user-manual/seed-data.md" docs/Handsoff/slice-01-auth-scaffold.md
+    grep -q "docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-slice-01.md" docs/Handsoff/slice-01-auth-scaffold.md
     grep -q "Bootstrap Sandbox" docs/Handsoff/bootstrap-sandbox.md
     grep -q "Laravel Cloud" docs/Handsoff/production-deploy.md
     grep -q "Namecheap" docs/Handsoff/production-deploy.md
@@ -94,6 +99,8 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
 
     # Starting-point files all reference Handsoff.md
     grep -q "Handsoff.md" CLAUDE.md
+    grep -q "DOCS.md" CLAUDE.md
+    grep -q "docs/larv/08-implementation/reports/" CLAUDE.md
     grep -q "bootstrap-sandbox.md" CLAUDE.md
     grep -q "production-deploy.md" CLAUDE.md
     grep -q "package-guide.md" CLAUDE.md

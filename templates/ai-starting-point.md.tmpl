@@ -3,6 +3,7 @@
 This project is managed by the **larv** Laravel workflow plugin. The full plan and execution contract live in:
 
 - `docs/Handsoff.md` — index + project context (start here)
+- `DOCS.md` — root documentation index for users and AI sessions
 - `docs/Handsoff/bootstrap-sandbox.md` — creates a bare Laravel scaffold if `artisan` is missing, then starts and probes the app sandbox before the first slice
 - `docs/Handsoff/production-deploy.md` — production deploy checklist, defaults to Laravel Cloud + Namecheap
 - `docs/Handsoff/env-guide.md` — sandbox and production environment variable guide
@@ -13,6 +14,7 @@ This project is managed by the **larv** Laravel workflow plugin. The full plan a
 - `docs/user-manual/testing/` — per-slice end-to-end testing guides
 - `docs/user-manual/seed-data.md` — seeded records, credentials, reset, and demo-data removal guide
 - `docs/larv/implementation-tracker.yaml` — tracker (append on every change)
+- `docs/larv/08-implementation/reports/` — per-slice implementation reports
 - `docs/larv/local-learnings.md` — learnings staging (append when you discover something worth saving)
 - `adr/` — architecture decision records
 
@@ -32,6 +34,7 @@ This project is managed by the **larv** Laravel workflow plugin. The full plan a
 7. After every change:
    - Append a tracker entry (snippet in the slice handsoff).
    - Update `STATE.yaml.slices.<slice-id>.status` (snippet in the slice handsoff).
+   - Write the implementation report under `docs/larv/08-implementation/reports/`.
    - Write or update the per-slice guide in `docs/user-manual/testing/`.
    - Update `docs/user-manual/seed-data.md` with seeded records, credentials, reset commands, and demo-data removal notes.
    - Append to `docs/larv/local-learnings.md` if you discovered something.
@@ -42,14 +45,16 @@ This project is managed by the **larv** Laravel workflow plugin. The full plan a
 
 When opening a new AI session because context is high or the previous session ended:
 
-1. Read `docs/Handsoff.md`.
-2. Read `docs/larv/STATE.yaml`.
-3. Read `docs/larv/implementation-tracker.yaml` and `docs/larv/implementation-tracker.md` if present.
-4. Read `docs/larv/07-runtime/sandbox-url.txt` if it exists. If it is missing, run `docs/Handsoff/bootstrap-sandbox.md` before app code edits; it handles missing `artisan` by scaffolding Laravel first.
-5. Read `docs/user-manual/README.md` and `docs/user-manual/seed-data.md`.
-6. Find the first slice whose STATE status is not completed.
-7. Open the matching `docs/Handsoff/slice-NN-<name>.md` and continue from its next unchecked Definition of Done item.
-8. If all slices are complete, run verification or deployment depending on the user's request.
+1. Read `DOCS.md`.
+2. Read `docs/Handsoff.md`.
+3. Read `docs/larv/STATE.yaml`.
+4. Read `docs/larv/implementation-tracker.yaml` and `docs/larv/implementation-tracker.md` if present.
+5. Read the latest reports in `docs/larv/08-implementation/reports/` if they exist.
+6. Read `docs/larv/07-runtime/sandbox-url.txt` if it exists. If it is missing, run `docs/Handsoff/bootstrap-sandbox.md` before app code edits; it handles missing `artisan` by scaffolding Laravel first.
+7. Read `docs/user-manual/README.md` and `docs/user-manual/seed-data.md`.
+8. Find the first slice whose STATE status is not completed.
+9. Open the matching `docs/Handsoff/slice-NN-<name>.md` and continue from its next unchecked Definition of Done item.
+10. If all slices are complete, run verification or deployment depending on the user's request.
 
 If larv commands are available, `/larv:resume` can do the same state lookup for a managed project.
 
