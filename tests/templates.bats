@@ -74,6 +74,8 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "docs/larv/07-runtime/sandbox-url.txt" templates/bootstrap-sandbox.md.tmpl
     grep -q "ufw allow" templates/bootstrap-sandbox.md.tmpl
     grep -q "ufw status" templates/bootstrap-sandbox.md.tmpl
+    grep -q "upsert_env DEMO_MODE true" templates/bootstrap-sandbox.md.tmpl
+    grep -q "DEMO_MODE=true bash docs/larv/07-runtime/deploy-sandbox.sh" templates/bootstrap-sandbox.md.tmpl
     grep -q "export APP_PORT DB_NAME PROJECT_ROOT APP_ROOT APP_URL" templates/bootstrap-sandbox.md.tmpl
     grep -q "DB_CONNECTION" templates/bootstrap-sandbox.md.tmpl
     grep -q "createdb" templates/bootstrap-sandbox.md.tmpl
@@ -95,6 +97,7 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "Namecheap" templates/production-deploy.md.tmpl
     grep -q "Ask the user" templates/production-deploy.md.tmpl
     grep -q "APP_KEY" templates/production-deploy.md.tmpl
+    grep -q "DEMO_MODE=false" templates/production-deploy.md.tmpl
     grep -q "A record" templates/production-deploy.md.tmpl
 }
 
@@ -139,6 +142,10 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "docs/user-manual/testing" templates/operations-guide.md.tmpl
     grep -q "docs/user-manual/seed-data.md" templates/operations-guide.md.tmpl
     grep -q "migrate:fresh --seed" templates/operations-guide.md.tmpl
+    grep -q "DEMO_MODE=true" templates/env-guide.md.tmpl
+    grep -q "DEMO_MODE=false" templates/env-guide.md.tmpl
+    grep -q "User Switcher" templates/env-guide.md.tmpl
+    grep -q "normal email/username" templates/operations-guide.md.tmpl
 }
 
 @test "user manual templates cover testing and seed reset" {
@@ -149,6 +156,10 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "at least 10 realistic records" templates/seed-data-guide.md.tmpl
     grep -q "migrate:fresh --seed" templates/seed-data-guide.md.tmpl
     grep -q "Demo Credentials" templates/seed-data-guide.md.tmpl
+    grep -q "multiple focused seeders" templates/seed-data-guide.md.tmpl
+    grep -q "DEMO_MODE=true" templates/seed-data-guide.md.tmpl
+    grep -q "User Switcher" templates/seed-data-guide.md.tmpl
+    grep -q "DEMO_MODE=false" templates/seed-data-guide.md.tmpl
 }
 
 @test "docs index template points AI and users to organized docs" {

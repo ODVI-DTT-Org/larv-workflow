@@ -5,10 +5,33 @@ The app must not look empty in sandbox review. Every implemented feature must ha
 ## Required Seeder Policy
 
 - Each user-facing feature slice must add or update Laravel seeders.
+- Create multiple focused seeders, not one opaque dump: demo users/roles, org/tenant structure, feature records, edge states, and relationship/linkage records.
 - Seed at least 10 realistic records for each feature unless the feature naturally has fewer valid states.
 - Seed all roles/personas needed to test the planned flows.
 - Seed edge cases where useful: draft, active, approved, rejected, overdue, archived, failed, or escalated records.
+- Seed enough demo users to test the whole app flow through the navbar User Switcher when `DEMO_MODE=true`.
 - Keep demo credentials and reset commands documented here after every slice.
+
+## Demo Mode
+
+Sandbox `.env` defaults to:
+
+```dotenv
+DEMO_MODE=true
+```
+
+When `DEMO_MODE=true`:
+
+- The app must be reviewable without logging in.
+- The navbar must show a User Switcher populated from seeded demo users.
+- Switching users must update the current demo identity and permissions so reviewers can test each role/persona flow.
+- Seeders must include all users, roles, departments/tenants, and records needed for the switcher to exercise the full workflow.
+
+When `DEMO_MODE=false`:
+
+- The User Switcher must be hidden.
+- Users must authenticate normally by email/username and password.
+- Demo seed data may still exist in non-production environments, but access must use normal auth.
 
 ## Demo Credentials
 
@@ -17,6 +40,8 @@ Update this table as users/roles are created.
 | Role | Email | Password | Purpose |
 |---|---|---|---|
 | Admin | admin@example.com | password | Default administrative review account |
+
+Also document every seeded switcher identity here: role, name, email/username, password when login is required, and what flow that identity can test.
 
 ## Reset Sandbox Data
 

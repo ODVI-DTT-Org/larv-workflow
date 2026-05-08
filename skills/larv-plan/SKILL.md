@@ -26,7 +26,7 @@ Turn the approved design, architecture, and test strategy into implementation sl
 3. Produce `docs/larv/06-implementation/token-budget.md` with slice-level token/minute estimates.
 4. Initialize or update `STATE.yaml.slices` with the planned slice IDs.
 5. Write the executable sandbox deployment script at `docs/larv/07-runtime/deploy-sandbox.sh`.
-6. For every user-facing slice, include seeder obligations: at least 10 realistic records per feature, all roles/personas needed for browser QA, and the expected testing guide path under `docs/user-manual/testing/`.
+6. For every user-facing slice, include demo-data obligations: multiple focused seeders, at least 10 realistic records per feature, all roles/personas needed for browser QA, `DEMO_MODE=true` sandbox behavior, a navbar User Switcher for demo identities, and the expected testing guide path under `docs/user-manual/testing/`.
 7. For every slice that creates or modifies UI, include visual implementation obligations copied from `docs/larv/03-design/visual-implementation-contract.md`, `brand-spec.md`, `ui-design.md`, and the chosen mockup paths. UI slices must map each app route to an exact mockup file and include screenshot parity acceptance criteria for desktop and mobile.
 
 ## Package slice requirements
@@ -62,6 +62,7 @@ The script runs locally on the VM from the current project root and must:
 - Assume `docs/Handsoff/bootstrap-sandbox.md` may create a bare Laravel scaffold first when `artisan` is missing in a greenfield docs-only project.
 - Start or restart the app process so `http://127.0.0.1:$APP_PORT/` responds.
 - Run migrations and seeders so the sandbox has demo data visible immediately.
+- Ensure sandbox `.env` contains `DEMO_MODE=true` so reviewers can use the app without login and switch between seeded users.
 - Fail fast with useful errors (`set -euo pipefail`).
 - Avoid placeholders such as `TODO`, `TBD`, or "deployment commands here".
 
@@ -82,6 +83,7 @@ fi
 if [ ! -f .env ] && [ -f .env.example ]; then
     cp .env.example .env
 fi
+grep -q '^DEMO_MODE=' .env && sed -i 's/^DEMO_MODE=.*/DEMO_MODE=true/' .env || printf "\nDEMO_MODE=true\n" >> .env
 
 if command -v composer >/dev/null 2>&1; then
     composer install --no-interaction --prefer-dist --optimize-autoloader

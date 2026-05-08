@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.20 (next) - Demo mode seeders and user switcher
+
+- Adds `DEMO_MODE=true` as a sandbox default and `DEMO_MODE=false` as the production default.
+- Requires user-facing slices to create multiple focused seeders so first app review shows populated records across roles/personas and feature states.
+- Requires demo-mode no-login access plus a navbar User Switcher for seeded users, with normal email/username + password login restored when `DEMO_MODE=false`.
+
 ## 0.4.19 (next) - Strict mockup parity expectation
 
 - Tightens UI implementation from design inspiration to route-by-route mockup parity.

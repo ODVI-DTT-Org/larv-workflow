@@ -65,6 +65,9 @@ yaml.safe_load(parts[1])
     grep -q "desktop/mobile screenshot checks" commands/larv-feature.md
     grep -q "exact chosen mockup files" commands/larv-feature.md
     grep -q "production screen should look like the selected mockup" commands/larv-feature.md
+    grep -q "DEMO_MODE=true" commands/larv-feature.md
+    grep -q "User Switcher" commands/larv-feature.md
+    grep -q "DEMO_MODE=false" commands/larv-feature.md
 }
 
 @test "larv-debug command describes mini-flow with regression test" {

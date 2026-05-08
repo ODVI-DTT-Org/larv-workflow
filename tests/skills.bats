@@ -231,6 +231,9 @@ yaml.safe_load(parts[1])
     grep -q "rerun docs/Handsoff/bootstrap-sandbox.md" skills/larv-plan/SKILL.md
     grep -q "at least 10 realistic records" skills/larv-plan/SKILL.md
     grep -q "php artisan db:seed --force" skills/larv-plan/SKILL.md
+    grep -q "multiple focused seeders" skills/larv-plan/SKILL.md
+    grep -q "DEMO_MODE=true" skills/larv-plan/SKILL.md
+    grep -q "User Switcher" skills/larv-plan/SKILL.md
 }
 
 @test "larv-orchestrator describes Phase 0a and Phase 6.5 in greenfield sequence" {
@@ -272,6 +275,8 @@ yaml.safe_load(parts[1])
     grep -q "desktop and mobile screenshots" skills/larv-implement/SKILL.md
     grep -q "visual source of truth" skills/larv-implement/SKILL.md
     grep -q "docs/larv/08-implementation/screenshots/<slice-id>/" skills/larv-implement/SKILL.md
+    grep -q "demo-mode User Switcher identities" skills/larv-implement/SKILL.md
+    grep -q "DEMO_MODE=false" skills/larv-implement/SKILL.md
 }
 
 @test "larv-handoff renders production and user guide documents" {

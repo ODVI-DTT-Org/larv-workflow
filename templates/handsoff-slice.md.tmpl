@@ -31,10 +31,26 @@
 Every user-facing feature in this slice must include realistic seed data so the sandbox is demonstrable, not blank.
 
 - Create or update Laravel seeder classes for this slice.
+- Prefer multiple focused seeder classes so demo data is maintainable: users/roles, org/tenant structure, feature records, edge states, and relationship/linkage records.
 - Seed at least 10 realistic records for each feature introduced or changed by this slice, unless the domain has fewer valid states.
-- Seed every role/persona required to test this slice's flow.
+- Seed every role/persona required to test this slice's flow and the full app journey, including admin, manager/approver, regular member, and restricted/read-only identities where the domain supports them.
 - Include enough record states to make the UI obvious during review, such as draft, active, approved, rejected, overdue, archived, failed, or escalated where applicable.
+- The first browser review after `php artisan migrate:fresh --seed` must show populated records, not empty states, on the primary app screens.
 - Update `docs/user-manual/seed-data.md` with seeded records, credentials, reset commands, and removal/production notes.
+
+## 6.2 Demo mode and user switcher
+
+The sandbox `.env` must default to `DEMO_MODE=true`.
+
+If this slice creates or modifies auth, navigation, layout, middleware, users, roles, permissions, tenancy, or any user-visible workflow, implement or preserve demo-mode behavior:
+
+- When `DEMO_MODE=true`, reviewers must be able to access the app without logging in.
+- When `DEMO_MODE=true`, the navbar must show a User Switcher populated from seeded demo users.
+- The switcher must let reviewers impersonate/switch between seeded identities for the domain's major roles, departments/tenants, and permission levels.
+- Switching users must change the effective current user for policies, queries, dashboards, and visible records.
+- When `DEMO_MODE=false`, the User Switcher must be hidden and the app must require normal login by email/username and password.
+- Production deployment must set `DEMO_MODE=false`.
+- Document switcher identities and normal-login credentials in `docs/user-manual/seed-data.md`.
 
 ## 7. API endpoints
 
@@ -80,6 +96,8 @@ parallel: {{parallel_flag}}
 - [ ] Migration runs backward: `docker compose exec app php artisan migrate:rollback`
 - [ ] Seeders run successfully: `php artisan db:seed` or `docker compose exec app php artisan db:seed`
 - [ ] At least 10 realistic records per feature are visible in the sandbox UI or documented with a justified exception.
+- [ ] `.env` contains `DEMO_MODE=true` in sandbox and `docs/user-manual/seed-data.md` explains how to set `DEMO_MODE=false` for normal login.
+- [ ] If this slice touches auth/navigation/users/roles/permissions/workflows, the navbar User Switcher works when `DEMO_MODE=true` and is hidden when `DEMO_MODE=false`.
 - [ ] No N+1 queries on listed endpoints (verified with Telescope or similar)
 - [ ] `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md` written with end-to-end browser testing instructions.
 - [ ] `docs/user-manual/seed-data.md` updated with credentials, seeded records, reset commands, and demo-data removal notes.
@@ -192,6 +210,7 @@ The guide must be written for an end user doing browser QA and must include:
 
 - Sandbox URL: read from `docs/larv/07-runtime/sandbox-url.txt`
 - Login credentials and roles needed for this slice
+- Demo mode status, User Switcher identities, and how to switch users when `DEMO_MODE=true`
 - Seeded records the user should see, including at least 10 records per feature or a justified exception
 - Step-by-step navigation from login to the screens touched by this slice
 - What can be tested now
@@ -209,6 +228,8 @@ test -s docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 test -s docs/user-manual/seed-data.md
 grep -qi "Sandbox URL" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 grep -qi "Seeded records" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
+grep -qi "DEMO_MODE" docs/user-manual/seed-data.md
+grep -qi "User Switcher" docs/user-manual/seed-data.md
 grep -qi "Visual parity" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 grep -qi "migrate:fresh --seed" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 grep -qi "{{slice_id}}" docs/user-manual/seed-data.md

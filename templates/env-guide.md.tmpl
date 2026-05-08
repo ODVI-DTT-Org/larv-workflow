@@ -10,6 +10,7 @@ Use this guide for sandbox and production configuration. Do not commit real secr
 | `APP_ENV` | `local` | sandbox |
 | `APP_DEBUG` | `true` | sandbox |
 | `APP_URL` | read from `docs/larv/07-runtime/sandbox-url.txt` | bootstrap |
+| `DEMO_MODE` | `true` | sandbox |
 | `DB_CONNECTION` | `mysql` unless `DB_CONNECTION=pgsql` was passed | bootstrap |
 | `DB_HOST` | `127.0.0.1` | bootstrap |
 | `DB_PORT` | `3306` for MySQL/MariaDB, `5432` for PostgreSQL | bootstrap |
@@ -36,6 +37,7 @@ APP_ENV=production
 APP_KEY=<generate with php artisan key:generate --show>
 APP_DEBUG=false
 APP_URL=https://<production-domain>
+DEMO_MODE=false
 
 DB_CONNECTION=<mysql or pgsql>
 DB_HOST=<laravel-cloud-db-host>
@@ -56,6 +58,12 @@ MAIL_PASSWORD=<mail-password>
 MAIL_FROM_ADDRESS=<verified-sender>
 MAIL_FROM_NAME="{{project_name}}"
 ```
+
+## Demo mode
+
+`DEMO_MODE=true` is the default for the sandbox. In demo mode, the app must allow no-login browser review and show a User Switcher in the navbar so reviewers can switch between seeded users, roles, departments, tenants, and permission levels.
+
+Set `DEMO_MODE=false` for production and serious auth testing. When false, the app must require normal login by email/username and password, and the User Switcher must not be visible.
 
 ## Package-specific values
 
