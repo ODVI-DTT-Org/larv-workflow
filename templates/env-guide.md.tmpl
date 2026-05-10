@@ -10,7 +10,6 @@ Use this guide for sandbox and production configuration. Do not commit real secr
 | `APP_ENV` | `local` | sandbox |
 | `APP_DEBUG` | `true` | sandbox |
 | `APP_URL` | read from `docs/larv/07-runtime/sandbox-url.txt` | bootstrap |
-| `DEMO_MODE` | `true` | sandbox |
 | `DB_CONNECTION` | `pgsql` | bootstrap |
 | `DB_HOST` | `127.0.0.1` | bootstrap |
 | `DB_PORT` | `5432` | bootstrap |
@@ -37,8 +36,6 @@ APP_ENV=production
 APP_KEY=<generate with php artisan key:generate --show>
 APP_DEBUG=false
 APP_URL=https://<production-domain>
-DEMO_MODE=false
-
 DB_CONNECTION=pgsql
 DB_HOST=<laravel-cloud-db-host>
 DB_PORT=5432
@@ -59,11 +56,11 @@ MAIL_FROM_ADDRESS=<verified-sender>
 MAIL_FROM_NAME="{{project_name}}"
 ```
 
-## Demo mode
+## Test credentials
 
-`DEMO_MODE=true` is the default for the sandbox. In demo mode, the app must allow no-login browser review and show a User Switcher in the navbar so reviewers can switch between seeded users, roles, departments, tenants, and permission levels.
+Sandbox review uses normal login with seeded test credentials. Document each seeded user's email/username and password, role, permissions scope, and recommended test flow in `docs/user-manual/seed-data.md`.
 
-Set `DEMO_MODE=false` for production and serious auth testing. When false, the app must require normal login by email/username and password, and the User Switcher must not be visible.
+Do not add a navbar impersonation/user-switching UI unless the product requirements explicitly ask for one.
 
 ## Package-specific values
 

@@ -39,8 +39,8 @@ This project is managed by the **larv** Laravel workflow plugin. The full plan a
    - Write the implementation report under `docs/larv/08-implementation/reports/`.
    - If UI changed, make it match `docs/larv/03-design/visual-implementation-contract.md` and the chosen mockups, save desktop/mobile screenshots under `docs/larv/08-implementation/screenshots/`, and record reference paths plus any approved deviations.
    - Write or update the per-slice guide in `docs/user-manual/testing/`.
-   - Update `docs/user-manual/seed-data.md` with seeded records, credentials, reset commands, and demo-data removal notes.
-   - Preserve sandbox `DEMO_MODE=true`, populated demo seeders, and the navbar User Switcher. When `DEMO_MODE=false`, require normal login and hide the switcher.
+   - Update `docs/user-manual/seed-data.md` with seeded records, test credentials for every role/persona needed for full-flow QA, reset commands, and test-data removal notes.
+   - Do not add a navbar impersonation/user-switching UI unless the product requirements explicitly ask for one. Reviewers must use normal login with seeded credentials.
    - Run required Laravel commands yourself: migrations, seeders, cache clears, asset builds, queue/runtime restarts, package-specific commands, and sandbox restarts/probes when code changes require them. Do not ask the user to run sandbox commands manually.
    - Keep the sandbox current after app code changes and show the user the public URL from `docs/larv/07-runtime/sandbox-url.txt` only after probing it.
    - Append to `docs/larv/local-learnings.md` if you discovered something.

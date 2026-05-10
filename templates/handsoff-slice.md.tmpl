@@ -31,26 +31,23 @@
 Every user-facing feature in this slice must include realistic seed data so the sandbox is demonstrable, not blank.
 
 - Create or update Laravel seeder classes for this slice.
-- Prefer multiple focused seeder classes so demo data is maintainable: users/roles, org/tenant structure, feature records, edge states, and relationship/linkage records.
+- Prefer multiple focused seeder classes so test data is maintainable: users/roles, org/tenant structure, feature records, edge states, and relationship/linkage records.
 - Seed at least 10 realistic records for each feature introduced or changed by this slice, unless the domain has fewer valid states.
 - Seed every role/persona required to test this slice's flow and the full app journey, including admin, manager/approver, regular member, and restricted/read-only identities where the domain supports them.
 - Include enough record states to make the UI obvious during review, such as draft, active, approved, rejected, overdue, archived, failed, or escalated where applicable.
 - The first browser review after `php artisan migrate:fresh --seed` must show populated records, not empty states, on the primary app screens.
 - Update `docs/user-manual/seed-data.md` with seeded records, credentials, reset commands, and removal/production notes.
 
-## 6.2 Demo mode and user switcher
+## 6.2 Seeded test credentials
 
-The sandbox `.env` must default to `DEMO_MODE=true`.
+If this slice creates or modifies auth, navigation, layout, middleware, users, roles, permissions, tenancy, or any user-visible workflow, implement or preserve seeded test credentials for full-flow browser QA:
 
-If this slice creates or modifies auth, navigation, layout, middleware, users, roles, permissions, tenancy, or any user-visible workflow, implement or preserve demo-mode behavior:
-
-- When `DEMO_MODE=true`, reviewers must be able to access the app without logging in.
-- When `DEMO_MODE=true`, the navbar must show a User Switcher populated from seeded demo users.
-- The switcher must let reviewers impersonate/switch between seeded identities for the domain's major roles, departments/tenants, and permission levels.
-- Switching users must change the effective current user for policies, queries, dashboards, and visible records.
-- When `DEMO_MODE=false`, the User Switcher must be hidden and the app must require normal login by email/username and password.
-- Production deployment must set `DEMO_MODE=false`.
-- Document switcher identities and normal-login credentials in `docs/user-manual/seed-data.md`.
+- Create seeded users for every role, persona, department, tenant, permission level, approval state, or ownership path needed to test the whole app flow.
+- Use real login paths. Reviewers must sign in with seeded email/username and password credentials, not bypass auth through impersonation or switching UI.
+- Include credentials for both happy-path and restricted/edge-case users, such as admin, manager/approver, standard member, read-only/restricted, suspended/inactive, cross-tenant/department-denied, or domain-specific actors where applicable.
+- Seed records owned by those users so dashboards, lists, approvals, notifications, policies, and cross-role handoffs can be tested immediately after `php artisan migrate:fresh --seed`.
+- Document every seeded credential, role, permissions scope, and recommended test flow in `docs/user-manual/seed-data.md`.
+- Do not add a navbar impersonation/user-switching UI unless the product requirements explicitly ask for one.
 
 ## 7. API endpoints
 
@@ -98,8 +95,8 @@ parallel: {{parallel_flag}}
 - [ ] At least 10 realistic records per feature are visible in the sandbox UI or documented with a justified exception.
 - [ ] The AI ran every Laravel runtime command required by this slice: migrations, seeders, cache clears, asset builds, queue/runtime restarts, and other package-specific commands as applicable.
 - [ ] The AI restarted or reloaded the sandbox when code/runtime changes required it and verified the public URL with `curl` before announcing it.
-- [ ] `.env` contains `DEMO_MODE=true` in sandbox and `docs/user-manual/seed-data.md` explains how to set `DEMO_MODE=false` for normal login.
-- [ ] If this slice touches auth/navigation/users/roles/permissions/workflows, the navbar User Switcher works when `DEMO_MODE=true` and is hidden when `DEMO_MODE=false`.
+- [ ] `docs/user-manual/seed-data.md` documents seeded credentials for every role/persona needed to test the full app flow.
+- [ ] If this slice touches auth/navigation/users/roles/permissions/workflows, reviewers can sign in through the normal login flow with seeded credentials for each relevant role.
 - [ ] No N+1 queries on listed endpoints (verified with Telescope or similar)
 - [ ] `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md` written with end-to-end browser testing instructions.
 - [ ] `docs/user-manual/seed-data.md` updated with credentials, seeded records, reset commands, and demo-data removal notes.
@@ -128,7 +125,7 @@ After code changes, you are responsible for applying all required Laravel runtim
 Decide what is required from the files you changed:
 
 - migrations/schema changes: `php artisan migrate --force`
-- seeder/demo data changes: `php artisan db:seed --force`
+- seeder/test data changes: `php artisan db:seed --force`
 - config/env/routes/events/views/container changes: `php artisan optimize:clear`
 - frontend dependency changes: `npm install`
 - frontend asset changes: `npm run build`
@@ -159,7 +156,7 @@ if [ -z "$DB_DATABASE" ] || [ "$DB_DATABASE" = "null" ]; then
   DB_DATABASE="$(grep '^DB_DATABASE=' .env | cut -d= -f2-)"
 fi
 
-APP_PORT="$APP_PORT" DB_DATABASE="$DB_DATABASE" DEMO_MODE="${DEMO_MODE:-true}" bash docs/larv/07-runtime/deploy-sandbox.sh
+APP_PORT="$APP_PORT" DB_DATABASE="$DB_DATABASE" bash docs/larv/07-runtime/deploy-sandbox.sh
 ```
 
 Probe before announcing the URL:
@@ -268,7 +265,7 @@ The guide must be written for an end user doing browser QA and must include:
 
 - Sandbox URL: read from `docs/larv/07-runtime/sandbox-url.txt`
 - Login credentials and roles needed for this slice
-- Demo mode status, User Switcher identities, and how to switch users when `DEMO_MODE=true`
+- Seeded credentials, roles, permission scopes, and which user to sign in as for each test path
 - Seeded records the user should see, including at least 10 records per feature or a justified exception
 - Step-by-step navigation from login to the screens touched by this slice
 - What can be tested now
@@ -276,7 +273,7 @@ The guide must be written for an end user doing browser QA and must include:
 - Terminal verification commands run by the AI
 - Laravel runtime commands run by the AI, including migrations, seeders, cache/build commands, queue/runtime restarts, and sandbox restart/probe status
 - Screenshot paths and visual parity notes for screens touched by this slice
-- How to reset demo data with `php artisan migrate:fresh --seed` or the Docker equivalent
+- How to reset seeded test data with `php artisan migrate:fresh --seed` or the Docker equivalent
 - How to remove/disable demo seed data before production
 
 Run this verifier before continuing:
@@ -287,8 +284,8 @@ test -s docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 test -s docs/user-manual/seed-data.md
 grep -qi "Sandbox URL" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 grep -qi "Seeded records" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
-grep -qi "DEMO_MODE" docs/user-manual/seed-data.md
-grep -qi "User Switcher" docs/user-manual/seed-data.md
+grep -qi "credentials" docs/user-manual/seed-data.md
+grep -qi "role" docs/user-manual/seed-data.md
 grep -qi "Visual parity" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 grep -qi "migrate:fresh --seed" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 grep -qi "Runtime commands" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md

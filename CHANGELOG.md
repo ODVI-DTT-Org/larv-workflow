@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.24 (next) - Seeded login credentials instead of demo switcher
+
+- Removes the sandbox demo-mode and navbar user-switcher requirements from generated handoff, seed guides, env guides, and feature planning.
+- Requires seeded test credentials for every role/persona, permissions scope, tenant/department, and full-flow browser QA path.
+- Keeps seed data mandatory while making normal login the review path for sandbox testing.
+
 ## 0.4.23 (next) - PostgreSQL-only sandbox bootstrap
 
 - Makes generated sandbox bootstrap PostgreSQL-only with `DB_CONNECTION=pgsql`, port `5432`, and a default `larv` database password.

@@ -44,7 +44,7 @@ For each `slice-NN-<name>.md`:
 5. Run section 10's Definition of Done checklist.
 6. Write `docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-<slice-id>.md` per section 16; never write implementation reports at the project root.
 7. Write or update the hard-required user testing guide at `docs/user-manual/testing/<slice-id>-<slice-slug>.md`.
-8. Update `docs/user-manual/seed-data.md` with seeded records, demo credentials, demo-mode User Switcher identities, reset commands, `DEMO_MODE=false` login behavior, and demo-data removal notes.
+8. Update `docs/user-manual/seed-data.md` with seeded records, test credentials for every role/persona needed for full-flow QA, permissions scopes, reset commands, and test-data removal notes.
 9. Run section 13's tracker append snippet.
 10. Run section 14's local-learnings append snippet if you discovered something.
 11. Run section 15's STATE.yaml update snippet.

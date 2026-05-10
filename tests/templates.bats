@@ -76,8 +76,7 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "docs/larv/07-runtime/sandbox-url.txt" templates/bootstrap-sandbox.md.tmpl
     grep -q "ufw allow" templates/bootstrap-sandbox.md.tmpl
     grep -q "ufw status" templates/bootstrap-sandbox.md.tmpl
-    grep -q "upsert_env DEMO_MODE true" templates/bootstrap-sandbox.md.tmpl
-    grep -q "DEMO_MODE=true bash docs/larv/07-runtime/deploy-sandbox.sh" templates/bootstrap-sandbox.md.tmpl
+    ! grep -q "DEMO_MODE" templates/bootstrap-sandbox.md.tmpl
     grep -q "export APP_PORT DB_NAME PROJECT_ROOT APP_ROOT APP_URL" templates/bootstrap-sandbox.md.tmpl
     grep -q "DB_CONNECTION" templates/bootstrap-sandbox.md.tmpl
     grep -q "createdb" templates/bootstrap-sandbox.md.tmpl
@@ -100,7 +99,7 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "Namecheap" templates/production-deploy.md.tmpl
     grep -q "Ask the user" templates/production-deploy.md.tmpl
     grep -q "APP_KEY" templates/production-deploy.md.tmpl
-    grep -q "DEMO_MODE=false" templates/production-deploy.md.tmpl
+    ! grep -q "DEMO_MODE" templates/production-deploy.md.tmpl
     grep -q "A record" templates/production-deploy.md.tmpl
 }
 
@@ -146,10 +145,11 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "docs/user-manual/testing" templates/operations-guide.md.tmpl
     grep -q "docs/user-manual/seed-data.md" templates/operations-guide.md.tmpl
     grep -q "migrate:fresh --seed" templates/operations-guide.md.tmpl
-    grep -q "DEMO_MODE=true" templates/env-guide.md.tmpl
-    grep -q "DEMO_MODE=false" templates/env-guide.md.tmpl
-    grep -q "User Switcher" templates/env-guide.md.tmpl
-    grep -q "normal email/username" templates/operations-guide.md.tmpl
+    grep -q "normal login" templates/env-guide.md.tmpl
+    grep -q "seeded test credentials" templates/operations-guide.md.tmpl
+    grep -q "email/username and password" templates/env-guide.md.tmpl
+    ! grep -q "User Switcher" templates/env-guide.md.tmpl
+    ! grep -q "DEMO_MODE" templates/env-guide.md.tmpl
     grep -q "AI is responsible for running Laravel commands" templates/operations-guide.md.tmpl
     grep -q "queue/Horizon/runtime restarts" templates/operations-guide.md.tmpl
     grep -q "docs/larv/07-runtime/deploy-sandbox.sh" templates/operations-guide.md.tmpl
@@ -162,11 +162,12 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "Required Seeder Policy" templates/seed-data-guide.md.tmpl
     grep -q "at least 10 realistic records" templates/seed-data-guide.md.tmpl
     grep -q "migrate:fresh --seed" templates/seed-data-guide.md.tmpl
-    grep -q "Demo Credentials" templates/seed-data-guide.md.tmpl
+    grep -q "Test Credentials" templates/seed-data-guide.md.tmpl
     grep -q "multiple focused seeders" templates/seed-data-guide.md.tmpl
-    grep -q "DEMO_MODE=true" templates/seed-data-guide.md.tmpl
-    grep -q "User Switcher" templates/seed-data-guide.md.tmpl
-    grep -q "DEMO_MODE=false" templates/seed-data-guide.md.tmpl
+    grep -q "normal login" templates/seed-data-guide.md.tmpl
+    grep -q "Permissions Scope" templates/seed-data-guide.md.tmpl
+    ! grep -q "User Switcher" templates/seed-data-guide.md.tmpl
+    ! grep -q "DEMO_MODE" templates/seed-data-guide.md.tmpl
 }
 
 @test "docs index template points AI and users to organized docs" {

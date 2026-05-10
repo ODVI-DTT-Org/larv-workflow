@@ -17,7 +17,7 @@ npm run build
 
 Use `docs/Handsoff/env-guide.md` to fill `.env` values.
 
-Sandbox review defaults to `DEMO_MODE=true`. With demo mode enabled, reviewers should see a navbar User Switcher and can use the app without logging in. Set `DEMO_MODE=false` to test normal email/username + password login.
+Sandbox review uses normal login with seeded test credentials. Use `docs/user-manual/seed-data.md` to find the email/username and password for each role/persona needed to test the full app flow.
 
 ## Run locally
 
@@ -77,11 +77,11 @@ docs/user-manual/testing/
 
 Each guide explains how to navigate the app, what seeded records should be visible, which credentials to use, and what can be tested after that slice.
 
-The seed guide also explains demo mode, seeded switcher identities, and how to disable demo access.
+The seed guide also explains seeded credentials, role coverage, permissions scopes, reset commands, and how to remove test data before production.
 
 ## Seed data and reset
 
-Seed data, demo credentials, reset commands, and demo-data removal guidance live in:
+Seed data, test credentials, reset commands, and test-data removal guidance live in:
 
 ```text
 docs/user-manual/seed-data.md
