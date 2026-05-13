@@ -92,8 +92,10 @@ yaml.safe_load(parts[1])
     grep -q "Handsoff/slice-NN" skills/larv-implement/SKILL.md
     grep -q "self-contained" skills/larv-implement/SKILL.md
     grep -q "section 12.1" skills/larv-implement/SKILL.md
+    grep -q "section 12.2" skills/larv-implement/SKILL.md
     grep -q "Never ask the user to run sandbox verification commands manually" skills/larv-implement/SKILL.md
     grep -q "queue/runtime restarts" skills/larv-implement/SKILL.md
+    grep -q "every page, route, state, credential role, and planned flow" skills/larv-implement/SKILL.md
 }
 
 @test "larv-plan SKILL.md is no longer a stub" {
@@ -314,6 +316,11 @@ yaml.safe_load(parts[1])
     grep -q "vendor/bin/pint --test" skills/larv-verify/SKILL.md
     grep -q "vendor/bin/phpstan analyse" skills/larv-verify/SKILL.md
     grep -q "docs/larv/09-verification/final-report.md" skills/larv-verify/SKILL.md
+    grep -q "Browser flow and mockup parity verification" skills/larv-verify/SKILL.md
+    grep -q "Visit every planned user-facing page" skills/larv-verify/SKILL.md
+    grep -q "Sign in with every seeded credential" skills/larv-verify/SKILL.md
+    grep -q "Compare implemented UI against approved mockups" skills/larv-verify/SKILL.md
+    grep -q "Do not return \`status: complete\` if any planned page/flow is untested" skills/larv-verify/SKILL.md
 }
 
 @test "phase prompts reference required bundled skills" {

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.25 (next) - Full browser flow and mockup parity verification
+
+- Requires handoff implementation to browser-check every touched page, role path, state, and flow against the approved `/larv:full` plan before marking a slice complete.
+- Adds hard visual parity verification against approved mockups, including screenshots, route-by-route comparison, and no unapproved design drift.
+- Extends final verification so Phase 9 fails if planned pages/flows are untested, seeded credential paths are unchecked, or implemented UI contradicts approved mockups and user decisions.
+
 ## 0.4.24 (next) - Seeded login credentials instead of demo switcher
 
 - Removes the sandbox demo-mode and navbar user-switcher requirements from generated handoff, seed guides, env guides, and feature planning.

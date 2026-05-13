@@ -78,6 +78,7 @@ For every screen listed in section 8:
 - use the seeded records from section 6.1 so the screen looks populated during browser review
 - capture desktop and mobile screenshots after implementation under `docs/larv/08-implementation/screenshots/{{slice_id}}/`
 - compare those screenshots against the chosen mockup and fix visual drift before marking the slice complete
+- browser-check every implemented page and user flow touched by this slice against the approved plan, user decisions, testing guide, and mockup route mapping
 - do not mark the slice complete with unexplained visual differences. Any remaining difference must be documented in the implementation report and must be caused by real data, accessibility, browser constraints, or an explicit user-approved deviation.
 - document reference mockup paths, screenshot paths, and approved remaining visual differences in `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md`
 
@@ -103,6 +104,8 @@ parallel: {{parallel_flag}}
 - [ ] If UI was touched, each app route is mapped to a chosen mockup in `docs/larv/03-design/visual-implementation-contract.md`.
 - [ ] If UI was touched, desktop and mobile screenshots were saved under `docs/larv/08-implementation/screenshots/{{slice_id}}/`.
 - [ ] If UI was touched, screenshots were compared against chosen mockups and all non-trivial visual differences were fixed or explicitly documented as approved deviations.
+- [ ] Every page and user flow touched by this slice was browser-checked against `docs/larv/00-discuss/`, `docs/larv/01-domain/`, `docs/larv/03-design/visual-implementation-contract.md`, `docs/larv/04-test-strategy/acceptance-criteria.md`, and this slice's testing guide.
+- [ ] Any mismatch between implemented behavior, approved decisions, planned flows, or approved mockups was fixed before marking the slice complete, unless explicitly documented as a user-approved deviation.
 - [ ] `docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md` written
 - [ ] Tracker entry appended (see section 13)
 - [ ] Learnings appended if any (see section 14)
@@ -166,6 +169,33 @@ SANDBOX_URL="$(cat docs/larv/07-runtime/sandbox-url.txt)"
 curl -fsS --max-time 10 "$SANDBOX_URL" >/dev/null
 printf "Sandbox ready: %s\n" "$SANDBOX_URL"
 ```
+
+## 12.2 Browser flow and mockup parity verification
+
+After the sandbox is refreshed, use the public sandbox URL to verify the actual app in a browser or browser automation. Do not rely only on unit tests, screenshots, or code inspection.
+
+Read the approved planning sources before verifying:
+
+- `docs/larv/00-discuss/product-brief.md`
+- `docs/larv/00-discuss/library-decisions.md`
+- `docs/larv/01-domain/`
+- `docs/larv/03-design/design-decision.md`
+- `docs/larv/03-design/brand-spec.md`
+- `docs/larv/03-design/ui-design.md`
+- `docs/larv/03-design/visual-implementation-contract.md`
+- `docs/larv/04-test-strategy/acceptance-criteria.md`
+- `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md`
+
+Required verification work:
+
+- Visit every app page, route, modal, form, dashboard, table, detail screen, empty state, error state, and role-specific path touched by this slice.
+- Sign in with every seeded credential needed for this slice's roles and permission scopes.
+- Execute every planned happy path, denied/restricted path, approval/status transition, create/edit/delete path, and cross-role handoff documented for this slice.
+- Compare each UI route to its chosen mockup from `docs/larv/03-design/visual-implementation-contract.md`, including layout, spacing, typography, colors, density, icons, states, responsive behavior, and seeded-data presentation.
+- Capture proof screenshots for every checked route/state under `docs/larv/08-implementation/screenshots/{{slice_id}}/`.
+- Fix functional or visual mismatches before completion. Do not leave generic CRUD screens, starter UI, broken flows, missing seeded data, or design drift.
+
+If Playwright is available, create or update browser tests for the slice's critical flows and run them. If Playwright is not available, perform browser checks with the available tool and document exactly how each page/flow was verified.
 
 ## 13. Tracker append snippet (run on completion)
 
@@ -243,6 +273,19 @@ Pest: {{passed}}/{{total}}
 - server restart:
 - public URL probe: Sandbox ready: http://{{vm_host}}:{{app_port}}/{{smoke_path}}
 
+## Browser flow verification
+Plan sources checked:
+- docs/larv/00-discuss/product-brief.md
+- docs/larv/01-domain/
+- docs/larv/04-test-strategy/acceptance-criteria.md
+Credentials/roles tested:
+- ...
+Pages and flows checked:
+- ...
+Result: pass | blocked | approved-with-deviations
+Unresolved behavior differences:
+- none, or list each user-approved deviation
+
 ## Notes for the next implementer
 - ...
 
@@ -272,6 +315,7 @@ The guide must be written for an end user doing browser QA and must include:
 - What should not be expected yet
 - Terminal verification commands run by the AI
 - Laravel runtime commands run by the AI, including migrations, seeders, cache/build commands, queue/runtime restarts, and sandbox restart/probe status
+- Browser flow verification: pages visited, credentials/roles used, flows tested, and pass/block/deviation result
 - Screenshot paths and visual parity notes for screens touched by this slice
 - How to reset seeded test data with `php artisan migrate:fresh --seed` or the Docker equivalent
 - How to remove/disable demo seed data before production
@@ -289,6 +333,9 @@ grep -qi "role" docs/user-manual/seed-data.md
 grep -qi "Visual parity" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 grep -qi "migrate:fresh --seed" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 grep -qi "Runtime commands" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
+grep -qi "Browser flow verification" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
+grep -qi "Browser flow verification" docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md
+grep -qi "Parity result: pass" docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md
 grep -qi "Sandbox ready" docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md
 grep -qi "{{slice_id}}" docs/user-manual/seed-data.md
 ```
@@ -305,6 +352,7 @@ After this slice, read `STATE.yaml.execution.review_mode`.
   - Terminal verification commands run for this slice
   - Laravel runtime commands run by the AI and whether the sandbox was restarted
   - Public URL probe result from `docs/larv/07-runtime/sandbox-url.txt`
+  - Browser flow verification result and screenshot directory: `docs/larv/08-implementation/screenshots/{{slice_id}}/`
   - Browser paths or actions from `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md`
   - Files changed and tests passed
   Wait for explicit approval before continuing.
