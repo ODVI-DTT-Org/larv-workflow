@@ -6,8 +6,8 @@ load helpers
     [ -f README.md ]
 }
 
-@test "README.md mentions all 8 commands" {
-    for cmd in /larv:full /larv:adopt /larv:feature /larv:debug /larv:brainstorm /larv:learn /larv:status /larv:resume; do
+@test "README.md mentions all 12 commands" {
+    for cmd in /larv:full /larv:adopt /larv:feature /larv:debug /larv:brainstorm /larv:learn /larv:status /larv:resume /larv:sandbox /larv:sandbox-start /larv:sandbox-stop /larv:sandbox-reset; do
         run grep -F "$cmd" README.md
         [ "$status" -eq 0 ]
     done

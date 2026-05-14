@@ -52,9 +52,13 @@ load helpers
 }
 
 @test "Codex skill namespace exposes larv slash command equivalents" {
-    for skill in full status resume adopt brainstorm feature debug learn; do
+    for skill in full status resume adopt brainstorm feature debug learn sandbox sandbox-start sandbox-stop sandbox-reset; do
         [ -f "codex-skills/${skill}/SKILL.md" ] || { echo "missing codex-skills/${skill}/SKILL.md"; return 1; }
     done
     run grep -F "/larv:full" codex-skills/full/SKILL.md
+    [ "$status" -eq 0 ]
+    run grep -F "/larv:sandbox" codex-skills/sandbox/SKILL.md
+    [ "$status" -eq 0 ]
+    run grep -F "sandbox.sh" codex-skills/sandbox-start/SKILL.md
     [ "$status" -eq 0 ]
 }

@@ -8,7 +8,7 @@ A Claude Code plugin that turns AI into a full Laravel development team. You ans
 
 ## What `larv` is
 
-A bundled-marketplace Claude Code plugin. One install gives you 8 commands that orchestrate four underlying skills (`masterplan`, `superpowers-laravel`, `domain-driven-design`, `huashu-design`) into a complete Laravel-app workflow — from blank slate to production deploy.
+A bundled-marketplace Claude Code plugin. One install gives you 12 commands that orchestrate four underlying skills (`masterplan`, `superpowers-laravel`, `domain-driven-design`, `huashu-design`) into a complete Laravel-app workflow — from blank slate to production deploy.
 
 Five things it does that nothing else does together:
 
@@ -69,6 +69,17 @@ After install, `/larv:status` works in any directory. New projects default to `d
 7. Package-backed work must check `docs/Handsoff/package-guide.md`.
 8. Production follows `docs/Handsoff/production-deploy.md`, `env-guide.md`, and `operations-guide.md`.
 
+## Sandbox commands
+
+Use these from a larv-managed project when you need to recover the browser review state:
+
+- `/larv:sandbox` prints the current app, docs, and mockup URLs; probes each generated URL; shows seeded test credentials from `docs/user-manual/seed-data.md`; and summarizes browser testing guides from `docs/user-manual/testing/`.
+- `/larv:sandbox-start` restarts the current project's app sandbox plus docs/mockup static servers, opens firewall ports when possible, probes the public VM URLs, and then prints the sandbox report.
+- `/larv:sandbox-stop` stops only the current project's tmux sessions, using the project slug and recorded runtime ports so parallel projects do not overwrite each other.
+- `/larv:sandbox-reset` runs `php artisan migrate:fresh --seed --force`, restarts the sandbox, verifies the URLs, and prints the same credentials/testing report.
+
+These commands use public VM URLs such as `http://31.220.79.31:<port>`. If any generated URL is down, `/larv:sandbox` fails and tells the agent to run `/larv:sandbox-start`.
+
 ## Claude Code hooks
 
 larv ships optional Claude Code hooks:
@@ -91,7 +102,7 @@ codex plugin marketplace add .
 
 Codex reads the marketplace entry for `larv`, which points to `./plugins/larv`. In this repository that path is a symlink back to the plugin root so the plugin is not duplicated. See `docs/CODEX.md` for details.
 
-## The 8 commands at a glance
+## The 12 commands at a glance
 
 | Command | When to use |
 |---|---|
@@ -103,6 +114,10 @@ Codex reads the marketplace entry for `larv`, which points to `./plugins/larv`. 
 | `/larv:learn` | Manually trigger plugin self-improvement aggregation |
 | `/larv:status` | "Where am I in this project?" — prints `STATE.yaml` summary |
 | `/larv:resume` | Pick up a project where you (or a teammate) left off |
+| `/larv:sandbox` | Show current sandbox/docs/mockup URLs, readiness, seeded credentials, and browser testing instructions |
+| `/larv:sandbox-start` | Restart app/docs/mockup servers for the current project and verify public URLs |
+| `/larv:sandbox-stop` | Stop app/docs/mockup servers only for the current project |
+| `/larv:sandbox-reset` | Fresh-migrate, reseed, restart, verify, and print the sandbox report |
 
 ---
 

@@ -5,9 +5,10 @@ load helpers
 COMMANDS=(
     larv-full larv-adopt larv-feature larv-debug
     larv-brainstorm larv-learn larv-status larv-resume
+    larv-sandbox larv-sandbox-start larv-sandbox-stop larv-sandbox-reset
 )
 
-@test "all 8 command files exist" {
+@test "all 12 command files exist" {
     for cmd in "${COMMANDS[@]}"; do
         [ -f "commands/${cmd}.md" ] || { echo "missing commands/${cmd}.md"; return 1; }
     done
@@ -35,6 +36,16 @@ COMMANDS=(
 @test "larv-resume command invokes resume.sh" {
     run grep -F "scripts/resume.sh" commands/larv-resume.md
     [ "$status" -eq 0 ]
+}
+
+@test "sandbox commands invoke sandbox.sh lifecycle actions" {
+    grep -q 'scripts/sandbox.sh "$PWD" info' commands/larv-sandbox.md
+    grep -q 'scripts/sandbox.sh "$PWD" start' commands/larv-sandbox-start.md
+    grep -q 'scripts/sandbox.sh "$PWD" stop' commands/larv-sandbox-stop.md
+    grep -q 'scripts/sandbox.sh "$PWD" reset' commands/larv-sandbox-reset.md
+    grep -q "seeded test credentials" commands/larv-sandbox.md
+    grep -q "probes every public URL" commands/larv-sandbox-start.md
+    grep -q "migrate:fresh --seed --force" commands/larv-sandbox-reset.md
 }
 
 @test "every command file frontmatter is valid YAML" {

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.26 (next) - Project-scoped sandbox lifecycle commands
+
+- Adds `/larv:sandbox`, `/larv:sandbox-start`, `/larv:sandbox-stop`, and `/larv:sandbox-reset` for recovering current project URLs, credentials, testing guides, and sandbox lifecycle state.
+- Probes generated public app/docs/mockup URLs before reporting them as ready, and fails with a restart instruction when any generated URL is down.
+- Scopes stop/start behavior by project slug and recorded runtime ports so parallel larv projects do not overwrite each other's sandbox, docs, or mockup sessions.
+
 ## 0.4.25 (next) - Full browser flow and mockup parity verification
 
 - Requires handoff implementation to browser-check every touched page, role path, state, and flow against the approved `/larv:full` plan before marking a slice complete.
