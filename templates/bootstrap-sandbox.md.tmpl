@@ -50,9 +50,9 @@ install_vm_packages_if_missing() {
     missing_runtime=()
     command -v php >/dev/null || missing_runtime+=(php-cli php-xml php-mbstring php-curl php-zip php-pgsql)
     command -v composer >/dev/null || missing_runtime+=(composer unzip)
-    command -v tmux >/dev/null || missing_runtime+=(tmux)
     command -v curl >/dev/null || missing_runtime+=(curl)
     command -v ss >/dev/null || missing_runtime+=(iproute2)
+    command -v setsid >/dev/null || missing_runtime+=(util-linux)
     command -v flock >/dev/null || missing_runtime+=(util-linux)
     command -v rsync >/dev/null || missing_runtime+=(rsync)
     if [ "${#missing_runtime[@]}" -gt 0 ]; then
@@ -100,8 +100,8 @@ install_vm_packages_if_missing() {
 
 install_vm_packages_if_missing
 
-if ! command -v php >/dev/null || ! command -v composer >/dev/null || ! command -v tmux >/dev/null || ! command -v curl >/dev/null || ! command -v ss >/dev/null || ! command -v yq >/dev/null || ! command -v flock >/dev/null; then
-    echo "ERROR: php, composer, tmux, curl, ss, yq, and flock are required on this VM after auto-install. Install missing tools or set LARV_VM_INSTALL_MODE=apt." >&2
+if ! command -v php >/dev/null || ! command -v composer >/dev/null || ! command -v curl >/dev/null || ! command -v ss >/dev/null || ! command -v setsid >/dev/null || ! command -v yq >/dev/null || ! command -v flock >/dev/null; then
+    echo "ERROR: php, composer, curl, ss, setsid, yq, and flock are required on this VM after auto-install. Install missing tools or set LARV_VM_INSTALL_MODE=apt." >&2
     exit 1
 fi
 
@@ -225,6 +225,7 @@ trap 'rm -f "$PORT_RESERVATION_DIR/${APP_PORT:-__none__}"' EXIT
 
 APP_URL="http://$VM_HOST:$APP_PORT/"
 APP_SESSION="larv-app-$SLUG-$APP_PORT"
+APP_PID_FILE="${LARV_SANDBOX_PROCESS_DIR:-/tmp/larv-sandbox-processes}/$APP_SESSION.pid"
 
 if command -v ufw >/dev/null; then
     sudo ufw allow "$APP_PORT/tcp" >/dev/null
@@ -237,7 +238,7 @@ else
 fi
 
 upsert_env APP_URL "$APP_URL"
-(cd "$APP_ROOT" && APP_PORT="$APP_PORT" DB_DATABASE="$DB_NAME" LARV_PROJECT_SLUG="$SLUG" LARV_APP_SESSION="$APP_SESSION" bash docs/larv/07-runtime/deploy-sandbox.sh)
+(cd "$APP_ROOT" && APP_PORT="$APP_PORT" DB_DATABASE="$DB_NAME" LARV_PROJECT_SLUG="$SLUG" LARV_APP_SESSION="$APP_SESSION" LARV_APP_PID_FILE="$APP_PID_FILE" bash docs/larv/07-runtime/deploy-sandbox.sh)
 
 for attempt in $(seq 1 6); do
     if curl -fsS --max-time 5 -o /dev/null "http://127.0.0.1:$APP_PORT/"; then
@@ -284,10 +285,11 @@ DB port: $DB_PORT
 DB username: $DB_USERNAME
 Project root: $PROJECT_ROOT
 App session: $APP_SESSION
+App PID file: $APP_PID_FILE
 Runtime: local on $VM_HOST as $(whoami)
 EOF
 
-export APP_PORT DB_NAME PROJECT_ROOT APP_ROOT APP_URL APP_SESSION DB_CONNECTION DB_HOST DB_PORT DB_USERNAME
+export APP_PORT DB_NAME PROJECT_ROOT APP_ROOT APP_URL APP_SESSION APP_PID_FILE DB_CONNECTION DB_HOST DB_PORT DB_USERNAME
 yq -i '
   .execution.allocations += [
     {"kind":"app-port","value": strenv(APP_PORT)},

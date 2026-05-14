@@ -7,4 +7,4 @@ description: Use when the user types /larv:learn or asks to aggregate larv plugi
 
 This is the Codex-compatible entry point for `/larv:learn`.
 
-Read `commands/larv-learn.md`, then invoke the `larv-learn` skill from `/home/claude-team/kaito/workflow/skills/larv-learn/SKILL.md` with the requested flags.
+Read `/home/claude-team/kaito/workflow/commands/larv-learn.md`, then invoke the `larv-learn` skill from `/home/claude-team/kaito/workflow/skills/larv-learn/SKILL.md` with the requested flags.

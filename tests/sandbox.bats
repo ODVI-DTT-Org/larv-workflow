@@ -144,8 +144,10 @@ SH
     mkdir -p "$bin"
     cat > "$TMP_PROJECT/docs/larv/07-runtime/deploy-sandbox.sh" <<'SH'
 #!/usr/bin/env bash
-printf 'APP_PORT=%s SESSION=%s\n' "$APP_PORT" "$LARV_APP_SESSION" >> "$LARV_DEPLOY_LOG"
-tmux new-session -d -s "$LARV_APP_SESSION" "php artisan serve --host=0.0.0.0 --port=$APP_PORT"
+printf 'APP_PORT=%s SESSION=%s PID_FILE=%s\n' "$APP_PORT" "$LARV_APP_SESSION" "$LARV_APP_PID_FILE" >> "$LARV_DEPLOY_LOG"
+mkdir -p "$(dirname "$LARV_APP_PID_FILE")"
+printf '%s\n' "$$" > "$LARV_APP_PID_FILE"
+printf 'LISTEN 0 4096 0.0.0.0:%s\n' "$APP_PORT" >> "$LARV_STARTED_PORTS"
 SH
     chmod +x "$TMP_PROJECT/docs/larv/07-runtime/deploy-sandbox.sh"
     cat > "$bin/curl" <<'SH'
@@ -169,25 +171,23 @@ SH
     cat > "$bin/tmux" <<'SH'
 #!/usr/bin/env bash
 printf '%s\n' "$*" >> "$LARV_TMUX_LOG"
-case "$1" in
-  new-session)
-    cmd="${*: -1}"
-    port="$(grep -oE 'port[= ]?[0-9]+' <<<"$cmd" | grep -oE '[0-9]+' | tail -1)"
-    if [ -z "$port" ]; then
-      port="$(grep -oE '0\.0\.0\.0:[0-9]+' <<<"$cmd" | grep -oE '[0-9]+' | tail -1)"
-    fi
-    [ -n "$port" ] && printf 'LISTEN 0 4096 0.0.0.0:%s\n' "$port" >> "$LARV_STARTED_PORTS"
-    ;;
-esac
 exit 0
 SH
-    chmod +x "$bin/curl" "$bin/sudo" "$bin/ufw" "$bin/ss" "$bin/tmux"
+    cat > "$bin/setsid" <<'SH'
+#!/usr/bin/env bash
+cmd="$*"
+port="$(grep -oE '0\.0\.0\.0:[0-9]+' <<<"$cmd" | grep -oE '[0-9]+' | tail -1)"
+[ -n "$port" ] && printf 'LISTEN 0 4096 0.0.0.0:%s\n' "$port" >> "$LARV_STARTED_PORTS"
+exit 0
+SH
+    chmod +x "$bin/curl" "$bin/sudo" "$bin/ufw" "$bin/ss" "$bin/tmux" "$bin/setsid"
 
     LARV_TMUX_LOG="$log" LARV_STARTED_PORTS="$started" LARV_DEPLOY_LOG="$BATS_TEST_TMPDIR/deploy.log" PATH="$bin:$PATH" run bash scripts/sandbox.sh "$TMP_PROJECT" start
     [ "$status" -eq 0 ]
     grep -q "WARN: recorded app port 9101" <<<"$output"
     grep -q "WARN: recorded docs port 9501" <<<"$output"
     grep -q "APP_PORT=8000 SESSION=larv-app-goal-os-8000" "$BATS_TEST_TMPDIR/deploy.log"
+    ! grep -q "new-session" "$log"
     grep -q "http://31.220.79.31:8000/" "$TMP_PROJECT/docs/larv/07-runtime/sandbox-url.txt"
     grep -q "http://31.220.79.31:9500/" "$TMP_PROJECT/docs/larv/docsite-url.txt"
     grep -q "slug=goal-os" "$LARV_SANDBOX_OWNER_DIR/app/8000"

@@ -27,7 +27,7 @@ read_plugin_version() {
 
 vm_runtime_check() {
     local ssh_target="${LARV_VM_HOST_SSH_USER:-claude-team}@${LARV_VM_HOST:-31.220.79.31}"
-    local required="php tmux curl"
+    local required="php curl ss setsid"
     if [ "${LARV_PREFLIGHT_SKIP_VM_CHECK:-0}" = "1" ]; then
         echo "  skipped (LARV_PREFLIGHT_SKIP_VM_CHECK=1)"
         return 0

@@ -231,6 +231,9 @@ yaml.safe_load(parts[1])
     grep -q "executable" skills/larv-plan/SKILL.md
     grep -q "APP_PORT" skills/larv-plan/SKILL.md
     grep -q "DB_DATABASE" skills/larv-plan/SKILL.md
+    grep -q "LARV_APP_PID_FILE" skills/larv-plan/SKILL.md
+    grep -q "setsid bash" skills/larv-plan/SKILL.md
+    grep -q "without muxplex-visible tmux sessions" skills/larv-plan/SKILL.md
     grep -q "Handoff bootstrap refuses" skills/larv-plan/SKILL.md
     grep -q "bare Laravel scaffold" skills/larv-plan/SKILL.md
     grep -q "rerun docs/Handsoff/bootstrap-sandbox.md" skills/larv-plan/SKILL.md

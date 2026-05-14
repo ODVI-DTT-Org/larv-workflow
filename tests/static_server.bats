@@ -28,11 +28,11 @@ setup() {
     [ "$status" -ne 0 ]
 }
 
-@test "static_server_check_remote_deps uses ssh to require php tmux curl ss rsync" {
+@test "static_server_check_remote_deps uses ssh to require php curl ss setsid rsync" {
     cat > "$BIN/ssh" <<'EOF'
 #!/usr/bin/env bash
 case "$*" in
-    *"command -v php"*command\ -v\ tmux*command\ -v\ curl*command\ -v\ ss*command\ -v\ rsync*) exit 0 ;;
+    *"command -v php"*command\ -v\ curl*command\ -v\ ss*command\ -v\ setsid*command\ -v\ rsync*) exit 0 ;;
     *) exit 1 ;;
 esac
 EOF
@@ -43,10 +43,6 @@ EOF
 
 @test "static_server_check_remote_deps defaults to local runtime without ssh" {
     cat > "$BIN/php" <<'EOF'
-#!/usr/bin/env bash
-exit 0
-EOF
-    cat > "$BIN/tmux" <<'EOF'
 #!/usr/bin/env bash
 exit 0
 EOF
@@ -62,9 +58,29 @@ EOF
 #!/usr/bin/env bash
 exit 99
 EOF
-    chmod +x "$BIN/php" "$BIN/tmux" "$BIN/curl" "$BIN/ss" "$BIN/ssh"
+    cat > "$BIN/setsid" <<'EOF'
+#!/usr/bin/env bash
+exit 0
+EOF
+    chmod +x "$BIN/php" "$BIN/curl" "$BIN/ss" "$BIN/ssh" "$BIN/setsid"
     PATH="$BIN:$PATH" run bash -c "source $PROJECT_ROOT/scripts/lib/vm.sh && source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_check_remote_deps ignored"
     [ "$status" -eq 0 ]
+}
+
+@test "static_server_start defaults to PID process manager, not tmux" {
+    local root="$BATS_TEST_TMPDIR/root"
+    local process_dir="$BATS_TEST_TMPDIR/processes"
+    mkdir -p "$root" "$process_dir"
+    printf "ok\n" > "$root/index.html"
+    cat > "$BIN/tmux" <<'EOF'
+#!/usr/bin/env bash
+exit 99
+EOF
+    chmod +x "$BIN/tmux"
+
+    PATH="$BIN:$PATH" LARV_SANDBOX_PROCESS_DIR="$process_dir" run bash -c "source $PROJECT_ROOT/scripts/lib/vm.sh && source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_start '' '$PORT' '$root' test-static && curl -fsS http://127.0.0.1:$PORT/ | grep -q ok && static_server_stop '' test-static"
+    [ "$status" -eq 0 ]
+    [ ! -f "$process_dir/test-static.pid" ]
 }
 
 @test "static_server_open_firewall fails when ufw command fails" {

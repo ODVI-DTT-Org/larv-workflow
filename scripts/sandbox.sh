@@ -109,7 +109,7 @@ owner_file() {
 }
 
 write_owner() {
-    local dir="$1" kind="$2" port="$3" session="$4" file
+    local dir="$1" kind="$2" port="$3" session="$4" pid_file="${5:-}" file
     file="$(owner_file "$kind" "$port")"
     {
         printf "slug=%s\n" "$(project_slug "$dir")"
@@ -117,6 +117,7 @@ write_owner() {
         printf "kind=%s\n" "$kind"
         printf "port=%s\n" "$port"
         printf "session=%s\n" "$session"
+        [ -n "$pid_file" ] && printf "pid_file=%s\n" "$pid_file"
         printf "updated_at=%s\n" "$(date +%s)"
     } > "$file"
 }
@@ -171,7 +172,7 @@ detect_app_session() {
 }
 
 stop_owned_session() {
-    local dir="$1" kind="$2" port="$3" file session
+    local dir="$1" kind="$2" port="$3" file session pid_file pid
     [ -n "$port" ] || return 0
     if ! port_owned_by_project "$dir" "$kind" "$port"; then
         return 0
@@ -179,7 +180,15 @@ stop_owned_session() {
     file="$(owner_file "$kind" "$port")"
     session="$(owner_value "$file" session)"
     [ -n "$session" ] || session="$(session_for "$kind" "$(project_slug "$dir")" "$port")"
-    tmux kill-session -t "$session" 2>/dev/null || true
+    pid_file="$(owner_value "$file" pid_file)"
+    if [ -n "$pid_file" ] && [ -f "$pid_file" ]; then
+        pid="$(cat "$pid_file" 2>/dev/null || true)"
+        if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+            kill "-$pid" 2>/dev/null || kill "$pid" 2>/dev/null || true
+        fi
+        rm -f "$pid_file"
+    fi
+    static_server_stop "" "$session" 2>/dev/null || true
     remove_owner "$kind" "$port"
 }
 
@@ -393,7 +402,7 @@ start_static_kind() {
     static_server_start "" "$port" "$root" "$session"
     probe_with_retries "$url" static >/dev/null
     write_url "$dir" "$kind" "$url"
-    write_owner "$dir" "$kind" "$port" "$session"
+    write_owner "$dir" "$kind" "$port" "$session" "$(static_server_pid_file "$session")"
     release_port_reservation "$(port_role_for_kind "$kind")" "$port" "$(project_slug "$dir"):$(cd "$dir" && pwd -P):$kind" || true
 }
 
@@ -412,12 +421,12 @@ start_app() {
     db="$(read_yq '.sandbox.database.name // ""' "$dir/docs/larv/STATE.yaml")"
     [ -n "$db" ] && [ "$db" != "null" ] || db="$(grep '^DB_DATABASE=' "$dir/.env" 2>/dev/null | tail -1 | cut -d= -f2- || true)"
     open_firewall_if_possible "$port"
-    (cd "$dir" && APP_PORT="$port" DB_DATABASE="${db:-}" LARV_PROJECT_SLUG="$slug" LARV_APP_SESSION="$session" bash docs/larv/07-runtime/deploy-sandbox.sh)
+    (cd "$dir" && APP_PORT="$port" DB_DATABASE="${db:-}" LARV_PROJECT_SLUG="$slug" LARV_APP_SESSION="$session" LARV_APP_PID_FILE="$(static_server_pid_file "$session")" bash docs/larv/07-runtime/deploy-sandbox.sh)
     session="$(detect_app_session "$slug" "$port")"
     url="$(static_server_url "$port")/"
     probe_with_retries "$url" laravel >/dev/null
     write_url "$dir" app "$url"
-    write_owner "$dir" app "$port" "$session"
+    write_owner "$dir" app "$port" "$session" "$(static_server_pid_file "$session")"
     release_port_reservation app "$port" "$slug:$(cd "$dir" && pwd -P):app" || true
 }
 

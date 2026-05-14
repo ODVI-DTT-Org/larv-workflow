@@ -77,7 +77,8 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "ufw allow" templates/bootstrap-sandbox.md.tmpl
     grep -q "ufw status" templates/bootstrap-sandbox.md.tmpl
     ! grep -q "DEMO_MODE" templates/bootstrap-sandbox.md.tmpl
-    grep -q "export APP_PORT DB_NAME PROJECT_ROOT APP_ROOT APP_URL APP_SESSION" templates/bootstrap-sandbox.md.tmpl
+    grep -q "export APP_PORT DB_NAME PROJECT_ROOT APP_ROOT APP_URL APP_SESSION APP_PID_FILE" templates/bootstrap-sandbox.md.tmpl
+    grep -q "setsid" templates/bootstrap-sandbox.md.tmpl
     grep -q "DB_CONNECTION" templates/bootstrap-sandbox.md.tmpl
     grep -q "createdb" templates/bootstrap-sandbox.md.tmpl
     ! grep -qi "mariadb" templates/bootstrap-sandbox.md.tmpl

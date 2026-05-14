@@ -37,7 +37,7 @@ ssh_target="${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}"
 project_root="$(pwd -P)"
 docsite_root="/tmp/larv-$slug-docsite"
 if ! static_server_check_remote_deps "$ssh_target"; then
-    echo "ERROR: runtime missing required static-server tools: php, tmux, curl, or ss" >&2
+    echo "ERROR: runtime missing required static-server tools: php, curl, ss, or setsid" >&2
     exit 1
 fi
 
@@ -189,7 +189,7 @@ The doc-site server is not optional. Do not advance to the Phase 8 routing menu,
 
 - `docsite_port` was allocated through `allocate_port docsite "$slug"` and recorded as `docsite-port` in `STATE.yaml.execution.allocations`.
 - `verify_allocation "$docsite_port" docsite "$slug"` succeeded immediately before server start.
-- `static_server_check_remote_deps "$ssh_target"` passed for `php`, `tmux`, `curl`, and `ss` on the local VM runtime.
+- `static_server_check_remote_deps "$ssh_target"` passed for `php`, `curl`, `ss`, and `setsid` on the local VM runtime.
 - `static_server_open_firewall "$ssh_target" "$docsite_port"` succeeded or no local `ufw` is installed.
 - `docs/larv/` was copied to `$docsite_root` on the local VM.
 - `docs/Handsoff.md` and `docs/Handsoff/` were copied to `$docsite_root` on the local VM.

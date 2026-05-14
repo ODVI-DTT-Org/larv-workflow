@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.28 (next) - PID-managed sandboxes for muxplex-safe runtime
+
+- Changes new static docs/mockup servers and generated app sandbox scripts to use PID-file managed background processes instead of tmux by default, so sandbox services do not appear as closable muxplex sessions.
+- Keeps tmux fallback support for older generated projects and explicit `LARV_STATIC_SERVER_PROCESS_MANAGER=tmux` runs.
+- Extends sandbox ownership metadata with PID files so `/larv:sandbox-stop` can stop only the current project's owned runtime processes.
+- Folds pending learning notes and the Codex `/larv:learn` absolute command path into the plugin tree.
+
 ## 0.4.27 (next) - Harden sandbox port ownership
 
 - Adds project-owned runtime metadata for app, docs, and mockup sessions so `/larv:sandbox-stop` only stops sessions created for the current project.

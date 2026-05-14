@@ -58,7 +58,7 @@ Do not leave a selected package as an architecture-only decision. If there is no
 The script runs locally on the VM from the current project root and must:
 
 - Use `APP_PORT` from the environment.
-- Use `LARV_PROJECT_SLUG` and `LARV_APP_SESSION` from the environment when present so parallel projects get project-scoped app sessions.
+- Use `LARV_PROJECT_SLUG`, `LARV_APP_SESSION`, and `LARV_APP_PID_FILE` from the environment when present so parallel projects get project-scoped app processes without muxplex-visible tmux sessions.
 - Use `DB_DATABASE` from the environment when database configuration is needed.
 - Assume `docs/Handsoff/bootstrap-sandbox.md` may create a bare Laravel scaffold first when `artisan` is missing in a greenfield docs-only project.
 - Start or restart the app process so `http://127.0.0.1:$APP_PORT/` responds.
@@ -96,9 +96,16 @@ php artisan db:seed --force
 
 slug="${LARV_PROJECT_SLUG:-app}"
 session="${LARV_APP_SESSION:-larv-app-${slug}-${APP_PORT}}"
-tmux kill-session -t "$session" 2>/dev/null || true
-tmux new-session -d -s "$session" "php artisan serve --host=0.0.0.0 --port=$APP_PORT"
-tmux has-session -t "$session"
+pid_file="${LARV_APP_PID_FILE:-/tmp/larv-sandbox-processes/${session}.pid}"
+log_file="${pid_file%.pid}.log"
+mkdir -p "$(dirname "$pid_file")"
+if [ -f "$pid_file" ]; then
+    old_pid="$(cat "$pid_file" 2>/dev/null || true)"
+    [ -n "$old_pid" ] && kill "-$old_pid" 2>/dev/null || kill "$old_pid" 2>/dev/null || true
+    rm -f "$pid_file"
+fi
+setsid bash -lc "exec php artisan serve --host=0.0.0.0 --port=$APP_PORT" >"$log_file" 2>&1 < /dev/null &
+echo "$!" > "$pid_file"
 ```
 
 If Docker is required, write a Docker-specific script instead, but it must still honor `APP_PORT`, use a project-scoped Compose project name such as `larv-${LARV_PROJECT_SLUG:-app}`, publish only the assigned host port, start the stack, and leave the app probeable at `127.0.0.1:$APP_PORT`.

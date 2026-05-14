@@ -52,7 +52,7 @@ mockup_port=$(allocate_port mockup "$slug")
 bash scripts/state.sh record-allocation . mockup-port "$mockup_port"
 ssh_target="${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}"
 if ! static_server_check_remote_deps "$ssh_target"; then
-    echo "ERROR: runtime missing required static-server tools: php, tmux, curl, or ss" >&2
+    echo "ERROR: runtime missing required static-server tools: php, curl, ss, or setsid" >&2
     release_port_reservation mockup "$mockup_port" "$slug" || true
     exit 1
 fi
@@ -126,7 +126,7 @@ The mockup server is not optional. Do not proceed to brand finalization, `design
 - At least one HTML mockup exists under `docs/larv/03-design/mockups/`.
 - `mockup_port` was allocated through `allocate_port mockup "$slug"` and recorded as `mockup-port` in `STATE.yaml.execution.allocations`.
 - `verify_allocation "$mockup_port" mockup "$slug"` succeeded immediately before server start.
-- `static_server_check_remote_deps "$ssh_target"` passed for `php`, `tmux`, `curl`, and `ss` on the local VM runtime.
+- `static_server_check_remote_deps "$ssh_target"` passed for `php`, `curl`, `ss`, and `setsid` on the local VM runtime.
 - `static_server_open_firewall "$ssh_target" "$mockup_port"` succeeded or no local `ufw` is installed.
 - The mockups are served from `docs/larv/03-design/mockups` in the current project.
 - `static_server_start` succeeded.

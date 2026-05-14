@@ -132,7 +132,7 @@ Decide what is required from the files you changed:
 - config/env/routes/events/views/container changes: `php artisan optimize:clear`
 - frontend dependency changes: `npm install`
 - frontend asset changes: `npm run build`
-- queues/jobs/listeners/schedules: restart the queue worker, Horizon, scheduler, or the matching tmux process if present
+- queues/jobs/listeners/schedules: restart the queue worker, Horizon, scheduler, or the matching sandbox runtime process if present
 - Octane/Reverb/Horizon/Vite/runtime config changes: restart the affected process
 - route/controller/middleware/auth/layout changes: restart or reload the app server if the running sandbox will not pick them up automatically
 

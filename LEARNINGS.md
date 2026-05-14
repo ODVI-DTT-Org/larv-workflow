@@ -14,6 +14,10 @@ Entries are indexed by topic, not chronology. Add to the matching section.
 
 <!-- API drift, version-specific gotchas, and supported versions. -->
 
+- [plugin] 2026-05-08: For fresh Laravel 13 apps, treat the compatible starter matrix as Filament 4, Pest 4, and Larastan 3. Filament 3 stops at Laravel 12, and Pest 3 expects PHPUnit 11 while Laravel 13 ships PHPUnit 12. Source: `kaito/eos-app/docs/larv/local-learnings.md` and `kaito/eos-app/docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-slice-01.md`.
+
+- [plugin] 2026-05-08: Laravel 13's default Tailwind v4 scaffold is `@theme`-driven. When Filament theming is needed, prefer `php artisan make:filament-theme <panel>` and keep the generated Vite-aware stubs rather than reintroducing `tailwind.config.js`-style `@config` wiring. Source: `kaito/eos-app/docs/larv/local-learnings.md`.
+
 ## Discuss-phase questions
 
 <!-- Questions to add to Phase 0 based on missing-information incidents. -->
@@ -25,6 +29,12 @@ Entries are indexed by topic, not chronology. Add to the matching section.
 ## Failure modes prevented
 
 <!-- Recurring failure modes and the guards added for them. -->
+
+- [plugin] 2026-05-08: Greenfield sandbox bootstrap must not assume `artisan` already exists. Slice 01 should scaffold Laravel before rerunning bootstrap, and generated runtime docs should make that ordering explicit. Source: `kaito/backups/eos-app/docs/larv/local-learnings.md`.
+
+- [plugin] 2026-05-08: Sandbox runtime scripts should derive `APP_ROOT` from `docs/larv/07-runtime/` as three levels up, allow an explicit `APP_ROOT` override, and bind `php artisan serve` to `0.0.0.0` for external VM access. The two-level path and `127.0.0.1` default both produced broken sandboxes. Source: `kaito/eos-app/docs/larv/local-learnings.md` and `kaito/eos-app/docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-slice-01.md`.
+
+- [plugin] 2026-05-08: Sandbox defaults should tolerate Redis-backed Laravel configs even when the VM lacks the PHP Redis extension. Prefer a documented `predis` fallback over assuming `ext-redis` is present. Source: `kaito/backups/eos-app/docs/larv/local-learnings.md` and `kaito/backups/eos-app/IMPLEMENTATION-REPORT-01.md`.
 
 ## Composition lessons
 
