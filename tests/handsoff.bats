@@ -147,6 +147,8 @@ EOF
     grep -q "Sandbox ready at" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     grep -q 'PROJECT_ROOT="$(pwd -P)"' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     grep -q 'APP_ROOT="$PROJECT_ROOT"' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+    grep -q 'APP_SESSION="larv-app-$SLUG-$APP_PORT"' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+    grep -q 'LARV_PROJECT_SLUG="$SLUG" LARV_APP_SESSION="$APP_SESSION"' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     grep -q '"kind":"project-root","value": strenv(APP_ROOT)' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     ! grep -q 'rsync -a --delete' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     ! grep -E 'scripts/lib/[a-z_]+\.sh' "$TMP/docs/Handsoff/bootstrap-sandbox.md"

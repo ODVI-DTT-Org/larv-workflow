@@ -4,6 +4,8 @@ load helpers
 
 setup() {
     TMP_PROJECT="$(setup_tmp_project)"
+    export LARV_SANDBOX_OWNER_DIR="$TMP_PROJECT/owners"
+    export LARV_PORT_RESERVATION_DIR="$TMP_PROJECT/port-reservations"
     mkdir -p "$TMP_PROJECT/docs/larv/07-runtime"
     mkdir -p "$TMP_PROJECT/docs/larv/03-design/mockups"
     mkdir -p "$TMP_PROJECT/docs/user-manual/testing"
@@ -40,6 +42,7 @@ MD
 
 teardown() {
     teardown_tmp_project "$TMP_PROJECT"
+    unset LARV_SANDBOX_OWNER_DIR LARV_PORT_RESERVATION_DIR LARV_TEST_SS_OUTPUT LARV_STARTED_PORTS LARV_DEPLOY_LOG
 }
 
 @test "sandbox info prints URLs credentials testing guides and succeeds when generated URLs are reachable" {
@@ -84,6 +87,28 @@ SH
 @test "sandbox stop kills only project-scoped sessions" {
     local bin="$BATS_TEST_TMPDIR/bin" log="$BATS_TEST_TMPDIR/tmux.log"
     mkdir -p "$bin"
+    mkdir -p "$LARV_SANDBOX_OWNER_DIR/app" "$LARV_SANDBOX_OWNER_DIR/docs" "$LARV_SANDBOX_OWNER_DIR/mockups"
+    cat > "$LARV_SANDBOX_OWNER_DIR/app/9101" <<EOF
+slug=goal-os
+root=$TMP_PROJECT
+kind=app
+port=9101
+session=larv-app-goal-os-9101
+EOF
+    cat > "$LARV_SANDBOX_OWNER_DIR/docs/9501" <<EOF
+slug=goal-os
+root=$TMP_PROJECT
+kind=docs
+port=9501
+session=larv-docsite-goal-os-9501
+EOF
+    cat > "$LARV_SANDBOX_OWNER_DIR/mockups/9401" <<EOF
+slug=goal-os
+root=$TMP_PROJECT
+kind=mockups
+port=9401
+session=larv-mockups-goal-os-9401
+EOF
     cat > "$bin/tmux" <<'SH'
 #!/usr/bin/env bash
 printf '%s\n' "$*" >> "$LARV_TMUX_LOG"
@@ -94,9 +119,77 @@ SH
     LARV_TMUX_LOG="$log" PATH="$bin:$PATH" run bash scripts/sandbox.sh "$TMP_PROJECT" stop
     [ "$status" -eq 0 ]
     grep -q "Stopped larv sandbox sessions for goal-os." <<<"$output"
-    grep -q "kill-session -t larv-app-9101" "$log"
-    grep -q "kill-session -t larv-docsite-goal-os" "$log"
+    grep -q "kill-session -t larv-app-goal-os-9101" "$log"
     grep -q "kill-session -t larv-docsite-goal-os-9501" "$log"
-    grep -q "kill-session -t larv-mockups-goal-os" "$log"
     grep -q "kill-session -t larv-mockups-goal-os-9401" "$log"
+}
+
+@test "sandbox stop does not kill unowned sessions from URL files alone" {
+    local bin="$BATS_TEST_TMPDIR/bin" log="$BATS_TEST_TMPDIR/tmux.log"
+    mkdir -p "$bin"
+    cat > "$bin/tmux" <<'SH'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "$LARV_TMUX_LOG"
+exit 0
+SH
+    chmod +x "$bin/tmux"
+
+    LARV_TMUX_LOG="$log" PATH="$bin:$PATH" run bash scripts/sandbox.sh "$TMP_PROJECT" stop
+    [ "$status" -eq 0 ]
+    [ ! -s "$log" ]
+}
+
+@test "sandbox start reallocates foreign occupied ports and writes project-owned URLs" {
+    local bin="$BATS_TEST_TMPDIR/bin" log="$BATS_TEST_TMPDIR/tmux.log" started="$BATS_TEST_TMPDIR/started-ports"
+    mkdir -p "$bin"
+    cat > "$TMP_PROJECT/docs/larv/07-runtime/deploy-sandbox.sh" <<'SH'
+#!/usr/bin/env bash
+printf 'APP_PORT=%s SESSION=%s\n' "$APP_PORT" "$LARV_APP_SESSION" >> "$LARV_DEPLOY_LOG"
+tmux new-session -d -s "$LARV_APP_SESSION" "php artisan serve --host=0.0.0.0 --port=$APP_PORT"
+SH
+    chmod +x "$TMP_PROJECT/docs/larv/07-runtime/deploy-sandbox.sh"
+    cat > "$bin/curl" <<'SH'
+#!/usr/bin/env bash
+exit 0
+SH
+    cat > "$bin/sudo" <<'SH'
+#!/usr/bin/env bash
+exec "$@"
+SH
+    cat > "$bin/ufw" <<'SH'
+#!/usr/bin/env bash
+exit 0
+SH
+    cat > "$bin/ss" <<'SH'
+#!/usr/bin/env bash
+printf 'LISTEN 0 4096 0.0.0.0:9101\n'
+printf 'LISTEN 0 4096 0.0.0.0:9501\n'
+[ -f "$LARV_STARTED_PORTS" ] && cat "$LARV_STARTED_PORTS"
+SH
+    cat > "$bin/tmux" <<'SH'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "$LARV_TMUX_LOG"
+case "$1" in
+  new-session)
+    cmd="${*: -1}"
+    port="$(grep -oE 'port[= ]?[0-9]+' <<<"$cmd" | grep -oE '[0-9]+' | tail -1)"
+    if [ -z "$port" ]; then
+      port="$(grep -oE '0\.0\.0\.0:[0-9]+' <<<"$cmd" | grep -oE '[0-9]+' | tail -1)"
+    fi
+    [ -n "$port" ] && printf 'LISTEN 0 4096 0.0.0.0:%s\n' "$port" >> "$LARV_STARTED_PORTS"
+    ;;
+esac
+exit 0
+SH
+    chmod +x "$bin/curl" "$bin/sudo" "$bin/ufw" "$bin/ss" "$bin/tmux"
+
+    LARV_TMUX_LOG="$log" LARV_STARTED_PORTS="$started" LARV_DEPLOY_LOG="$BATS_TEST_TMPDIR/deploy.log" PATH="$bin:$PATH" run bash scripts/sandbox.sh "$TMP_PROJECT" start
+    [ "$status" -eq 0 ]
+    grep -q "WARN: recorded app port 9101" <<<"$output"
+    grep -q "WARN: recorded docs port 9501" <<<"$output"
+    grep -q "APP_PORT=8000 SESSION=larv-app-goal-os-8000" "$BATS_TEST_TMPDIR/deploy.log"
+    grep -q "http://31.220.79.31:8000/" "$TMP_PROJECT/docs/larv/07-runtime/sandbox-url.txt"
+    grep -q "http://31.220.79.31:9500/" "$TMP_PROJECT/docs/larv/docsite-url.txt"
+    grep -q "slug=goal-os" "$LARV_SANDBOX_OWNER_DIR/app/8000"
+    grep -q "session=larv-docsite-goal-os-9500" "$LARV_SANDBOX_OWNER_DIR/docs/9500"
 }

@@ -11,4 +11,4 @@ Run the larv sandbox stop helper for the current project:
 bash /home/claude-team/kaito/workflow/scripts/sandbox.sh "$PWD" stop
 ```
 
-It stops only the tmux sessions for the current larv project slug and recorded runtime ports.
+It stops only sessions with owner metadata for the current larv project root and slug, preventing one project from killing another project's sandbox.

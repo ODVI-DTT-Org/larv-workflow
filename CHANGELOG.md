@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.27 (next) - Harden sandbox port ownership
+
+- Adds project-owned runtime metadata for app, docs, and mockup sessions so `/larv:sandbox-stop` only stops sessions created for the current project.
+- Makes `/larv:sandbox-start` detect foreign-owned or occupied recorded ports, allocate a fresh port, rewrite the public URL artifact, and verify the new URL before reporting it.
+- Fixes a shared allocator flock leak that could deadlock a single process when allocating multiple sandbox ports in sequence.
+- Updates generated app sandbox scripts to use slug-scoped app sessions (`larv-app-<slug>-<port>`) and pass `LARV_PROJECT_SLUG`/`LARV_APP_SESSION` through handoff bootstrap.
+
 ## 0.4.26 (next) - Project-scoped sandbox lifecycle commands
 
 - Adds `/larv:sandbox`, `/larv:sandbox-start`, `/larv:sandbox-stop`, and `/larv:sandbox-reset` for recovering current project URLs, credentials, testing guides, and sandbox lifecycle state.

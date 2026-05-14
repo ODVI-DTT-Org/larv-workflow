@@ -74,11 +74,11 @@ After install, `/larv:status` works in any directory. New projects default to `d
 Use these from a larv-managed project when you need to recover the browser review state:
 
 - `/larv:sandbox` prints the current app, docs, and mockup URLs; probes each generated URL; shows seeded test credentials from `docs/user-manual/seed-data.md`; and summarizes browser testing guides from `docs/user-manual/testing/`.
-- `/larv:sandbox-start` restarts the current project's app sandbox plus docs/mockup static servers, opens firewall ports when possible, probes the public VM URLs, and then prints the sandbox report.
-- `/larv:sandbox-stop` stops only the current project's tmux sessions, using the project slug and recorded runtime ports so parallel projects do not overwrite each other.
+- `/larv:sandbox-start` restarts the current project's app sandbox plus docs/mockup static servers, reallocates any recorded port that is already occupied or owned by another project, opens firewall ports when possible, probes the public VM URLs, and then prints the sandbox report.
+- `/larv:sandbox-stop` stops only sessions with owner metadata for the current project, using the project slug, project root, and recorded runtime ports so parallel projects do not overwrite each other.
 - `/larv:sandbox-reset` runs `php artisan migrate:fresh --seed --force`, restarts the sandbox, verifies the URLs, and prints the same credentials/testing report.
 
-These commands use public VM URLs such as `http://31.220.79.31:<port>`. If any generated URL is down, `/larv:sandbox` fails and tells the agent to run `/larv:sandbox-start`.
+These commands use public VM URLs such as `http://31.220.79.31:<port>`. If any generated URL is down, `/larv:sandbox` fails and tells the agent to run `/larv:sandbox-start`. New projects use slug-scoped app sessions like `larv-app-<slug>-<port>`.
 
 ## Claude Code hooks
 

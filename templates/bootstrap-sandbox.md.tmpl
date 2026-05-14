@@ -224,6 +224,7 @@ fi
 trap 'rm -f "$PORT_RESERVATION_DIR/${APP_PORT:-__none__}"' EXIT
 
 APP_URL="http://$VM_HOST:$APP_PORT/"
+APP_SESSION="larv-app-$SLUG-$APP_PORT"
 
 if command -v ufw >/dev/null; then
     sudo ufw allow "$APP_PORT/tcp" >/dev/null
@@ -236,7 +237,7 @@ else
 fi
 
 upsert_env APP_URL "$APP_URL"
-(cd "$APP_ROOT" && APP_PORT="$APP_PORT" DB_DATABASE="$DB_NAME" bash docs/larv/07-runtime/deploy-sandbox.sh)
+(cd "$APP_ROOT" && APP_PORT="$APP_PORT" DB_DATABASE="$DB_NAME" LARV_PROJECT_SLUG="$SLUG" LARV_APP_SESSION="$APP_SESSION" bash docs/larv/07-runtime/deploy-sandbox.sh)
 
 for attempt in $(seq 1 6); do
     if curl -fsS --max-time 5 -o /dev/null "http://127.0.0.1:$APP_PORT/"; then
@@ -282,10 +283,11 @@ DB host: $DB_HOST
 DB port: $DB_PORT
 DB username: $DB_USERNAME
 Project root: $PROJECT_ROOT
+App session: $APP_SESSION
 Runtime: local on $VM_HOST as $(whoami)
 EOF
 
-export APP_PORT DB_NAME PROJECT_ROOT APP_ROOT APP_URL DB_CONNECTION DB_HOST DB_PORT DB_USERNAME
+export APP_PORT DB_NAME PROJECT_ROOT APP_ROOT APP_URL APP_SESSION DB_CONNECTION DB_HOST DB_PORT DB_USERNAME
 yq -i '
   .execution.allocations += [
     {"kind":"app-port","value": strenv(APP_PORT)},

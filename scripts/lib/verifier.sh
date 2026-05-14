@@ -105,6 +105,7 @@ release_port_reservation() {
             rm -f "$file"
         fi
     fi
+    flock -u 9
 }
 
 # allocate_port <role> [owner]
@@ -136,10 +137,12 @@ allocate_port() {
         if ! grep -qx "$port" <<<"$listening" && ! port_reserved_any_unlocked "$role" "$port"; then
             reserve_port_unlocked "$role" "$port" "$owner"
             echo "$port"
+            flock -u 9
             return 0
         fi
     done
     echo "ERROR: port range $lo-$hi exhausted (role=$role)" >&2
+    flock -u 9
     return 1
 }
 
@@ -187,10 +190,13 @@ verify_allocation() {
     listening="$(verifier_run "ss -tlnp 2>/dev/null" 2>/dev/null \
         | awk '{print $4}' | awk -F: '{print $NF}' | sort -un)"
     if grep -qx "$port" <<<"$listening"; then
+        flock -u 9
         return 1
     fi
     if [ -n "$role" ] && port_reserved_by_other_unlocked "$role" "$port" "$owner"; then
+        flock -u 9
         return 1
     fi
+    flock -u 9
     return 0
 }

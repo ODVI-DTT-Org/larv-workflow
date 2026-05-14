@@ -58,6 +58,7 @@ Do not leave a selected package as an architecture-only decision. If there is no
 The script runs locally on the VM from the current project root and must:
 
 - Use `APP_PORT` from the environment.
+- Use `LARV_PROJECT_SLUG` and `LARV_APP_SESSION` from the environment when present so parallel projects get project-scoped app sessions.
 - Use `DB_DATABASE` from the environment when database configuration is needed.
 - Assume `docs/Handsoff/bootstrap-sandbox.md` may create a bare Laravel scaffold first when `artisan` is missing in a greenfield docs-only project.
 - Start or restart the app process so `http://127.0.0.1:$APP_PORT/` responds.
@@ -93,13 +94,14 @@ php artisan key:generate --force >/dev/null 2>&1 || true
 php artisan migrate --force
 php artisan db:seed --force
 
-session="larv-app-${APP_PORT}"
+slug="${LARV_PROJECT_SLUG:-app}"
+session="${LARV_APP_SESSION:-larv-app-${slug}-${APP_PORT}}"
 tmux kill-session -t "$session" 2>/dev/null || true
 tmux new-session -d -s "$session" "php artisan serve --host=0.0.0.0 --port=$APP_PORT"
 tmux has-session -t "$session"
 ```
 
-If Docker is required, write a Docker-specific script instead, but it must still honor `APP_PORT`, start the stack, and leave the app probeable at `127.0.0.1:$APP_PORT`.
+If Docker is required, write a Docker-specific script instead, but it must still honor `APP_PORT`, use a project-scoped Compose project name such as `larv-${LARV_PROJECT_SLUG:-app}`, publish only the assigned host port, start the stack, and leave the app probeable at `127.0.0.1:$APP_PORT`.
 
 After writing it, run:
 

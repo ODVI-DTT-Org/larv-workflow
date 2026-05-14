@@ -5,6 +5,7 @@ PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 source "$PLUGIN_ROOT/scripts/lib/vm.sh"
 source "$PLUGIN_ROOT/scripts/lib/probe.sh"
 source "$PLUGIN_ROOT/scripts/lib/static_server.sh"
+source "$PLUGIN_ROOT/scripts/lib/verifier.sh"
 
 usage() {
     cat >&2 <<'EOF'
@@ -13,7 +14,8 @@ Usage: sandbox.sh <project-dir> <info|start|stop|reset>
 Commands:
   info   Show app/docs/mockup URLs, probe status, seeded credentials, and testing guides.
   start  Start/restart the app sandbox and static docs/mockup servers for this project.
-  stop   Stop app/docs/mockup tmux sessions for this project.
+         Unsafe or foreign-owned recorded ports are reallocated before start.
+  stop   Stop app/docs/mockup sessions owned by this project.
   reset  Run migrate:fresh --seed, restart the app sandbox, and show sandbox info.
 EOF
     exit 64
@@ -72,7 +74,159 @@ url_for() {
 
 port_from_url() {
     local url="$1"
+    [ -n "$url" ] || return 0
     sed -E 's#^https?://[^:/]+:([0-9]+).*$#\1#' <<<"$url"
+}
+
+port_role_for_kind() {
+    case "$1" in
+        app) echo "app" ;;
+        docs) echo "docsite" ;;
+        mockups) echo "mockup" ;;
+        *) return 1 ;;
+    esac
+}
+
+session_for() {
+    local kind="$1" slug="$2" port="$3"
+    case "$kind" in
+        app) echo "larv-app-$slug-$port" ;;
+        docs) echo "larv-docsite-$slug-$port" ;;
+        mockups) echo "larv-mockups-$slug-$port" ;;
+        *) return 1 ;;
+    esac
+}
+
+owner_base() {
+    echo "${LARV_SANDBOX_OWNER_DIR:-/tmp/larv-sandbox-owners}"
+}
+
+owner_file() {
+    local kind="$1" port="$2" base
+    base="$(owner_base)"
+    mkdir -p "$base/$kind"
+    echo "$base/$kind/$port"
+}
+
+write_owner() {
+    local dir="$1" kind="$2" port="$3" session="$4" file
+    file="$(owner_file "$kind" "$port")"
+    {
+        printf "slug=%s\n" "$(project_slug "$dir")"
+        printf "root=%s\n" "$(cd "$dir" && pwd -P)"
+        printf "kind=%s\n" "$kind"
+        printf "port=%s\n" "$port"
+        printf "session=%s\n" "$session"
+        printf "updated_at=%s\n" "$(date +%s)"
+    } > "$file"
+}
+
+remove_owner() {
+    local kind="$1" port="$2" file
+    [ -n "$port" ] || return 0
+    file="$(owner_file "$kind" "$port")"
+    rm -f "$file"
+}
+
+owner_value() {
+    local file="$1" key="$2"
+    awk -F= -v key="$key" '$1 == key {print $2}' "$file" 2>/dev/null | head -1
+}
+
+port_owned_by_project() {
+    local dir="$1" kind="$2" port="$3" file root
+    [ -n "$port" ] || return 1
+    file="$(owner_file "$kind" "$port")"
+    [ -f "$file" ] || return 1
+    root="$(cd "$dir" && pwd -P)"
+    [ "$(owner_value "$file" slug)" = "$(project_slug "$dir")" ] && [ "$(owner_value "$file" root)" = "$root" ]
+}
+
+port_is_listening() {
+    local port="$1" listening
+    [ -n "$port" ] || return 1
+    listening="$(verifier_run "ss -tlnp 2>/dev/null" 2>/dev/null \
+        | awk '{print $4}' | awk -F: '{print $NF}' | sort -un || true)"
+    grep -qx "$port" <<<"$listening"
+}
+
+tmux_session_exists() {
+    local session="$1"
+    command -v tmux >/dev/null && tmux has-session -t "$session" >/dev/null 2>&1
+}
+
+detect_app_session() {
+    local slug="$1" port="$2" preferred legacy
+    preferred="$(session_for app "$slug" "$port")"
+    legacy="larv-app-$port"
+    if tmux_session_exists "$preferred"; then
+        echo "$preferred"
+        return
+    fi
+    if tmux_session_exists "$legacy"; then
+        echo "$legacy"
+        return
+    fi
+    echo "$preferred"
+}
+
+stop_owned_session() {
+    local dir="$1" kind="$2" port="$3" file session
+    [ -n "$port" ] || return 0
+    if ! port_owned_by_project "$dir" "$kind" "$port"; then
+        return 0
+    fi
+    file="$(owner_file "$kind" "$port")"
+    session="$(owner_value "$file" session)"
+    [ -n "$session" ] || session="$(session_for "$kind" "$(project_slug "$dir")" "$port")"
+    tmux kill-session -t "$session" 2>/dev/null || true
+    remove_owner "$kind" "$port"
+}
+
+write_url() {
+    local dir="$1" kind="$2" url="$3" file
+    file="$(url_file "$dir" "$kind")"
+    mkdir -p "$(dirname "$file")"
+    printf "%s\n" "$url" > "$file"
+    if [ "$kind" = "app" ] && command -v yq >/dev/null; then
+        APP_URL_VALUE="$url" yq -i '.sandbox.app_url = strenv(APP_URL_VALUE)' "$dir/docs/larv/STATE.yaml" 2>/dev/null || true
+    fi
+}
+
+record_allocation_if_possible() {
+    local dir="$1" kind="$2" port="$3" allocation_kind
+    case "$kind" in
+        app) allocation_kind="app-port" ;;
+        docs) allocation_kind="docsite-port" ;;
+        mockups) allocation_kind="mockup-port" ;;
+        *) return 0 ;;
+    esac
+    bash "$PLUGIN_ROOT/scripts/state.sh" record-allocation "$dir" "$allocation_kind" "$port" >/dev/null 2>&1 || true
+}
+
+safe_port_for_kind() {
+    local dir="$1" kind="$2" preferred="${3:-}" slug role port url owner
+    slug="$(project_slug "$dir")"
+    role="$(port_role_for_kind "$kind")"
+    owner="$slug:$(cd "$dir" && pwd -P):$kind"
+
+    if [ -n "$preferred" ] && [[ "$preferred" =~ ^[0-9]+$ ]]; then
+        if port_owned_by_project "$dir" "$kind" "$preferred"; then
+            echo "$preferred"
+            return 0
+        fi
+        if ! port_is_listening "$preferred" && verify_allocation "$preferred" "$role" "$owner"; then
+            echo "$preferred"
+            return 0
+        fi
+        echo "WARN: recorded $kind port $preferred is already in use or owned by another project; allocating a new port." >&2
+    fi
+
+    port="$(allocate_port "$role" "$owner")"
+    url="$(static_server_url "$port")/"
+    write_url "$dir" "$kind" "$url"
+    record_allocation_if_possible "$dir" "$kind" "$port"
+    echo "$port"
 }
 
 status_for_url() {
@@ -211,40 +365,60 @@ HTML
 start_static_kind() {
     local dir="$1" kind="$2" slug="$3" root session url port file
     url="$(url_for "$dir" "$kind")"
+    if [ -z "$url" ] && [ "$kind" = "docs" ]; then
+        port="$(safe_port_for_kind "$dir" "$kind" "")"
+        url="$(static_server_url "$port")/"
+    elif [ -z "$url" ] && [ "$kind" = "mockups" ] && [ -d "$dir/docs/larv/03-design/mockups" ]; then
+        port="$(safe_port_for_kind "$dir" "$kind" "")"
+        url="$(static_server_url "$port")/"
+    fi
     [ -n "$url" ] || return 0
     port="$(port_from_url "$url")"
+    port="$(safe_port_for_kind "$dir" "$kind" "$port")"
     [ -n "$port" ] && [[ "$port" =~ ^[0-9]+$ ]] || return 0
+    url="$(static_server_url "$port")/"
     case "$kind" in
         docs)
             root="$(stage_docsite "$dir" "$slug")"
-            session="larv-docsite-$slug"
+            session="$(session_for "$kind" "$slug" "$port")"
             ;;
         mockups)
             root="$dir/docs/larv/03-design/mockups"
             [ -d "$root" ] || return 0
-            session="larv-mockups-$slug"
+            session="$(session_for "$kind" "$slug" "$port")"
             ;;
         *) return 0 ;;
     esac
     open_firewall_if_possible "$port"
     static_server_start "" "$port" "$root" "$session"
     probe_with_retries "$url" static >/dev/null
-    file="$(url_file "$dir" "$kind")"
-    printf "%s\n" "$url" > "$file"
+    write_url "$dir" "$kind" "$url"
+    write_owner "$dir" "$kind" "$port" "$session"
+    release_port_reservation "$(port_role_for_kind "$kind")" "$port" "$(project_slug "$dir"):$(cd "$dir" && pwd -P):$kind" || true
 }
 
 start_app() {
-    local dir="$1" url port db
+    local dir="$1" url port db slug session
     [ -x "$dir/docs/larv/07-runtime/deploy-sandbox.sh" ] || return 0
+    slug="$(project_slug "$dir")"
     url="$(url_for "$dir" app)"
     if [ -n "$url" ]; then
         port="$(port_from_url "$url")"
     else
         port="$(read_yq '.execution.allocations[]? | select(.kind == "app-port") | .value' "$dir/docs/larv/STATE.yaml" | tail -1)"
     fi
+    port="$(safe_port_for_kind "$dir" app "$port")"
+    session="$(session_for app "$slug" "$port")"
     db="$(read_yq '.sandbox.database.name // ""' "$dir/docs/larv/STATE.yaml")"
     [ -n "$db" ] && [ "$db" != "null" ] || db="$(grep '^DB_DATABASE=' "$dir/.env" 2>/dev/null | tail -1 | cut -d= -f2- || true)"
-    (cd "$dir" && APP_PORT="${port:-}" DB_DATABASE="${db:-}" bash docs/larv/07-runtime/deploy-sandbox.sh)
+    open_firewall_if_possible "$port"
+    (cd "$dir" && APP_PORT="$port" DB_DATABASE="${db:-}" LARV_PROJECT_SLUG="$slug" LARV_APP_SESSION="$session" bash docs/larv/07-runtime/deploy-sandbox.sh)
+    session="$(detect_app_session "$slug" "$port")"
+    url="$(static_server_url "$port")/"
+    probe_with_retries "$url" laravel >/dev/null
+    write_url "$dir" app "$url"
+    write_owner "$dir" app "$port" "$session"
+    release_port_reservation app "$port" "$slug:$(cd "$dir" && pwd -P):app" || true
 }
 
 sandbox_start() {
@@ -267,11 +441,9 @@ sandbox_stop() {
     app_port="$(port_from_url "$app_url")"
     docs_port="$(port_from_url "$docs_url")"
     mockups_port="$(port_from_url "$mockups_url")"
-    [ -n "$app_port" ] && tmux kill-session -t "larv-app-$app_port" 2>/dev/null || true
-    tmux kill-session -t "larv-docsite-$slug" 2>/dev/null || true
-    tmux kill-session -t "larv-docsite-$slug-$docs_port" 2>/dev/null || true
-    tmux kill-session -t "larv-mockups-$slug" 2>/dev/null || true
-    tmux kill-session -t "larv-mockups-$slug-$mockups_port" 2>/dev/null || true
+    stop_owned_session "$dir" app "$app_port"
+    stop_owned_session "$dir" docs "$docs_port"
+    stop_owned_session "$dir" mockups "$mockups_port"
     echo "Stopped larv sandbox sessions for $slug."
 }
 
