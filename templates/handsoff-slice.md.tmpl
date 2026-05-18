@@ -59,7 +59,7 @@ If this slice creates or modifies auth, navigation, layout, middleware, users, r
 
 ## 8.1 Visual implementation contract
 
-If this slice creates or modifies any UI screen, the implementation must match the approved design artifacts. The user chose the mockups and expects the production app to look like them. Treat the chosen mockup as the visual source of truth, not loose inspiration.
+If this slice creates or modifies any UI screen, the implementation must match the approved design artifacts. The user chose the mockups and expects the production app to look like them. Treat the chosen mockup as the final UI contract and visual source of truth, not loose inspiration.
 
 Do not build generic Laravel starter UI, default Tailwind panels, or plain CRUD screens when a mockup/design contract exists.
 
@@ -79,7 +79,7 @@ For every screen listed in section 8:
 - capture desktop and mobile screenshots after implementation under `docs/larv/08-implementation/screenshots/{{slice_id}}/`
 - compare those screenshots against the chosen mockup and fix visual drift before marking the slice complete
 - browser-check every implemented page and user flow touched by this slice against the approved plan, user decisions, testing guide, and mockup route mapping
-- do not mark the slice complete with unexplained visual differences. Any remaining difference must be documented in the implementation report and must be caused by real data, accessibility, browser constraints, or an explicit user-approved deviation.
+- do not mark the slice complete with unexplained visual differences. The implemented app must match the approved mockups in layout, typography, colors, spacing, component styling, density, responsive behavior, and seeded-data feel. Any remaining difference must be documented in the implementation report and must be caused by real data, accessibility, browser constraints, or an explicit user-approved deviation.
 - document reference mockup paths, screenshot paths, and approved remaining visual differences in `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md`
 
 ## 9. Dependencies

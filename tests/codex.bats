@@ -61,4 +61,6 @@ load helpers
     [ "$status" -eq 0 ]
     run grep -F "sandbox.sh" codex-skills/sandbox-start/SKILL.md
     [ "$status" -eq 0 ]
+    run grep -F "LARV_APP_PORT" codex-skills/sandbox-start/SKILL.md
+    [ "$status" -eq 0 ]
 }

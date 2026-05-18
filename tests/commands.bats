@@ -45,6 +45,10 @@ COMMANDS=(
     grep -q 'scripts/sandbox.sh "$PWD" reset' commands/larv-sandbox-reset.md
     grep -q "seeded test credentials" commands/larv-sandbox.md
     grep -q "probes every public URL" commands/larv-sandbox-start.md
+    grep -q "ask the user which public VM ports" commands/larv-sandbox-start.md
+    grep -q "LARV_APP_PORT" commands/larv-sandbox-start.md
+    grep -q "LARV_DOCS_PORT" commands/larv-sandbox-start.md
+    grep -q "LARV_MOCKUPS_PORT" commands/larv-sandbox-start.md
     grep -q "migrate:fresh --seed --force" commands/larv-sandbox-reset.md
 }
 

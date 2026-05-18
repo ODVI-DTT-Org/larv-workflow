@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## 0.4.29 (next) - User-selected sandbox ports and stricter mockup contract
+
+- Requires `/larv:sandbox-start` to ask for app, docs, and mockup ports before exposing servers; explicit ports can also be passed through `LARV_APP_PORT`, `LARV_DOCS_PORT`, and `LARV_MOCKUPS_PORT`.
+- Rejects occupied user-requested ports instead of silently reallocating to a different port, while keeping automatic allocation for `auto` or blank choices.
+- Requires Phase 3 mockups, Phase 6.5 docs, and handoff sandbox bootstrap to ask for the user's desired port before opening firewall/probe/announce.
+- Tightens final verification so approved mockups are the final UI contract after implementation, not design inspiration.
+
 ## 0.4.28 (next) - PID-managed sandboxes for muxplex-safe runtime
 
 - Changes new static docs/mockup servers and generated app sandbox scripts to use PID-file managed background processes instead of tmux by default, so sandbox services do not appear as closable muxplex sessions.

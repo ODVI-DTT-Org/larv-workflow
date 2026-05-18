@@ -40,7 +40,13 @@ Do NOT WebFetch yet.
 
 When the user replies, WebFetch each pick's `.md` from getdesign.md and cache at `docs/larv/03-design/picks/<slug>.md` with frontmatter (`source_url`, `fetched_at`, `attribution`). Print a confirmation table summarizing each pick.
 
-### 5. Allocate mockup port
+### 5. Ask for and allocate mockup port
+
+Before allocating or exposing the mockup server, ask the user:
+
+> "Which public VM port do you want for the mockup server? Use `auto` for automatic allocation. Valid range: 9000-9499."
+
+If the user chooses a number, use it as `requested_mockup_port`. If they choose `auto`, leave it empty.
 
 ```bash
 . scripts/lib/vm.sh
@@ -48,7 +54,23 @@ When the user replies, WebFetch each pick's `.md` from getdesign.md and cache at
 . scripts/lib/static_server.sh
 
 slug=$(yq -r .project.slug docs/larv/STATE.yaml)
-mockup_port=$(allocate_port mockup "$slug")
+requested_mockup_port="${requested_mockup_port:-}"
+if [ -n "$requested_mockup_port" ]; then
+    case "$requested_mockup_port" in
+        ''|*[!0-9]*) echo "ERROR: mockup port must be numeric or auto" >&2; exit 1 ;;
+    esac
+    if [ "$requested_mockup_port" -lt 9000 ] || [ "$requested_mockup_port" -gt 9499 ]; then
+        echo "ERROR: mockup port must be in 9000-9499" >&2
+        exit 1
+    fi
+    if ! verify_allocation "$requested_mockup_port" mockup "$slug"; then
+        echo "ERROR: requested mockup port $requested_mockup_port is not available. Ask the user for another port." >&2
+        exit 1
+    fi
+    mockup_port="$requested_mockup_port"
+else
+    mockup_port=$(allocate_port mockup "$slug")
+fi
 bash scripts/state.sh record-allocation . mockup-port "$mockup_port"
 ssh_target="${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}"
 if ! static_server_check_remote_deps "$ssh_target"; then
@@ -124,7 +146,8 @@ echo "Mockups ready at $mockup_url"
 The mockup server is not optional. Do not proceed to brand finalization, `design-decision.md`, `brand-spec.md`, `ui-design.md`, auto-commit, or `status: complete` until all of these are true:
 
 - At least one HTML mockup exists under `docs/larv/03-design/mockups/`.
-- `mockup_port` was allocated through `allocate_port mockup "$slug"` and recorded as `mockup-port` in `STATE.yaml.execution.allocations`.
+- The user was asked for the mockup port before allocation/exposure. If they provided a port, it was verified before use; otherwise `mockup_port` was allocated through `allocate_port mockup "$slug"`.
+- `mockup_port` was recorded as `mockup-port` in `STATE.yaml.execution.allocations`.
 - `verify_allocation "$mockup_port" mockup "$slug"` succeeded immediately before server start.
 - `static_server_check_remote_deps "$ssh_target"` passed for `php`, `curl`, `ss`, and `setsid` on the local VM runtime.
 - `static_server_open_firewall "$ssh_target" "$mockup_port"` succeeded or no local `ufw` is installed.

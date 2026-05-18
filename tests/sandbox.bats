@@ -193,3 +193,76 @@ SH
     grep -q "slug=goal-os" "$LARV_SANDBOX_OWNER_DIR/app/8000"
     grep -q "session=larv-docsite-goal-os-9500" "$LARV_SANDBOX_OWNER_DIR/docs/9500"
 }
+
+@test "sandbox start honors user-requested app docs and mockup ports" {
+    local bin="$BATS_TEST_TMPDIR/bin" log="$BATS_TEST_TMPDIR/tmux.log" started="$BATS_TEST_TMPDIR/started-requested"
+    mkdir -p "$bin"
+    cat > "$TMP_PROJECT/docs/larv/07-runtime/deploy-sandbox.sh" <<'SH'
+#!/usr/bin/env bash
+printf 'APP_PORT=%s SESSION=%s PID_FILE=%s\n' "$APP_PORT" "$LARV_APP_SESSION" "$LARV_APP_PID_FILE" >> "$LARV_DEPLOY_LOG"
+mkdir -p "$(dirname "$LARV_APP_PID_FILE")"
+printf '%s\n' "$$" > "$LARV_APP_PID_FILE"
+printf 'LISTEN 0 4096 0.0.0.0:%s\n' "$APP_PORT" >> "$LARV_STARTED_PORTS"
+SH
+    chmod +x "$TMP_PROJECT/docs/larv/07-runtime/deploy-sandbox.sh"
+    cat > "$bin/curl" <<'SH'
+#!/usr/bin/env bash
+exit 0
+SH
+    cat > "$bin/sudo" <<'SH'
+#!/usr/bin/env bash
+exec "$@"
+SH
+    cat > "$bin/ufw" <<'SH'
+#!/usr/bin/env bash
+exit 0
+SH
+    cat > "$bin/ss" <<'SH'
+#!/usr/bin/env bash
+[ -f "$LARV_STARTED_PORTS" ] && cat "$LARV_STARTED_PORTS"
+SH
+    cat > "$bin/tmux" <<'SH'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "$LARV_TMUX_LOG"
+exit 0
+SH
+    cat > "$bin/setsid" <<'SH'
+#!/usr/bin/env bash
+cmd="$*"
+port="$(grep -oE '0\.0\.0\.0:[0-9]+' <<<"$cmd" | grep -oE '[0-9]+' | tail -1)"
+[ -n "$port" ] && printf 'LISTEN 0 4096 0.0.0.0:%s\n' "$port" >> "$LARV_STARTED_PORTS"
+exit 0
+SH
+    chmod +x "$bin/curl" "$bin/sudo" "$bin/ufw" "$bin/ss" "$bin/tmux" "$bin/setsid"
+
+    LARV_APP_PORT=8123 LARV_DOCS_PORT=9567 LARV_MOCKUPS_PORT=9123 \
+        LARV_TMUX_LOG="$log" LARV_STARTED_PORTS="$started" LARV_DEPLOY_LOG="$BATS_TEST_TMPDIR/requested-deploy.log" PATH="$bin:$PATH" \
+        run bash scripts/sandbox.sh "$TMP_PROJECT" start
+    [ "$status" -eq 0 ]
+    grep -q "APP_PORT=8123 SESSION=larv-app-goal-os-8123" "$BATS_TEST_TMPDIR/requested-deploy.log"
+    grep -q "http://31.220.79.31:8123/" "$TMP_PROJECT/docs/larv/07-runtime/sandbox-url.txt"
+    grep -q "http://31.220.79.31:9567/" "$TMP_PROJECT/docs/larv/docsite-url.txt"
+    grep -q "http://31.220.79.31:9123/" "$TMP_PROJECT/docs/larv/03-design/mockup-url.txt"
+    grep -q "port=8123" "$LARV_SANDBOX_OWNER_DIR/app/8123"
+    grep -q "port=9567" "$LARV_SANDBOX_OWNER_DIR/docs/9567"
+    grep -q "port=9123" "$LARV_SANDBOX_OWNER_DIR/mockups/9123"
+}
+
+@test "sandbox start rejects user-requested occupied port instead of reallocating" {
+    local bin="$BATS_TEST_TMPDIR/bin"
+    mkdir -p "$bin"
+    cat > "$TMP_PROJECT/docs/larv/07-runtime/deploy-sandbox.sh" <<'SH'
+#!/usr/bin/env bash
+exit 0
+SH
+    chmod +x "$TMP_PROJECT/docs/larv/07-runtime/deploy-sandbox.sh"
+    cat > "$bin/ss" <<'SH'
+#!/usr/bin/env bash
+printf 'LISTEN 0 4096 0.0.0.0:8123\n'
+SH
+    chmod +x "$bin/ss"
+
+    LARV_APP_PORT=8123 PATH="$bin:$PATH" run bash scripts/sandbox.sh "$TMP_PROJECT" start
+    [ "$status" -ne 0 ]
+    grep -q "requested app port 8123 is already in use" <<<"$output"
+}

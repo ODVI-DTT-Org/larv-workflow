@@ -87,6 +87,120 @@ port_role_for_kind() {
     esac
 }
 
+port_range_for_kind() {
+    case "$1" in
+        app) echo "8000-8999" ;;
+        docs) echo "9500-9999" ;;
+        mockups) echo "9000-9499" ;;
+        *) return 1 ;;
+    esac
+}
+
+port_in_range() {
+    local kind="$1" port="$2" lo hi range
+    [[ "$port" =~ ^[0-9]+$ ]] || return 1
+    range="$(port_range_for_kind "$kind")"
+    lo="${range%-*}"
+    hi="${range#*-}"
+    [ "$port" -ge "$lo" ] && [ "$port" -le "$hi" ]
+}
+
+requested_port_env_name() {
+    case "$1" in
+        app) echo "LARV_APP_PORT" ;;
+        docs) echo "LARV_DOCS_PORT" ;;
+        mockups) echo "LARV_MOCKUPS_PORT" ;;
+        *) return 1 ;;
+    esac
+}
+
+requested_port_value() {
+    case "$1" in
+        app) echo "${REQUESTED_APP_PORT:-}" ;;
+        docs) echo "${REQUESTED_DOCS_PORT:-}" ;;
+        mockups) echo "${REQUESTED_MOCKUPS_PORT:-}" ;;
+        *) return 1 ;;
+    esac
+}
+
+set_requested_port_value() {
+    local kind="$1" value="$2"
+    case "$kind" in
+        app) REQUESTED_APP_PORT="$value" ;;
+        docs) REQUESTED_DOCS_PORT="$value" ;;
+        mockups) REQUESTED_MOCKUPS_PORT="$value" ;;
+        *) return 1 ;;
+    esac
+}
+
+env_requested_port() {
+    local kind="$1" env_name value
+    env_name="$(requested_port_env_name "$kind")"
+    value="${!env_name:-}"
+    [ -n "$value" ] && echo "$value"
+    return 0
+}
+
+prompt_can_read_tty() {
+    [ -t 0 ] && [ -r /dev/tty ] && [ -w /dev/tty ]
+}
+
+current_or_recorded_port() {
+    local dir="$1" kind="$2" url port
+    url="$(url_for "$dir" "$kind")"
+    port="$(port_from_url "$url")"
+    if [ -z "$port" ] && [ "$kind" = "app" ]; then
+        port="$(read_yq '.execution.allocations[]? | select(.kind == "app-port") | .value' "$dir/docs/larv/STATE.yaml" | tail -1)"
+    elif [ -z "$port" ] && [ "$kind" = "docs" ]; then
+        port="$(read_yq '.execution.allocations[]? | select(.kind == "docsite-port") | .value' "$dir/docs/larv/STATE.yaml" | tail -1)"
+    elif [ -z "$port" ] && [ "$kind" = "mockups" ]; then
+        port="$(read_yq '.execution.allocations[]? | select(.kind == "mockup-port") | .value' "$dir/docs/larv/STATE.yaml" | tail -1)"
+    fi
+    [ "$port" != "null" ] && echo "$port"
+}
+
+ask_requested_port_for_kind() {
+    local dir="$1" kind="$2" label="$3" env_value default range answer
+    env_value="$(env_requested_port "$kind")"
+    if [ -n "$env_value" ]; then
+        [ "$env_value" = "auto" ] && return
+        if ! port_in_range "$kind" "$env_value"; then
+            echo "ERROR: $(requested_port_env_name "$kind")=$env_value is outside the $(port_range_for_kind "$kind") range." >&2
+            exit 1
+        fi
+        set_requested_port_value "$kind" "$env_value"
+        return
+    fi
+    if ! prompt_can_read_tty; then
+        return
+    fi
+    default="$(current_or_recorded_port "$dir" "$kind")"
+    range="$(port_range_for_kind "$kind")"
+    while true; do
+        if [ -n "$default" ]; then
+            printf "Choose %s port (%s). Press Enter to keep %s or type a new port: " "$label" "$range" "$default" > /dev/tty
+        else
+            printf "Choose %s port (%s). Press Enter for automatic allocation or type a port: " "$label" "$range" > /dev/tty
+        fi
+        IFS= read -r answer < /dev/tty || answer=""
+        [ -n "$answer" ] || answer="$default"
+        [ "$answer" = "auto" ] && return
+        [ -n "$answer" ] || return
+        if port_in_range "$kind" "$answer"; then
+            set_requested_port_value "$kind" "$answer"
+            return
+        fi
+        printf "Port must be in range %s.\n" "$range" > /dev/tty
+    done
+}
+
+ask_requested_ports() {
+    local dir="$1"
+    ask_requested_port_for_kind "$dir" app "app sandbox"
+    ask_requested_port_for_kind "$dir" docs "docs"
+    ask_requested_port_for_kind "$dir" mockups "mockups"
+}
+
 session_for() {
     local kind="$1" slug="$2" port="$3"
     case "$kind" in
@@ -214,10 +328,21 @@ record_allocation_if_possible() {
 }
 
 safe_port_for_kind() {
-    local dir="$1" kind="$2" preferred="${3:-}" slug role port url owner
+    local dir="$1" kind="$2" preferred="${3:-}" explicit="${4:-0}" slug role port url owner
     slug="$(project_slug "$dir")"
     role="$(port_role_for_kind "$kind")"
     owner="$slug:$(cd "$dir" && pwd -P):$kind"
+
+    if [ -n "$preferred" ] && [[ "$preferred" =~ ^[0-9]+$ ]]; then
+        if ! port_in_range "$kind" "$preferred"; then
+            if [ "$explicit" = "1" ]; then
+                echo "ERROR: requested $kind port $preferred is outside the $(port_range_for_kind "$kind") range." >&2
+                return 1
+            fi
+            echo "WARN: recorded $kind port $preferred is outside the $(port_range_for_kind "$kind") range; allocating a new port." >&2
+            preferred=""
+        fi
+    fi
 
     if [ -n "$preferred" ] && [[ "$preferred" =~ ^[0-9]+$ ]]; then
         if port_owned_by_project "$dir" "$kind" "$preferred"; then
@@ -227,6 +352,10 @@ safe_port_for_kind() {
         if ! port_is_listening "$preferred" && verify_allocation "$preferred" "$role" "$owner"; then
             echo "$preferred"
             return 0
+        fi
+        if [ "$explicit" = "1" ]; then
+            echo "ERROR: requested $kind port $preferred is already in use or owned by another project. Pick a different port." >&2
+            return 1
         fi
         echo "WARN: recorded $kind port $preferred is already in use or owned by another project; allocating a new port." >&2
     fi
@@ -372,18 +501,21 @@ HTML
 }
 
 start_static_kind() {
-    local dir="$1" kind="$2" slug="$3" root session url port file
+    local dir="$1" kind="$2" slug="$3" root session url port requested explicit
+    requested="$(requested_port_value "$kind")"
+    explicit=0
+    [ -n "$requested" ] && explicit=1
     url="$(url_for "$dir" "$kind")"
     if [ -z "$url" ] && [ "$kind" = "docs" ]; then
-        port="$(safe_port_for_kind "$dir" "$kind" "")"
+        port="$(safe_port_for_kind "$dir" "$kind" "$requested" "$explicit")"
         url="$(static_server_url "$port")/"
     elif [ -z "$url" ] && [ "$kind" = "mockups" ] && [ -d "$dir/docs/larv/03-design/mockups" ]; then
-        port="$(safe_port_for_kind "$dir" "$kind" "")"
+        port="$(safe_port_for_kind "$dir" "$kind" "$requested" "$explicit")"
         url="$(static_server_url "$port")/"
     fi
     [ -n "$url" ] || return 0
-    port="$(port_from_url "$url")"
-    port="$(safe_port_for_kind "$dir" "$kind" "$port")"
+    port="${requested:-$(port_from_url "$url")}"
+    port="$(safe_port_for_kind "$dir" "$kind" "$port" "$explicit")"
     [ -n "$port" ] && [[ "$port" =~ ^[0-9]+$ ]] || return 0
     url="$(static_server_url "$port")/"
     case "$kind" in
@@ -407,16 +539,20 @@ start_static_kind() {
 }
 
 start_app() {
-    local dir="$1" url port db slug session
+    local dir="$1" url port db slug session requested explicit
     [ -x "$dir/docs/larv/07-runtime/deploy-sandbox.sh" ] || return 0
     slug="$(project_slug "$dir")"
+    requested="$(requested_port_value app)"
+    explicit=0
+    [ -n "$requested" ] && explicit=1
     url="$(url_for "$dir" app)"
     if [ -n "$url" ]; then
         port="$(port_from_url "$url")"
     else
         port="$(read_yq '.execution.allocations[]? | select(.kind == "app-port") | .value' "$dir/docs/larv/STATE.yaml" | tail -1)"
     fi
-    port="$(safe_port_for_kind "$dir" app "$port")"
+    port="${requested:-$port}"
+    port="$(safe_port_for_kind "$dir" app "$port" "$explicit")"
     session="$(session_for app "$slug" "$port")"
     db="$(read_yq '.sandbox.database.name // ""' "$dir/docs/larv/STATE.yaml")"
     [ -n "$db" ] && [ "$db" != "null" ] || db="$(grep '^DB_DATABASE=' "$dir/.env" 2>/dev/null | tail -1 | cut -d= -f2- || true)"
@@ -434,6 +570,7 @@ sandbox_start() {
     local dir="$1" slug
     require_project "$dir"
     slug="$(project_slug "$dir")"
+    ask_requested_ports "$dir"
     start_app "$dir"
     start_static_kind "$dir" docs "$slug"
     start_static_kind "$dir" mockups "$slug"

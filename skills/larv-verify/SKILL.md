@@ -99,7 +99,7 @@ Write `docs/larv/09-verification/final-report.md` with:
 
 Do not return `status: complete` if Pint, Pest, Larastan, asset build, migration status, or sandbox smoke fails.
 
-Do not return `status: complete` if any planned page/flow is untested, any role credential path is unchecked, any approved mockup route is unmatched, any screen visibly drifts from the chosen mockup, or any implemented behavior contradicts approved decisions from `/larv:full`, unless the final report documents an explicit user-approved deviation.
+Do not return `status: complete` if any planned page/flow is untested, any role credential path is unchecked, any approved mockup route is unmatched, any screen visibly drifts from the chosen mockup, or any implemented behavior contradicts approved decisions from `/larv:full`, unless the final report documents an explicit user-approved deviation. Approved mockups are the final UI contract: after implementation, the app must match the approved mockups in layout, typography, color, spacing, component styling, density, responsive behavior, and seeded-data feel.
 
 ## Subagent return contract
 

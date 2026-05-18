@@ -149,6 +149,8 @@ EOF
     grep -q 'APP_ROOT="$PROJECT_ROOT"' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     grep -q 'APP_SESSION="larv-app-$SLUG-$APP_PORT"' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     grep -q 'APP_PID_FILE="${LARV_SANDBOX_PROCESS_DIR:-/tmp/larv-sandbox-processes}/$APP_SESSION.pid"' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+    grep -q "ask the user which public VM app port" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
+    grep -q "LARV_APP_PORT" "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     grep -q 'LARV_PROJECT_SLUG="$SLUG" LARV_APP_SESSION="$APP_SESSION" LARV_APP_PID_FILE="$APP_PID_FILE"' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     grep -q '"kind":"project-root","value": strenv(APP_ROOT)' "$TMP/docs/Handsoff/bootstrap-sandbox.md"
     ! grep -q 'rsync -a --delete' "$TMP/docs/Handsoff/bootstrap-sandbox.md"

@@ -198,10 +198,47 @@ reservation_is_stale() {
 
 listening="$(ss -tlnp 2>/dev/null | awk '{print $4}' | awk -F: '{print $NF}' | sort -un)"
 
+echo "Before exposing the app sandbox, ask the user which public VM app port they want."
+echo "Valid range: 8000-8999. They may choose 'auto' for automatic allocation."
+REQUESTED_APP_PORT="${LARV_APP_PORT:-}"
+if [ -z "$REQUESTED_APP_PORT" ] && [ -t 0 ] && [ -r /dev/tty ] && [ -w /dev/tty ]; then
+    printf "Choose app sandbox port (8000-8999). Press Enter for automatic allocation: " > /dev/tty
+    IFS= read -r REQUESTED_APP_PORT < /dev/tty || REQUESTED_APP_PORT=""
+fi
+if [ "$REQUESTED_APP_PORT" = "auto" ]; then
+    REQUESTED_APP_PORT=""
+fi
+if [ -n "$REQUESTED_APP_PORT" ]; then
+    case "$REQUESTED_APP_PORT" in
+        ''|*[!0-9]*) echo "ERROR: requested app port must be numeric or auto" >&2; exit 1 ;;
+    esac
+    if [ "$REQUESTED_APP_PORT" -lt 8000 ] || [ "$REQUESTED_APP_PORT" -gt 8999 ]; then
+        echo "ERROR: requested app port must be in 8000-8999" >&2
+        exit 1
+    fi
+fi
+
 APP_PORT=""
 exec 9>"$PORT_RESERVATION_LOCK"
 flock 9
+if [ -n "$REQUESTED_APP_PORT" ]; then
+    reservation_file="$PORT_RESERVATION_DIR/$REQUESTED_APP_PORT"
+    if [ -f "$reservation_file" ] && reservation_is_stale "$reservation_file"; then
+        rm -f "$reservation_file"
+    fi
+    if grep -qx "$REQUESTED_APP_PORT" <<<"$listening" || [ -f "$reservation_file" ]; then
+        echo "ERROR: requested app port $REQUESTED_APP_PORT is already in use or reserved. Ask the user for another port." >&2
+        exit 1
+    fi
+    {
+        printf "owner=%s\n" "$SLUG"
+        printf "created_at=%s\n" "$(date +%s)"
+        printf "pid=%s\n" "$$"
+    } > "$reservation_file"
+    APP_PORT="$REQUESTED_APP_PORT"
+fi
 for port in $(seq 8000 8999); do
+    [ -n "$APP_PORT" ] && break
     reservation_file="$PORT_RESERVATION_DIR/$port"
     if [ -f "$reservation_file" ] && reservation_is_stale "$reservation_file"; then
         rm -f "$reservation_file"

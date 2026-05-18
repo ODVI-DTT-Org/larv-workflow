@@ -41,8 +41,27 @@ if ! static_server_check_remote_deps "$ssh_target"; then
     exit 1
 fi
 
-# 1. Allocate port from docsite range (9500-9999)
-docsite_port=$(allocate_port docsite "$slug")
+# 1. Ask for and allocate port from docsite range (9500-9999)
+#
+# Before allocating or exposing the doc-site, ask the user:
+# "Which public VM port do you want for the docs site? Use `auto` for automatic allocation. Valid range: 9500-9999."
+requested_docsite_port="${requested_docsite_port:-}"
+if [ -n "$requested_docsite_port" ]; then
+    case "$requested_docsite_port" in
+        ''|*[!0-9]*) echo "ERROR: doc-site port must be numeric or auto" >&2; exit 1 ;;
+    esac
+    if [ "$requested_docsite_port" -lt 9500 ] || [ "$requested_docsite_port" -gt 9999 ]; then
+        echo "ERROR: doc-site port must be in 9500-9999" >&2
+        exit 1
+    fi
+    if ! verify_allocation "$requested_docsite_port" docsite "$slug"; then
+        echo "ERROR: requested doc-site port $requested_docsite_port is not available. Ask the user for another port." >&2
+        exit 1
+    fi
+    docsite_port="$requested_docsite_port"
+else
+    docsite_port=$(allocate_port docsite "$slug")
+fi
 bash scripts/state.sh record-allocation . docsite-port "$docsite_port"
 trap 'release_port_reservation docsite "$docsite_port" "$slug" || true' EXIT
 if ! static_server_open_firewall "$ssh_target" "$docsite_port"; then
@@ -187,7 +206,8 @@ echo "Plan available for review at $docsite_url"
 
 The doc-site server is not optional. Do not advance to the Phase 8 routing menu, auto-commit, or return `status: complete` until all of these are true:
 
-- `docsite_port` was allocated through `allocate_port docsite "$slug"` and recorded as `docsite-port` in `STATE.yaml.execution.allocations`.
+- The user was asked for the doc-site port before allocation/exposure. If they provided a port, it was verified before use; otherwise `docsite_port` was allocated through `allocate_port docsite "$slug"`.
+- `docsite_port` was recorded as `docsite-port` in `STATE.yaml.execution.allocations`.
 - `verify_allocation "$docsite_port" docsite "$slug"` succeeded immediately before server start.
 - `static_server_check_remote_deps "$ssh_target"` passed for `php`, `curl`, `ss`, and `setsid` on the local VM runtime.
 - `static_server_open_firewall "$ssh_target" "$docsite_port"` succeeded or no local `ufw` is installed.

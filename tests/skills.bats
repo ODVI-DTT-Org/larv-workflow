@@ -163,6 +163,8 @@ yaml.safe_load(parts[1])
     ! grep -q "STUB — sub-project A scaffolding only" skills/larv-design/SKILL.md
     grep -q "getdesign.md" skills/larv-design/SKILL.md
     grep -q "allocate_port mockup" skills/larv-design/SKILL.md
+    grep -q "Which public VM port do you want for the mockup server" skills/larv-design/SKILL.md
+    grep -q "requested_mockup_port" skills/larv-design/SKILL.md
     grep -qi "probe-before-announce" skills/larv-design/SKILL.md
     grep -q "bundle/huashu-design/SKILL.md" skills/larv-design/SKILL.md
     grep -q "visual-implementation-contract.md" skills/larv-design/SKILL.md
@@ -191,6 +193,8 @@ yaml.safe_load(parts[1])
     grep -q "^name: larv-docsite" skills/larv-docsite/SKILL.md
     grep -q "Phase 6.5" skills/larv-docsite/SKILL.md
     grep -q "allocate_port docsite" skills/larv-docsite/SKILL.md
+    grep -q "Which public VM port do you want for the docs site" skills/larv-docsite/SKILL.md
+    grep -q "requested_docsite_port" skills/larv-docsite/SKILL.md
     grep -q "Docsify" skills/larv-docsite/SKILL.md
 }
 
@@ -323,6 +327,7 @@ yaml.safe_load(parts[1])
     grep -q "Visit every planned user-facing page" skills/larv-verify/SKILL.md
     grep -q "Sign in with every seeded credential" skills/larv-verify/SKILL.md
     grep -q "Compare implemented UI against approved mockups" skills/larv-verify/SKILL.md
+    grep -q "Approved mockups are the final UI contract" skills/larv-verify/SKILL.md
     grep -q "Do not return \`status: complete\` if any planned page/flow is untested" skills/larv-verify/SKILL.md
 }
 
