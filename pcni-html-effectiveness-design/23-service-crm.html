@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Customer Service Dashboard — PCNI CRM</title>
+  <link rel="stylesheet" href="design-system.css">
+  <link rel="stylesheet" href="crm-shared-styles.css">
+  <style>
+    .header {
+      padding: var(--space-24) 0;
+      border-bottom: var(--border-light);
+      background: linear-gradient(135deg, #FFFBF0 0%, #FFFEF9 100%);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-24);
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 var(--space-24);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-12);
+    }
+
+    .logo img {
+      height: 40px;
+      width: auto;
+      border-radius: var(--radius-md);
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-text .org {
+      font-size: 12px;
+      color: var(--gray-600);
+    }
+
+    .logo-text .app {
+      font-weight: 700;
+      color: var(--pcni-primary);
+      font-size: 14px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-24);
+    }
+
+    .search-box {
+      width: 280px;
+      padding: var(--space-12) var(--space-16);
+      border: var(--border-light);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      background: var(--white);
+    }
+
+    .nav-item {
+      padding: var(--space-12) var(--space-16);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      color: var(--gray-700);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .nav-item:hover {
+      background: var(--gray-100);
+      color: var(--pcni-primary);
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin: 0 0 var(--space-8) 0;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--gray-600);
+      margin: 0;
+    }
+
+    .sla-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: var(--space-8);
+    }
+
+    .sla-on-track {
+      background: var(--pcni-success);
+    }
+
+    .sla-warning {
+      background: var(--pcni-warning);
+    }
+
+    .sla-breached {
+      background: var(--pcni-danger);
+    }
+
+    .priority-high {
+      color: var(--pcni-danger);
+      font-weight: 600;
+    }
+
+    .priority-medium {
+      color: var(--pcni-warning);
+      font-weight: 600;
+    }
+
+    .priority-low {
+      color: var(--pcni-accent);
+      font-weight: 600;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--gray-200);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-right: var(--space-8);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <img src="pcni-logo.png" alt="PCNI Logo">
+        <div class="logo-text">
+          <div class="org">People's Credit Network</div>
+          <div class="app">Customer Support Portal</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <input type="text" class="search-box" placeholder="Search tickets...">
+        <div class="nav-item">Notifications</div>
+        <div class="nav-item">Settings</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="crm-container">
+    <!-- Sidebar -->
+    <aside class="crm-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Support Metrics</div>
+        <div class="metric-card">
+          <div class="metric-label">Open Tickets</div>
+          <div class="metric-value">12</div>
+          <div class="metric-subtext">3 high priority</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Avg Resolution Time</div>
+          <div class="metric-value">4.2h</div>
+          <div class="metric-subtext">Down from 5.1h</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Customer Satisfaction</div>
+          <div class="metric-value">4.6/5</div>
+          <div class="metric-subtext">Based on 48 ratings</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">First Response Time</div>
+          <div class="metric-value">32 min</div>
+          <div class="metric-subtext">SLA target: 1 hour</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Team Performance</div>
+        <div class="metric-card">
+          <div class="metric-label">Tickets Closed (30d)</div>
+          <div class="metric-value">87</div>
+          <div class="metric-subtext">+12% vs last month</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="crm-main">
+      <div>
+        <h1 class="page-title">Support Queue</h1>
+        <p class="page-subtitle">Manage customer support tickets</p>
+      </div>
+
+      <!-- Filter Panel -->
+      <div class="filter-panel">
+        <div class="filter-title">Filters</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-16);">
+          <div class="filter-group">
+            <label><input type="checkbox" name="status" value="open"> Open</label>
+            <label><input type="checkbox" name="status" value="pending"> Pending Response</label>
+            <label><input type="checkbox" name="status" value="resolved"> Resolved</label>
+          </div>
+          <div class="filter-group">
+            <label><input type="checkbox" name="priority" value="high"> High Priority</label>
+            <label><input type="checkbox" name="priority" value="medium"> Medium Priority</label>
+            <label><input type="checkbox" name="priority" value="low"> Low Priority</label>
+          </div>
+          <div class="filter-group">
+            <label><input type="checkbox" name="sla" value="on-track"> On Track</label>
+            <label><input type="checkbox" name="sla" value="warning"> Warning</label>
+            <label><input type="checkbox" name="sla" value="breached"> Breached</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bulk Action Bar -->
+      <div class="bulk-action-bar">
+        <span class="action-count">0 selected</span>
+        <div class="bulk-actions">
+          <button class="btn btn-secondary" onclick="assignSelected()">Assign To Me</button>
+          <button class="btn btn-secondary" onclick="updatePriority()">Update Priority</button>
+          <button class="btn btn-secondary" onclick="closeSelected()">Close Tickets</button>
+        </div>
+      </div>
+
+      <!-- Tickets Table -->
+      <div class="table-wrapper card">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 40px;"><input type="checkbox" onchange="TableSelection.toggleAll(this)"></th>
+              <th>Ticket ID</th>
+              <th>Customer</th>
+              <th>Issue</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Assigned To</th>
+              <th>SLA Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-id="TKT-5001" data-status="open" data-priority="high">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'TKT-5001')"></td>
+              <td style="font-weight: 600;">TKT-5001</td>
+              <td>John Williams</td>
+              <td>Account locked unable to access</td>
+              <td><span class="priority-high">High</span></td>
+              <td><span class="badge status-open">Open</span></td>
+              <td><div class="avatar">MJ</div>Maria Johnson</td>
+              <td><span class="sla-indicator sla-on-track"></span>On Track (45 min)</td>
+              <td><button class="btn btn-small btn-primary" onclick="CRMModal.open('ticket-modal-1')">View</button></td>
+            </tr>
+            <tr data-id="TKT-5002" data-status="open" data-priority="high">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'TKT-5002')"></td>
+              <td style="font-weight: 600;">TKT-5002</td>
+              <td>Sarah Lee</td>
+              <td>Payment processing error</td>
+              <td><span class="priority-high">High</span></td>
+              <td><span class="badge status-open">Open</span></td>
+              <td><div class="avatar">RC</div>Robert Chen</td>
+              <td><span class="sla-indicator sla-warning"></span>Warning (58 min)</td>
+              <td><button class="btn btn-small btn-primary" onclick="CRMModal.open('ticket-modal-2')">View</button></td>
+            </tr>
+            <tr data-id="TKT-5003" data-status="pending" data-priority="high">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'TKT-5003')"></td>
+              <td style="font-weight: 600;">TKT-5003</td>
+              <td>Michael Brown</td>
+              <td>Loan application rejected without reason</td>
+              <td><span class="priority-high">High</span></td>
+              <td><span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #92400e;">Pending</span></td>
+              <td><div class="avatar">AD</div>Alex Davis</td>
+              <td><span class="sla-indicator sla-breached"></span>Breached (125 min)</td>
+              <td><button class="btn btn-small btn-primary" onclick="CRMModal.open('ticket-modal-3')">View</button></td>
+            </tr>
+            <tr data-id="TKT-5004" data-status="open" data-priority="medium">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'TKT-5004')"></td>
+              <td style="font-weight: 600;">TKT-5004</td>
+              <td>Jennifer Martinez</td>
+              <td>Question about credit score calculation</td>
+              <td><span class="priority-medium">Medium</span></td>
+              <td><span class="badge status-open">Open</span></td>
+              <td><div class="avatar">SH</div>Sophia Hart</td>
+              <td><span class="sla-indicator sla-on-track"></span>On Track (15 min)</td>
+              <td><button class="btn btn-small btn-primary" onclick="CRMModal.open('ticket-modal-4')">View</button></td>
+            </tr>
+            <tr data-id="TKT-5005" data-status="open" data-priority="medium">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'TKT-5005')"></td>
+              <td style="font-weight: 600;">TKT-5005</td>
+              <td>David Park</td>
+              <td>Requesting loan modification</td>
+              <td><span class="priority-medium">Medium</span></td>
+              <td><span class="badge status-open">Open</span></td>
+              <td><div class="avatar">MC</div>Maya Chen</td>
+              <td><span class="sla-indicator sla-on-track"></span>On Track (32 min)</td>
+              <td><button class="btn btn-small btn-primary" onclick="CRMModal.open('ticket-modal-5')">View</button></td>
+            </tr>
+            <tr data-id="TKT-5006" data-status="pending" data-priority="medium">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'TKT-5006')"></td>
+              <td style="font-weight: 600;">TKT-5006</td>
+              <td>Emily Rodriguez</td>
+              <td>Statement download not working</td>
+              <td><span class="priority-medium">Medium</span></td>
+              <td><span class="badge" style="background: rgba(245, 158, 11, 0.1); color: #92400e;">Pending</span></td>
+              <td><div class="avatar">KL</div>Kevin Liu</td>
+              <td><span class="sla-indicator sla-warning"></span>Warning (85 min)</td>
+              <td><button class="btn btn-small btn-primary" onclick="CRMModal.open('ticket-modal-6')">View</button></td>
+            </tr>
+            <tr data-id="TKT-5007" data-status="open" data-priority="low">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'TKT-5007')"></td>
+              <td style="font-weight: 600;">TKT-5007</td>
+              <td>Christopher White</td>
+              <td>Feedback on mobile app</td>
+              <td><span class="priority-low">Low</span></td>
+              <td><span class="badge status-open">Open</span></td>
+              <td><div class="avatar">JW</div>James Wilson</td>
+              <td><span class="sla-indicator sla-on-track"></span>On Track (5 min)</td>
+              <td><button class="btn btn-small btn-primary" onclick="CRMModal.open('ticket-modal-7')">View</button></td>
+            </tr>
+            <tr data-id="TKT-5008" data-status="open" data-priority="low">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'TKT-5008')"></td>
+              <td style="font-weight: 600;">TKT-5008</td>
+              <td>Amanda Foster</td>
+              <td>Website accessibility question</td>
+              <td><span class="priority-low">Low</span></td>
+              <td><span class="badge status-open">Open</span></td>
+              <td><div class="avatar">NP</div>Nina Patel</td>
+              <td><span class="sla-indicator sla-on-track"></span>On Track (22 min)</td>
+              <td><button class="btn btn-small btn-primary" onclick="CRMModal.open('ticket-modal-8')">View</button></td>
+            </tr>
+            <tr data-id="TKT-5009" data-status="resolved" data-priority="high">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'TKT-5009')"></td>
+              <td style="font-weight: 600;">TKT-5009</td>
+              <td>Robert Thompson</td>
+              <td>Two factor authentication not working</td>
+              <td><span class="priority-high">High</span></td>
+              <td><span class="badge status-closed">Resolved</span></td>
+              <td><div class="avatar">EK</div>Elena Kim</td>
+              <td><span class="sla-indicator sla-on-track"></span>Resolved (47 min)</td>
+              <td><button class="btn btn-small btn-secondary" onclick="CRMModal.open('ticket-modal-9')">View</button></td>
+            </tr>
+            <tr data-id="TKT-5010" data-status="resolved" data-priority="medium">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'TKT-5010')"></td>
+              <td style="font-weight: 600;">TKT-5010</td>
+              <td>Lisa Anderson</td>
+              <td>Password reset email not received</td>
+              <td><span class="priority-medium">Medium</span></td>
+              <td><span class="badge status-closed">Resolved</span></td>
+              <td><div class="avatar">MP</div>Marcus Price</td>
+              <td><span class="sla-indicator sla-on-track"></span>Resolved (23 min)</td>
+              <td><button class="btn btn-small btn-secondary" onclick="CRMModal.open('ticket-modal-10')">View</button></td>
+            </tr>
+            <tr data-id="TKT-5011" data-status="resolved" data-priority="low">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'TKT-5011')"></td>
+              <td style="font-weight: 600;">TKT-5011</td>
+              <td>Daniel Garcia</td>
+              <td>Inquiry about interest rate details</td>
+              <td><span class="priority-low">Low</span></td>
+              <td><span class="badge status-closed">Resolved</span></td>
+              <td><div class="avatar">TJ</div>Tanya Johnson</td>
+              <td><span class="sla-indicator sla-on-track"></span>Resolved (15 min)</td>
+              <td><button class="btn btn-small btn-secondary" onclick="CRMModal.open('ticket-modal-11')">View</button></td>
+            </tr>
+            <tr data-id="TKT-5012" data-status="resolved" data-priority="low">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'TKT-5012')"></td>
+              <td style="font-weight: 600;">TKT-5012</td>
+              <td>Nancy Young</td>
+              <td>Request for account statement</td>
+              <td><span class="priority-low">Low</span></td>
+              <td><span class="badge status-closed">Resolved</span></td>
+              <td><div class="avatar">LB</div>Lucas Bell</td>
+              <td><span class="sla-indicator sla-on-track"></span>Resolved (8 min)</td>
+              <td><button class="btn btn-small btn-secondary" onclick="CRMModal.open('ticket-modal-12')">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Ticket Detail Modals -->
+  <div id="ticket-modal-1" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Ticket Details</h2>
+        <button class="modal-close" onclick="CRMModal.close('ticket-modal-1')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <div class="modal-section-title">Ticket Information</div>
+          <div class="modal-row"><span class="modal-label">Ticket ID</span><span class="modal-value">TKT-5001</span></div>
+          <div class="modal-row"><span class="modal-label">Customer</span><span class="modal-value">John Williams</span></div>
+          <div class="modal-row"><span class="modal-label">Email</span><span class="modal-value">john.williams@email.com</span></div>
+          <div class="modal-row"><span class="modal-label">Phone</span><span class="modal-value">(555) 123-4567</span></div>
+          <div class="modal-row"><span class="modal-label">Account ID</span><span class="modal-value">ACC-45821</span></div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">Issue Details</div>
+          <div class="modal-row"><span class="modal-label">Subject</span><span class="modal-value">Account locked unable to access</span></div>
+          <div class="modal-row"><span class="modal-label">Priority</span><span class="modal-value"><span class="priority-high">High</span></span></div>
+          <div class="modal-row"><span class="modal-label">Status</span><span class="modal-value"><span class="badge status-open">Open</span></span></div>
+          <div class="modal-row"><span class="modal-label">Created</span><span class="modal-value">Today 2:15 PM</span></div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">Assignment</div>
+          <div class="modal-row"><span class="modal-label">Assigned To</span><span class="modal-value">Maria Johnson</span></div>
+          <div class="modal-row"><span class="modal-label">SLA Status</span><span class="modal-value"><span class="sla-indicator sla-on-track"></span>On Track (45 min remaining)</span></div>
+          <div class="modal-row"><span class="modal-label">SLA Target</span><span class="modal-value">2 hours (High Priority)</span></div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">Customer History</div>
+          <div class="modal-row"><span class="modal-label">Account Age</span><span class="modal-value">2 years 3 months</span></div>
+          <div class="modal-row"><span class="modal-label">Previous Tickets</span><span class="modal-value">2 (both resolved)</span></div>
+          <div class="modal-row"><span class="modal-label">Customer Satisfaction</span><span class="modal-value">4.8/5 (average)</span></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="CRMModal.close('ticket-modal-1')">Close</button>
+        <button class="btn btn-primary" onclick="resolveTicket('TKT-5001')">Resolve</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Abbreviated modals for other tickets -->
+  <div id="ticket-modal-2" class="modal"><div class="modal-content"><div class="modal-header"><h2>Ticket Details</h2><button class="modal-close" onclick="CRMModal.close('ticket-modal-2')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Ticket Information</div><div class="modal-row"><span class="modal-label">Ticket ID</span><span class="modal-value">TKT-5002</span></div><div class="modal-row"><span class="modal-label">Customer</span><span class="modal-value">Sarah Lee</span></div><div class="modal-row"><span class="modal-label">Subject</span><span class="modal-value">Payment processing error</span></div><div class="modal-row"><span class="modal-label">Priority</span><span class="modal-value"><span class="priority-high">High</span></span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('ticket-modal-2')">Close</button><button class="btn btn-primary" onclick="resolveTicket('TKT-5002')">Resolve</button></div></div></div>
+
+  <div id="ticket-modal-3" class="modal"><div class="modal-content"><div class="modal-header"><h2>Ticket Details</h2><button class="modal-close" onclick="CRMModal.close('ticket-modal-3')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Ticket Information</div><div class="modal-row"><span class="modal-label">Ticket ID</span><span class="modal-value">TKT-5003</span></div><div class="modal-row"><span class="modal-label">Customer</span><span class="modal-value">Michael Brown</span></div><div class="modal-row"><span class="modal-label">Subject</span><span class="modal-value">Loan application rejected without reason</span></div><div class="modal-row"><span class="modal-label">Priority</span><span class="modal-value"><span class="priority-high">High</span></span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('ticket-modal-3')">Close</button><button class="btn btn-primary" onclick="resolveTicket('TKT-5003')">Resolve</button></div></div></div>
+
+  <div id="ticket-modal-4" class="modal"><div class="modal-content"><div class="modal-header"><h2>Ticket Details</h2><button class="modal-close" onclick="CRMModal.close('ticket-modal-4')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Ticket Information</div><div class="modal-row"><span class="modal-label">Ticket ID</span><span class="modal-value">TKT-5004</span></div><div class="modal-row"><span class="modal-label">Customer</span><span class="modal-value">Jennifer Martinez</span></div><div class="modal-row"><span class="modal-label">Subject</span><span class="modal-value">Question about credit score calculation</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('ticket-modal-4')">Close</button><button class="btn btn-primary" onclick="resolveTicket('TKT-5004')">Resolve</button></div></div></div>
+
+  <div id="ticket-modal-5" class="modal"><div class="modal-content"><div class="modal-header"><h2>Ticket Details</h2><button class="modal-close" onclick="CRMModal.close('ticket-modal-5')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Ticket Information</div><div class="modal-row"><span class="modal-label">Ticket ID</span><span class="modal-value">TKT-5005</span></div><div class="modal-row"><span class="modal-label">Customer</span><span class="modal-value">David Park</span></div><div class="modal-row"><span class="modal-label">Subject</span><span class="modal-value">Requesting loan modification</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('ticket-modal-5')">Close</button><button class="btn btn-primary" onclick="resolveTicket('TKT-5005')">Resolve</button></div></div></div>
+
+  <div id="ticket-modal-6" class="modal"><div class="modal-content"><div class="modal-header"><h2>Ticket Details</h2><button class="modal-close" onclick="CRMModal.close('ticket-modal-6')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Ticket Information</div><div class="modal-row"><span class="modal-label">Ticket ID</span><span class="modal-value">TKT-5006</span></div><div class="modal-row"><span class="modal-label">Customer</span><span class="modal-value">Emily Rodriguez</span></div><div class="modal-row"><span class="modal-label">Subject</span><span class="modal-value">Statement download not working</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('ticket-modal-6')">Close</button><button class="btn btn-primary" onclick="resolveTicket('TKT-5006')">Resolve</button></div></div></div>
+
+  <div id="ticket-modal-7" class="modal"><div class="modal-content"><div class="modal-header"><h2>Ticket Details</h2><button class="modal-close" onclick="CRMModal.close('ticket-modal-7')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Ticket Information</div><div class="modal-row"><span class="modal-label">Ticket ID</span><span class="modal-value">TKT-5007</span></div><div class="modal-row"><span class="modal-label">Customer</span><span class="modal-value">Christopher White</span></div><div class="modal-row"><span class="modal-label">Subject</span><span class="modal-value">Feedback on mobile app</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('ticket-modal-7')">Close</button><button class="btn btn-primary" onclick="resolveTicket('TKT-5007')">Resolve</button></div></div></div>
+
+  <div id="ticket-modal-8" class="modal"><div class="modal-content"><div class="modal-header"><h2>Ticket Details</h2><button class="modal-close" onclick="CRMModal.close('ticket-modal-8')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Ticket Information</div><div class="modal-row"><span class="modal-label">Ticket ID</span><span class="modal-value">TKT-5008</span></div><div class="modal-row"><span class="modal-label">Customer</span><span class="modal-value">Amanda Foster</span></div><div class="modal-row"><span class="modal-label">Subject</span><span class="modal-value">Website accessibility question</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('ticket-modal-8')">Close</button><button class="btn btn-primary" onclick="resolveTicket('TKT-5008')">Resolve</button></div></div></div>
+
+  <div id="ticket-modal-9" class="modal"><div class="modal-content"><div class="modal-header"><h2>Ticket Details</h2><button class="modal-close" onclick="CRMModal.close('ticket-modal-9')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Ticket Information</div><div class="modal-row"><span class="modal-label">Ticket ID</span><span class="modal-value">TKT-5009</span></div><div class="modal-row"><span class="modal-label">Customer</span><span class="modal-value">Robert Thompson</span></div><div class="modal-row"><span class="modal-label">Subject</span><span class="modal-value">Two factor authentication not working</span></div><div class="modal-row"><span class="modal-label">Status</span><span class="modal-value"><span class="badge status-closed">Resolved</span></span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('ticket-modal-9')">Close</button></div></div></div>
+
+  <div id="ticket-modal-10" class="modal"><div class="modal-content"><div class="modal-header"><h2>Ticket Details</h2><button class="modal-close" onclick="CRMModal.close('ticket-modal-10')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Ticket Information</div><div class="modal-row"><span class="modal-label">Ticket ID</span><span class="modal-value">TKT-5010</span></div><div class="modal-row"><span class="modal-label">Customer</span><span class="modal-value">Lisa Anderson</span></div><div class="modal-row"><span class="modal-label">Subject</span><span class="modal-value">Password reset email not received</span></div><div class="modal-row"><span class="modal-label">Status</span><span class="modal-value"><span class="badge status-closed">Resolved</span></span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('ticket-modal-10')">Close</button></div></div></div>
+
+  <div id="ticket-modal-11" class="modal"><div class="modal-content"><div class="modal-header"><h2>Ticket Details</h2><button class="modal-close" onclick="CRMModal.close('ticket-modal-11')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Ticket Information</div><div class="modal-row"><span class="modal-label">Ticket ID</span><span class="modal-value">TKT-5011</span></div><div class="modal-row"><span class="modal-label">Customer</span><span class="modal-value">Daniel Garcia</span></div><div class="modal-row"><span class="modal-label">Subject</span><span class="modal-value">Inquiry about interest rate details</span></div><div class="modal-row"><span class="modal-label">Status</span><span class="modal-value"><span class="badge status-closed">Resolved</span></span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('ticket-modal-11')">Close</button></div></div></div>
+
+  <div id="ticket-modal-12" class="modal"><div class="modal-content"><div class="modal-header"><h2>Ticket Details</h2><button class="modal-close" onclick="CRMModal.close('ticket-modal-12')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Ticket Information</div><div class="modal-row"><span class="modal-label">Ticket ID</span><span class="modal-value">TKT-5012</span></div><div class="modal-row"><span class="modal-label">Customer</span><span class="modal-value">Nancy Young</span></div><div class="modal-row"><span class="modal-label">Subject</span><span class="modal-value">Request for account statement</span></div><div class="modal-row"><span class="modal-label">Status</span><span class="modal-value"><span class="badge status-closed">Resolved</span></span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('ticket-modal-12')">Close</button></div></div></div>
+
+  <script src="crm-shared.js"></script>
+  <script>
+    function resolveTicket(ticketId) {
+      Notifications.show(`Ticket ${ticketId} resolved`, 'success');
+      CRMModal.close(`ticket-modal-${ticketId.split('-')[1]}`);
+      TableSelection.selectedIds.clear();
+      TableSelection.updateBulkActionBar();
+    }
+
+    function assignSelected() {
+      const selected = TableSelection.getSelectedIds();
+      if (selected.length === 0) return;
+      Notifications.show(`${selected.length} tickets assigned to you`, 'success');
+      TableSelection.selectedIds.clear();
+      TableSelection.updateBulkActionBar();
+    }
+
+    function updatePriority() {
+      const selected = TableSelection.getSelectedIds();
+      if (selected.length === 0) return;
+      Notifications.show(`Priority updated for ${selected.length} tickets`, 'info');
+      TableSelection.selectedIds.clear();
+      TableSelection.updateBulkActionBar();
+    }
+
+    function closeSelected() {
+      const selected = TableSelection.getSelectedIds();
+      if (selected.length === 0) return;
+      Notifications.show(`${selected.length} tickets closed`, 'success');
+      selected.forEach(id => {
+        const row = document.querySelector(`tr[data-id="${id}"]`);
+        if (row) row.remove();
+      });
+      TableSelection.selectedIds.clear();
+      TableSelection.updateBulkActionBar();
+    }
+  </script>
+</body>
+</html>
