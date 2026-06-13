@@ -4,7 +4,7 @@ load helpers
 
 TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report ddd-interview-questions bootstrap-sandbox.md.tmpl production-deploy.md.tmpl env-guide.md.tmpl operations-guide.md.tmpl package-matrix.md.tmpl package-slice-snippets.md.tmpl happy-path.md.tmpl user-manual-index.md.tmpl seed-data-guide.md.tmpl docs-index.md.tmpl)
 
-@test "all 16 templates exist" {
+@test "all 16 markdown templates and the Attio workspace HTML template exist" {
     for t in "${TEMPLATES[@]}"; do
         if [[ "$t" == *.tmpl ]]; then
             [ -f "templates/${t}" ] || { echo "missing templates/${t}"; return 1; }
@@ -12,6 +12,19 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
             [ -f "templates/${t}.md" ] || { echo "missing templates/${t}.md"; return 1; }
         fi
     done
+    [ -f templates/attio-crm-workspace.html ] || { echo "missing templates/attio-crm-workspace.html"; return 1; }
+}
+
+@test "Attio workspace template contains reusable CRM component primitives" {
+    grep -q "Attio CRM Workspace Template" templates/attio-crm-workspace.html
+    grep -q "data-component=\"attio-shell\"" templates/attio-crm-workspace.html
+    grep -q "data-component=\"attio-sidebar\"" templates/attio-crm-workspace.html
+    grep -q "data-component=\"attio-command-bar\"" templates/attio-crm-workspace.html
+    grep -q "data-component=\"attio-metric-strip\"" templates/attio-crm-workspace.html
+    grep -q "data-component=\"attio-record-table\"" templates/attio-crm-workspace.html
+    grep -q "data-component=\"attio-agent-activity\"" templates/attio-crm-workspace.html
+    grep -q -- "--attio-surface" templates/attio-crm-workspace.html
+    grep -q -- "--attio-card-radius" templates/attio-crm-workspace.html
 }
 
 @test "package slice snippets cover package-specific implementation slices" {
@@ -28,7 +41,7 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "handoff" templates/happy-path.md.tmpl
     grep -q "Codex CLI" templates/happy-path.md.tmpl
     grep -q "Laravel Cloud" templates/happy-path.md.tmpl
-    grep -q "http://31.220.79.31:<port>" templates/happy-path.md.tmpl
+    grep -q "http://sandbox.example.com:<port>" templates/happy-path.md.tmpl
     grep -q "127.0.0.1" templates/happy-path.md.tmpl
 }
 
@@ -185,6 +198,9 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
 
 @test "package matrix template covers Laravel ecosystem package propagation" {
     grep -q "Filament" templates/package-matrix.md.tmpl
+    grep -q "policy-app pattern" templates/package-matrix.md.tmpl
+    grep -q "admin routes share the main app shell" templates/package-matrix.md.tmpl
+    grep -q "shared-layout visual parity across roles" templates/package-matrix.md.tmpl
     grep -q "Sanctum" templates/package-matrix.md.tmpl
     grep -q "Fortify" templates/package-matrix.md.tmpl
     grep -q "Horizon" templates/package-matrix.md.tmpl
@@ -195,4 +211,11 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
     grep -q "Octane" templates/package-matrix.md.tmpl
     grep -q "Reverb" templates/package-matrix.md.tmpl
     grep -q "tenancy" templates/package-matrix.md.tmpl
+}
+
+@test "Filament slice snippet requires shared app layout for admin menus" {
+    grep -q "Filament Resource slice" templates/package-slice-snippets.md.tmpl
+    grep -q "policy-app pattern" templates/package-slice-snippets.md.tmpl
+    grep -q "admin routes share the main app shell" templates/package-slice-snippets.md.tmpl
+    grep -q "Do not create a separate-looking admin layout" templates/package-slice-snippets.md.tmpl
 }

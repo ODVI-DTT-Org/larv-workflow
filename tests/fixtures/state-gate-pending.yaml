@@ -13,14 +13,13 @@ plugin:
     masterplan: "0.0.0"
     superpowers-laravel: "0.0.0"
     domain-driven-design: "0.0.0"
-    huashu-design: "0.0.0"
   learnings_digest_hash: "abc1234"
 phase:
   current: 0
   last_completed: -1
   gates_pending: [0]
 gates:
-  - { phase: -1, passed_at: "2026-05-04T10:05:00Z", approved_by: itranario@oakdriveventures.com }
+  - { phase: -1, passed_at: "2026-05-04T10:05:00Z", approved_by: maintainers@example.org }
 slices:
   total: 0
   status: {}

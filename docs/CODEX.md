@@ -17,7 +17,7 @@ Codex reads `.agents/plugins/marketplace.json`, which points to `./plugins/larv`
 Codex CLI 0.125.0 does not expose local marketplace `commands/*.md` files as visible slash-menu entries in the same way Claude Code does. The compatible Codex entry points are installed as a skill namespace instead:
 
 ```bash
-ln -sfn /home/claude-team/kaito/workflow/codex-skills ~/.agents/skills/larv
+ln -sfn <larv-plugin-root>/codex-skills ~/.agents/skills/larv
 ```
 
 After restarting Codex, prompts such as `/larv:full`, `/larv:status`, and `/larv:resume` are model-visible skill triggers. They may not appear in the slash-command picker, but typing them in chat invokes the matching `larv:*` skill.

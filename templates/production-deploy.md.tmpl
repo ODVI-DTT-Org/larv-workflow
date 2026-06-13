@@ -80,7 +80,7 @@ Then confirm the selected organization, application, and environment before runn
 Ask the user to create an API token in Laravel Cloud organization settings, then export it outside git:
 
 ```bash
-export LARAVEL_CLOUD_API_TOKEN="..."
+# export LARAVEL_CLOUD_API_TOKEN=<set outside git>
 ```
 
 Before using it, verify it is present without printing it:
@@ -105,8 +105,8 @@ curl -fsS \
 Default DNS mode is guide-only. For Namecheap API automation, ask the user to export credentials outside git:
 
 ```bash
-export NAMECHEAP_API_USER="..."
-export NAMECHEAP_API_KEY="..."
+# export NAMECHEAP_API_USER=<set outside git>
+# export NAMECHEAP_API_KEY=<set outside git>
 export NAMECHEAP_USERNAME="${NAMECHEAP_API_USER}"
 export NAMECHEAP_CLIENT_IP="<whitelisted-public-ipv4>"
 ```

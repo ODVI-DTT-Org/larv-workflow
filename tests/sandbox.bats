@@ -14,13 +14,13 @@ project:
   name: Goal OS
   slug: goal-os
 sandbox:
-  app_url: http://31.220.79.31:9101
+  app_url: http://sandbox.example.com:9101
   database:
     name: larv_goal_os
 YAML
-    printf "http://31.220.79.31:9101\n" > "$TMP_PROJECT/docs/larv/07-runtime/sandbox-url.txt"
-    printf "http://31.220.79.31:9501\n" > "$TMP_PROJECT/docs/larv/docsite-url.txt"
-    printf "http://31.220.79.31:9401\n" > "$TMP_PROJECT/docs/larv/03-design/mockup-url.txt"
+    printf "http://sandbox.example.com:9101\n" > "$TMP_PROJECT/docs/larv/07-runtime/sandbox-url.txt"
+    printf "http://sandbox.example.com:9501\n" > "$TMP_PROJECT/docs/larv/docsite-url.txt"
+    printf "http://sandbox.example.com:9401\n" > "$TMP_PROJECT/docs/larv/03-design/mockup-url.txt"
     cat > "$TMP_PROJECT/docs/user-manual/seed-data.md" <<'MD'
 # Seed Data
 
@@ -57,9 +57,9 @@ SH
     PATH="$bin:$PATH" run bash scripts/sandbox.sh "$TMP_PROJECT" info
     [ "$status" -eq 0 ]
     grep -q "Larv sandbox for Goal OS (goal-os)" <<<"$output"
-    grep -q "App:.*http://31.220.79.31:9101.*ready" <<<"$output"
-    grep -q "Docs:.*http://31.220.79.31:9501.*ready" <<<"$output"
-    grep -q "Mockups:.*http://31.220.79.31:9401.*ready" <<<"$output"
+    grep -q "App:.*http://sandbox.example.com:9101.*ready" <<<"$output"
+    grep -q "Docs:.*http://sandbox.example.com:9501.*ready" <<<"$output"
+    grep -q "Mockups:.*http://sandbox.example.com:9401.*ready" <<<"$output"
     grep -q "Source: docs/user-manual/seed-data.md" <<<"$output"
     grep -q "sarah@example.test" <<<"$output"
     grep -q "docs/user-manual/testing/slice-01.md" <<<"$output"
@@ -80,7 +80,7 @@ SH
 
     PATH="$bin:$PATH" run bash scripts/sandbox.sh "$TMP_PROJECT" info
     [ "$status" -ne 0 ]
-    grep -q "Docs:.*http://31.220.79.31:9501.*down" <<<"$output"
+    grep -q "Docs:.*http://sandbox.example.com:9501.*down" <<<"$output"
     grep -q "Run /larv:sandbox-start" <<<"$output"
 }
 
@@ -188,8 +188,8 @@ SH
     grep -q "WARN: recorded docs port 9501" <<<"$output"
     grep -q "APP_PORT=8000 SESSION=larv-app-goal-os-8000" "$BATS_TEST_TMPDIR/deploy.log"
     ! grep -q "new-session" "$log"
-    grep -q "http://31.220.79.31:8000/" "$TMP_PROJECT/docs/larv/07-runtime/sandbox-url.txt"
-    grep -q "http://31.220.79.31:9500/" "$TMP_PROJECT/docs/larv/docsite-url.txt"
+    grep -q "http://sandbox.example.com:8000/" "$TMP_PROJECT/docs/larv/07-runtime/sandbox-url.txt"
+    grep -q "http://sandbox.example.com:9500/" "$TMP_PROJECT/docs/larv/docsite-url.txt"
     grep -q "slug=goal-os" "$LARV_SANDBOX_OWNER_DIR/app/8000"
     grep -q "session=larv-docsite-goal-os-9500" "$LARV_SANDBOX_OWNER_DIR/docs/9500"
 }
@@ -240,9 +240,9 @@ SH
         run bash scripts/sandbox.sh "$TMP_PROJECT" start
     [ "$status" -eq 0 ]
     grep -q "APP_PORT=8123 SESSION=larv-app-goal-os-8123" "$BATS_TEST_TMPDIR/requested-deploy.log"
-    grep -q "http://31.220.79.31:8123/" "$TMP_PROJECT/docs/larv/07-runtime/sandbox-url.txt"
-    grep -q "http://31.220.79.31:9567/" "$TMP_PROJECT/docs/larv/docsite-url.txt"
-    grep -q "http://31.220.79.31:9123/" "$TMP_PROJECT/docs/larv/03-design/mockup-url.txt"
+    grep -q "http://sandbox.example.com:8123/" "$TMP_PROJECT/docs/larv/07-runtime/sandbox-url.txt"
+    grep -q "http://sandbox.example.com:9567/" "$TMP_PROJECT/docs/larv/docsite-url.txt"
+    grep -q "http://sandbox.example.com:9123/" "$TMP_PROJECT/docs/larv/03-design/mockup-url.txt"
     grep -q "port=8123" "$LARV_SANDBOX_OWNER_DIR/app/8123"
     grep -q "port=9567" "$LARV_SANDBOX_OWNER_DIR/docs/9567"
     grep -q "port=9123" "$LARV_SANDBOX_OWNER_DIR/mockups/9123"

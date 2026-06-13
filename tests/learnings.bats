@@ -18,7 +18,8 @@ load helpers
     done
 }
 
-@test "LEARNINGS.md initial state has no real entries just structure" {
-    run grep -cE "^- " LEARNINGS.md
-    [ "$output" -le 5 ]
+@test "LEARNINGS.md contains curated plugin learning entries" {
+    run grep -cE "^(- \\[plugin\\]|\\[plugin\\])" LEARNINGS.md
+    [ "$status" -eq 0 ]
+    [ "$output" -ge 1 ]
 }

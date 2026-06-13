@@ -9,7 +9,6 @@ Bundle versions:
 - masterplan: {{ver}}
 - superpowers-laravel: {{ver}}
 - domain-driven-design: {{ver}}
-- huashu-design: {{ver}}
 
 Estimated budget: ~{{minutes}} min, ~${{cost}}
 Cap policy: {{cap-policy}}

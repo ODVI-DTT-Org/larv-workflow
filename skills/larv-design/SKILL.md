@@ -1,15 +1,16 @@
 ---
 name: larv-design
-description: Phase 3 - design recommendation memo, user browses getdesign.md in their own browser to pick >=3 designs, agent fetches picks, mockup server renders this app's screens in each picked style, user converges on one design, brand spec finalized.
+description: Phase 3 - design recommendation memo, user chooses from Attio-first recommendations or a specific direction, mockup server renders interactive HTML Effectiveness mockups for this app's screens, user converges on one design, brand spec finalized.
 ---
 
 # larv-design
 
-Help the user pick a visual design and finalize a brand spec. The user does the taste work in their own browser; the agent does the grounding work and serves a comparison harness for the user's actual screens.
+Help the user pick a visual design and finalize a brand spec. The user does the taste work in their own browser; the agent does the grounding work and serves a comparison harness for the user's actual screens. For any visual brainstorm, design template recommendation, or mockup template selection, use the bundled Attio Venture HTML Effectiveness gallery (`attio-venture-html-effectiveness/`, alias of `attio-venture-html-effectiveness-design/`) as the primary design reference and single source of truth unless the user explicitly chooses Attio Finance or another supplied direction. Phase 3 mockups are interactive Attio Venture HTML Effectiveness prototypes, not static screenshots or plain page comps.
 
 ## Inputs
 
 - `docs/larv/00-discuss/product-brief.md`
+- `docs/larv/00-discuss/design-preferences.md`
 - `docs/larv/01-domain/*.md`
 - `docs/larv/02-architecture/c4-*.md`
 
@@ -17,28 +18,69 @@ Help the user pick a visual design and finalize a brand spec. The user does the 
 
 ### 1. Frame the design ask
 
-Read inputs above. Write a one-paragraph design brief and confirm with the user.
+Read inputs above, including the Phase 0 design preference. Write a one-paragraph design brief and confirm with the user. If `docs/larv/00-discuss/design-preferences.md` says `mode: agent-recommendations`, start from that saved preference instead of asking whether recommendations are wanted again. If it says `mode: user-specified`, restate the saved style/template/brand direction and ask only if it is ambiguous. If it says `mode: decide-later` or the file is missing, ask the normal design preference question in Step 2.
 
 ### 2. Recommendation memo (the agent's job)
 
-Write `docs/larv/03-design/recommendations.md` with four sections:
+First honor `docs/larv/00-discuss/design-preferences.md`. If Phase 0 already captured `agent-recommendations`, write recommendations without re-asking this choice. If Phase 0 captured `user-specified`, write a decision memo around the saved direction. Only if Phase 0 captured `decide-later` or no usable preference exists, ask the user whether they want agent recommendations based on the PRD/domain docs or whether they already have a specific direction. Use this prompt:
+
+> "For the visual direction, do you want me to recommend designs based on your idea/PRD, or do you already have a specific style/template in mind? My default recommendation will start with the Attio workspace design, then apply the Attio Venture HTML Effectiveness reference (`attio-venture-html-effectiveness/`) unless Attio Finance or another direction is a better fit."
+
+If the user wants recommendations, write `docs/larv/03-design/recommendations.md` with four sections:
 
 - **Archetype call** - e.g., "B2B SaaS, admin-heavy, table-dense, multi-tenant. Audience: ops teams." (cite the brief)
 - **Look for** - concrete criteria for evaluation: "good empty states (your invite flow shows these often)", "table density treatments that don't break at 50 rows"
 - **Avoid** - opposites with reasons: "skip playful/whimsical (B2B audience, billing scope)"
-- **Starting points on getdesign.md** - 3-5 specific page URLs that match the archetype, plus 2-3 search keywords. Flag each as a starting point only.
+- **Starting points** - always put `templates/attio-crm-workspace.html` first as "Attio workspace baseline", then put `attio-venture-html-effectiveness/` as the primary HTML Effectiveness implementation reference, then add Attio Finance or other user-specified/local templates only when the domain fit is stronger. Include the recommended Design Choice System variant and a one-line reason each. Flag each as a starting point only.
 
-### 3. User browses on their own
+If the user already has a specific style/template in mind, still write `recommendations.md`, but make it a short decision memo that records their direction and shows how it compares to the default Attio workspace baseline.
+
+### Bundled Design Choice System
+
+The plugin ships local Attio/Attio Venture HTML Effectiveness galleries that can be used for larv docs preview mockups, new-app design templates, and visual brainstorm recommendations. These local galleries replace external design browsing during Phase 3.
+
+Default to `templates/attio-crm-workspace.html` as the first recommendation for every Phase 3 design selection. It is the Attio workspace baseline and contains reusable primitives for the shell, sidebar, command bar, metric strip, record table, and agent activity rail. Use `attio-venture-html-effectiveness/` as the canonical Attio Venture HTML Effectiveness design reference for generated mockups, and use Attio Finance only when its financial-services fit is stronger or the user chooses it.
+
+| Variant | Brand fit | Palette | Gallery path |
+|---|---|---|---|
+| Custom | Custom projects that need a neutral Attio-aligned starting point | Purple gradient, `#667eea` to `#764ba2` | Available through each gallery's `setup.html` Design Choice System |
+| Attio Finance | Financial services, credit, lending, banking, collections, payment, and risk workflows | Gold `#FAA000` plus blue `#1B5E7F` | `attio-finance-html-effectiveness-design/` |
+| Attio Venture | Venture capital, investment, growth, founder, portfolio, advisory, and default B2B SaaS workflows | Brown `#9B6632` plus tan `#ECCDAE` | `attio-venture-html-effectiveness/` (alias of `attio-venture-html-effectiveness-design/`) |
+
+Each gallery contains 23 self-contained templates with a shared Attio design language: restrained surfaces, dense but readable app layouts, tight component states, subtle borders, disciplined spacing, and brand-specific tokens layered over the same structure. Prefer these references when the app archetype matches their domain, when the user asks for a faster mockup path, or when a local visual representation is useful. Especially consider:
+
+- `21-credit-officer-crm.html` for loan, credit, approval, underwriting, and risk dashboards.
+- `22-sales-crm.html` for sales pipeline, business development, investor relations, partner, and deal-flow dashboards.
+- `23-service-crm.html` for support, servicing, customer success, ticket queue, and SLA workflows.
+- `05-design-system.html` and `06-component-variants.html` for brand token and component inventory references.
+- `02-exploration-visual-designs.html`, `07-prototype-animation.html`, and `08-prototype-interaction.html` for visual brainstorm and interaction mockup directions.
+
+When these galleries are used, copy or adapt the relevant HTML/CSS/JavaScript patterns into `docs/larv/03-design/mockups/<pick-slug>/`. For Attio Venture mockups, record `source_path: attio-venture-html-effectiveness/<template-file>` even though the filesystem alias points to `attio-venture-html-effectiveness-design/`. Do not serve mockups directly from the plugin gallery directory; generated project mockups must still live under `docs/larv/03-design/mockups/` and pass the normal mockup server gate.
+
+Every generated mockup set must preserve product branding in two places:
+
+- **App logo:** visible inside the app shell, header, sidebar, login, or equivalent primary navigation area. Use the selected project logo if the user provided one; otherwise adapt the selected gallery logo (`attio-venture-logo.png` from `attio-venture-html-effectiveness/` or `attio-finance-logo.png`) or create a simple text/mark lockup for custom/Attio projects.
+- **URL logo:** browser favicon links in every generated HTML mockup: `<link rel="icon" type="image/png" href="...">` and `<link rel="apple-touch-icon" href="...">`. The favicon asset must resolve from the served mockup directory, not from a plugin-only absolute path.
+
+### 3. User chooses a direction
 
 Print:
 
-> "Open https://getdesign.md/ in your browser, use the suggestions in `docs/larv/03-design/recommendations.md` as starting points, and come back with **at least 3 picks** (URLs or slugs). Reply `picked: <urls>` when ready, or `more recommendations` if my suggestions don't fit."
+> "My first recommendation is the Attio workspace baseline: `templates/attio-crm-workspace.html`, implemented with the Attio Venture HTML Effectiveness reference at `attio-venture-html-effectiveness/`. I also listed any relevant Attio Finance or user-specified options in `docs/larv/03-design/recommendations.md`. Choose one direction with `pick: <path-or-slug>`, ask for `attio plus recommendations`, or tell me a specific style/template you want instead."
 
-Do NOT WebFetch yet.
+Do not force the user to pick three designs. One chosen direction is enough to continue. Do not require any external inspiration site during Phase 3. Local gallery picks are read from the plugin repo only after the user selects them.
 
 ### 4. Agent fetches and confirms picks
 
-When the user replies, WebFetch each pick's `.md` from getdesign.md and cache at `docs/larv/03-design/picks/<slug>.md` with frontmatter (`source_url`, `fetched_at`, `attribution`). Print a confirmation table summarizing each pick.
+When the user replies, resolve the selected direction:
+
+- `pick: templates/attio-crm-workspace.html` or any Attio baseline slug: use the Attio workspace baseline.
+- `attio plus recommendations`: generate an Attio baseline pick plus the Attio Venture HTML Effectiveness reference and 1-3 domain-relevant Attio Finance/custom recommendations, then ask the user to choose one.
+- `pick: attio-venture-html-effectiveness/<file>` or `pick: attio-venture-html-effectiveness-design/<file>`: read the Attio Venture selected HTML file and record the pick using the `attio-venture-html-effectiveness/<file>` source path.
+- `pick: attio-finance-html-effectiveness-design/<file>`: read that selected HTML file.
+- A specific style/template in free text: summarize the direction and ask only if the source is ambiguous.
+
+For each selected direction, write a short extracted summary at `docs/larv/03-design/picks/<slug>.md`, and include frontmatter with `source_path` when a local file exists, `gallery_variant`, `template_count` when applicable, `attio_unified: true`, and `attribution`. Print a confirmation table summarizing the selected direction(s).
 
 ### 5. Ask for and allocate mockup port
 
@@ -85,13 +127,27 @@ if ! static_server_open_firewall "$ssh_target" "$mockup_port"; then
 fi
 ```
 
-### 6. Huashu generates mockups
+### 6. Generate Attio-style mockups
 
-Read and follow the bundled `huashu-design` skill for each pick (`bundle/huashu-design/SKILL.md`). Render 5-7 key screens per pick at `docs/larv/03-design/mockups/<pick-slug>/<screen>.html`.
+Render 5-7 key screens per pick at `docs/larv/03-design/mockups/<pick-slug>/<screen>.html` using the bundled Attio-style galleries and `templates/attio-crm-workspace.html` as reference material.
 
-The mockups must be high-fidelity product screens for this app's actual domain, not generic landing pages. Each mockup set must include realistic navigation, dense states, representative data, and the primary workflows from the domain docs.
+The mockups must be high-fidelity, interactive Attio Venture HTML Effectiveness product prototypes for this app's actual domain, not generic landing pages, static screenshots, or disconnected page comps. Each mockup set must include realistic navigation, dense states, representative data, and the primary workflows from the domain docs.
 
-**Feasibility fallback (per spec section 9.1 step 6):** if huashu cannot sustain consistency across all picks x screens, degrade to one mockup per pick (hero/dashboard only). Record the decision in `docs/larv/03-design/recommendations.md`.
+Use the Attio Venture HTML Effectiveness templates in `attio-venture-html-effectiveness/` as the concrete structure, interaction, and visual vocabulary source unless the user explicitly selected Attio Finance or another supplied design. Preserve useful density, tables, toolbars, filters, cards, badges, forms, modals, CRM interaction patterns, sidebar/header navigation, tabs, command bars, drawers, empty states, and hover/focus states, but rewrite labels, records, routes, and workflow states for the current app's domain. The Design Choice System variant selected for the mockup must be recorded in `design-decision.md` and reflected in `brand-spec.md`.
+
+Each mockup set must include:
+
+- `index.html` as a clickable navigation harness that links to every screen in the set and names the main workflow paths.
+- Working `<a href="...">` navigation between screens. Primary sidebar/header/menu links must not be dead placeholders.
+- Clickable primary actions for the app's core workflows. Use either real links to another mockup screen or small JavaScript interactions for tabs, filters, modals, drawers, row selection, status changes, form state, and toast/empty/loading/error states.
+- Route-like file names that correspond to planned app routes where possible, so `visual-implementation-contract.md` can map production routes to exact HTML files.
+- A short `interaction-map.md` listing each role, start screen, clickable path, expected end screen/state, and which HTML files implement the path.
+
+Do not accept static-only mockups. If a screen contains a primary action, navigation item, tab, filter, or row action, it must either navigate or visibly change state in the prototype.
+
+If the selected direction is Attio Venture or Attio Finance, copy the relevant logo asset into the mockup output and wire it as both the visible app logo and the favicon/URL logo. If the selected direction is Attio/custom and no logo exists, create a lightweight project wordmark or mark in the mockup assets and use that same asset consistently for the app shell and favicon.
+
+**Feasibility fallback (per spec section 9.1 step 6):** if the selected visual direction cannot sustain consistency across all picks x screens, degrade to one interactive mockup per pick (dashboard plus at least one clickable workflow path). Record the decision in `docs/larv/03-design/recommendations.md`. Do not degrade to static images or non-clickable HTML.
 
 ### 7. Mockup server (probe-before-announce)
 
@@ -146,6 +202,11 @@ echo "Mockups ready at $mockup_url"
 The mockup server is not optional. Do not proceed to brand finalization, `design-decision.md`, `brand-spec.md`, `ui-design.md`, auto-commit, or `status: complete` until all of these are true:
 
 - At least one HTML mockup exists under `docs/larv/03-design/mockups/`.
+- The mockups are explicitly based on the Attio Venture HTML Effectiveness reference (`attio-venture-html-effectiveness/`) unless the user chose Attio Finance or another supplied direction, and include `index.html` as a clickable navigation harness.
+- `docs/larv/03-design/mockups/<pick-slug>/interaction-map.md` exists for every pick and lists role/workflow click paths.
+- Every primary navigation item, primary action, tab, filter, modal trigger, and row action in the mockups either links to another mockup HTML file or visibly changes state with JavaScript.
+- A click-through smoke check was performed on the served mockup URL for the main workflow paths; broken links, dead primary actions, and disconnected screens were fixed before user review.
+- Every served HTML mockup includes a visible app logo and browser URL logo links (`rel="icon"` and `rel="apple-touch-icon"`) whose assets resolve from the mockup directory.
 - The user was asked for the mockup port before allocation/exposure. If they provided a port, it was verified before use; otherwise `mockup_port` was allocated through `allocate_port mockup "$slug"`.
 - `mockup_port` was recorded as `mockup-port` in `STATE.yaml.execution.allocations`.
 - `verify_allocation "$mockup_port" mockup "$slug"` succeeded immediately before server start.
@@ -171,13 +232,13 @@ errors_unresolved:
 
 ### 8. User picks one (or hybrid)
 
-User replies in chat: `pick: <slug>` or `hybrid: <slug-A> layout + <slug-B> palette`. If hybrid, regenerate via huashu and re-probe; iterate until the user commits with a single slug.
+User replies in chat: `pick: <slug>` or `hybrid: <slug-A> layout + <slug-B> palette`. If hybrid, regenerate the mockups from the selected local references and re-probe; iterate until the user commits with a single slug.
 
 Record decision at `docs/larv/03-design/design-decision.md` with rationale (free-text from the user; the picks not chosen and why if the user volunteered).
 
 ### 9. Finalize brand spec
 
-Read and follow `bundle/huashu-design/SKILL.md` with the chosen pick only. Outputs:
+Finalize the chosen local design direction. Outputs:
 
 - `docs/larv/03-design/brand-spec.md`
 - `docs/larv/03-design/ui-design.md`
@@ -186,11 +247,13 @@ Read and follow `bundle/huashu-design/SKILL.md` with the chosen pick only. Outpu
 `visual-implementation-contract.md` is mandatory. It is the bridge from mockups to production implementation and must include:
 
 - chosen mockup path(s) and the exact screens each app route should match
+- app logo and favicon/URL logo asset paths, including the final Laravel implementation location and required Blade/Inertia/Filament `<link rel="icon">` and `<link rel="apple-touch-icon">` tags
+- interaction-map path and interaction parity requirements: navigation links, role-specific entry points, primary actions, tabs, filters, modals/drawers, row actions, loading/empty/error states, and expected end states
 - typography scale, font choices, color tokens, spacing, radius, borders, shadows, and icon rules
 - layout shell requirements: navigation, sidebar/header behavior, max widths, density, empty/loading/error states
 - component inventory: buttons, cards, tables, forms, filters, badges, charts, modals, toasts, and their visual states
 - implementation notes for Laravel Blade/Livewire/Inertia/Filament as applicable
-- route-to-mockup parity matrix with columns: route, viewport, reference mockup file, required seeded state, screenshot output path, pass/fail criteria
+- route-to-mockup parity matrix with columns: route, viewport, reference mockup file, required seeded state, required interactions, screenshot output path, pass/fail criteria
 - screenshot parity checklist for desktop and mobile. The expectation is same visual output as the chosen mockups: same layout composition, typography hierarchy, color system, spacing rhythm, component styling, interaction states, and populated-data feel. Small differences are allowed only for real framework constraints, dynamic content, or accessibility fixes, and must be documented.
 - forbidden generic defaults, including unstyled starter pages, default Tailwind gray panels, oversized marketing heroes for app dashboards, and placeholder-only empty screens
 
@@ -207,9 +270,10 @@ safe_commit_docs "[larv] phase 3: design approved (pick=$(grep -oE 'pick: [^ ]+'
 
 ## What you do not do
 
-- Do not WebFetch from getdesign.md before the user provides explicit picks.
+- Do not ask the user to browse external inspiration sites during Phase 3.
+- Do not create static-only mockups, screenshot boards, or disconnected HTML pages. Mockups must be interactive, clickable, navigable Attio Venture HTML Effectiveness prototypes unless the user explicitly selected Attio Finance or another supplied design.
 - Do not announce the mockup URL until both inside and outside probes succeed.
-- Do not announce `127.0.0.1` or `localhost`; always print the external URL `http://31.220.79.31:<port>/`.
+- Do not announce `127.0.0.1` or `localhost`; always print the external URL `http://sandbox.example.com:<port>/`.
 - Do not pick the design for the user. Provide recommendations, never decisions.
 - Do not mark Phase 3 complete without a probe-confirmed `mockup_url`.
 - Do not mark Phase 3 complete without `docs/larv/03-design/visual-implementation-contract.md`.
@@ -218,11 +282,12 @@ safe_commit_docs "[larv] phase 3: design approved (pick=$(grep -oE 'pick: [^ ]+'
 
 ```yaml
 status: complete
-mockup_url: "http://31.220.79.31:<port>/"
+mockup_url: "http://sandbox.example.com:<port>/"
 files_written:
   - docs/larv/03-design/recommendations.md
   - docs/larv/03-design/picks/<slug>.md  # one per pick
   - docs/larv/03-design/mockups/<slug>/...
+  - docs/larv/03-design/mockups/<slug>/interaction-map.md
   - docs/larv/03-design/mockup-url.txt
   - docs/larv/03-design/design-decision.md
   - docs/larv/03-design/brand-spec.md

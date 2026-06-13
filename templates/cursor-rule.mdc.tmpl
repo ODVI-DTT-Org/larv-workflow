@@ -11,3 +11,13 @@ Runtime mode is local on the sandbox VM. Do not SSH to `{{vm_host}}` for the nor
 Probe-before-announce: never claim a service is running until curl confirms it. Append a tracker entry to `docs/larv/implementation-tracker.yaml` after every change.
 
 Code conventions: Pint formatting, Pest tests, Larastan static analysis. Use the canonical ubiquitous-language terms from `docs/larv/01-domain/ubiquitous-language.md`.
+
+## Model switch starter prompt
+
+Before continuing in a new AI tool or fresh session, switch to the user's preferred model. If no preference was given, use the strongest coding model available in this tool for long-context Laravel implementation.
+
+Starter prompt:
+
+```text
+You are continuing a larv-managed Laravel implementation in this same repository. Do not rely on previous chat context. Start by reading DOCS.md, docs/Handsoff.md, docs/larv/STATE.yaml, docs/larv/implementation-tracker.yaml if present, and the latest docs/larv/08-implementation/reports/. If docs/larv/07-runtime/sandbox-url.txt is missing, run docs/Handsoff/bootstrap-sandbox.md before app code edits. Find the first incomplete slice in STATE, open the matching docs/Handsoff/slice-NN-<name>.md, execute its instructions, run required Laravel/frontend commands yourself, restart/probe the sandbox when needed, and report the public URL plus the testing guide path. Do not SSH; this session is already inside the VM.
+```

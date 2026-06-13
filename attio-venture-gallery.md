@@ -1,0 +1,180 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e4]:
+      - img "Attio Venture Logo" [ref=e5]
+      - generic [ref=e6]:
+        - generic [ref=e7]: Attio Venture
+        - generic [ref=e8]: Ventures
+  - generic [ref=e9]:
+    - generic [ref=e10]: ✨ Design System Examples
+    - heading "The unreasonable effectiveness of HTML" [level=1] [ref=e11]
+    - paragraph [ref=e12]: A comprehensive gallery of production-ready HTML examples adapted to Attio Venture's design system. Each example is self-contained, requires no build steps, and demonstrates modern UI patterns.
+  - generic [ref=e13]:
+    - heading "🔍 Exploration" [level=2] [ref=e14]
+    - generic [ref=e15]:
+      - link "💻 Code Approaches Compare different technical implementations with side-by-side analysis. Interactive Comparison" [ref=e16] [cursor=pointer]:
+        - /url: 01-exploration-code-approaches.html
+        - generic [ref=e17]: 💻
+        - generic [ref=e18]: Code Approaches
+        - generic [ref=e19]: Compare different technical implementations with side-by-side analysis.
+        - generic [ref=e20]: Interactive Comparison
+      - link "🎨 Visual Designs Explore design variations and layout approaches. Design Variants" [ref=e21] [cursor=pointer]:
+        - /url: 02-exploration-visual-designs.html
+        - generic [ref=e22]: 🎨
+        - generic [ref=e23]: Visual Designs
+        - generic [ref=e24]: Explore design variations and layout approaches.
+        - generic [ref=e25]: Design Variants
+  - generic [ref=e26]:
+    - heading "💻 Code & Analysis" [level=2] [ref=e27]
+    - generic [ref=e28]:
+      - link "👀 Code Review (PR) Collaborative pull request review with inline comments. Development Workflow" [ref=e29] [cursor=pointer]:
+        - /url: 03-code-review-pr.html
+        - generic [ref=e30]: 👀
+        - generic [ref=e31]: Code Review (PR)
+        - generic [ref=e32]: Collaborative pull request review with inline comments.
+        - generic [ref=e33]: Development Workflow
+      - link "📚 Code Understanding Visual documentation with interactive source code browser. Documentation" [ref=e34] [cursor=pointer]:
+        - /url: 04-code-understanding.html
+        - generic [ref=e35]: 📚
+        - generic [ref=e36]: Code Understanding
+        - generic [ref=e37]: Visual documentation with interactive source code browser.
+        - generic [ref=e38]: Documentation
+      - link "🎯 Design System Design system reference with components and tokens. Brand Guidelines" [ref=e39] [cursor=pointer]:
+        - /url: 05-design-system.html
+        - generic [ref=e40]: 🎯
+        - generic [ref=e41]: Design System
+        - generic [ref=e42]: Design system reference with components and tokens.
+        - generic [ref=e43]: Brand Guidelines
+      - link "🧩 Component Variants Interactive showcase of UI components in different states. Component Library" [ref=e44] [cursor=pointer]:
+        - /url: 06-component-variants.html
+        - generic [ref=e45]: 🧩
+        - generic [ref=e46]: Component Variants
+        - generic [ref=e47]: Interactive showcase of UI components in different states.
+        - generic [ref=e48]: Component Library
+  - generic [ref=e49]:
+    - heading "🚀 Prototyping" [level=2] [ref=e50]
+    - generic [ref=e51]:
+      - link "✨ Animation Prototype Smooth transitions and animations for user flows. Motion Design" [ref=e52] [cursor=pointer]:
+        - /url: 07-prototype-animation.html
+        - generic [ref=e53]: ✨
+        - generic [ref=e54]: Animation Prototype
+        - generic [ref=e55]: Smooth transitions and animations for user flows.
+        - generic [ref=e56]: Motion Design
+      - link "🎮 Interaction Prototype Interactive dashboard with real-time metrics and filtering. User Interaction" [ref=e57] [cursor=pointer]:
+        - /url: 08-prototype-interaction.html
+        - generic [ref=e58]: 🎮
+        - generic [ref=e59]: Interaction Prototype
+        - generic [ref=e60]: Interactive dashboard with real-time metrics and filtering.
+        - generic [ref=e61]: User Interaction
+  - generic [ref=e62]:
+    - heading "📢 Communication" [level=2] [ref=e63]
+    - generic [ref=e64]:
+      - link "📊 Slide Deck Presentation template for business reviews and strategy. Presentation" [ref=e65] [cursor=pointer]:
+        - /url: 09-slide-deck.html
+        - generic [ref=e66]: 📊
+        - generic [ref=e67]: Slide Deck
+        - generic [ref=e68]: Presentation template for business reviews and strategy.
+        - generic [ref=e69]: Presentation
+      - link "📈 Status Report Weekly progress report with KPIs and metrics. Reporting" [ref=e70] [cursor=pointer]:
+        - /url: 11-status-report.html
+        - generic [ref=e71]: 📈
+        - generic [ref=e72]: Status Report
+        - generic [ref=e73]: Weekly progress report with KPIs and metrics.
+        - generic [ref=e74]: Reporting
+      - link "⚠️ Incident Report Structured documentation with timeline and remediation. Crisis Management" [ref=e75] [cursor=pointer]:
+        - /url: 12-incident-report.html
+        - generic [ref=e76]: ⚠️
+        - generic [ref=e77]: Incident Report
+        - generic [ref=e78]: Structured documentation with timeline and remediation.
+        - generic [ref=e79]: Crisis Management
+      - link "📝 PR Writeup Comprehensive pull request documentation. Development Docs" [ref=e80] [cursor=pointer]:
+        - /url: 17-pr-writeup.html
+        - generic [ref=e81]: 📝
+        - generic [ref=e82]: PR Writeup
+        - generic [ref=e83]: Comprehensive pull request documentation.
+        - generic [ref=e84]: Development Docs
+  - generic [ref=e85]:
+    - heading "📊 Diagrams & Research" [level=2] [ref=e86]
+    - generic [ref=e87]:
+      - link "🎨 SVG Illustrations Custom vector graphics and illustrations. Visual Assets" [ref=e88] [cursor=pointer]:
+        - /url: 10-svg-illustrations.html
+        - generic [ref=e89]: 🎨
+        - generic [ref=e90]: SVG Illustrations
+        - generic [ref=e91]: Custom vector graphics and illustrations.
+        - generic [ref=e92]: Visual Assets
+      - link "🔀 Flowchart Diagram Process flow visualization. Process Mapping" [ref=e93] [cursor=pointer]:
+        - /url: 13-flowchart-diagram.html
+        - generic [ref=e94]: 🔀
+        - generic [ref=e95]: Flowchart Diagram
+        - generic [ref=e96]: Process flow visualization.
+        - generic [ref=e97]: Process Mapping
+      - link "💡 Feature Explainer In-depth feature documentation with use cases. Product Research" [ref=e98] [cursor=pointer]:
+        - /url: 14-research-feature-explainer.html
+        - generic [ref=e99]: 💡
+        - generic [ref=e100]: Feature Explainer
+        - generic [ref=e101]: In-depth feature documentation with use cases.
+        - generic [ref=e102]: Product Research
+      - link "🧠 Concept Explainer Educational guide on complex concepts. Thought Leadership" [ref=e103] [cursor=pointer]:
+        - /url: 15-research-concept-explainer.html
+        - generic [ref=e104]: 🧠
+        - generic [ref=e105]: Concept Explainer
+        - generic [ref=e106]: Educational guide on complex concepts.
+        - generic [ref=e107]: Thought Leadership
+  - generic [ref=e108]:
+    - heading "📋 Planning & Implementation" [level=2] [ref=e109]
+    - link "🗓️ Implementation Plan Detailed project roadmap with phases and milestones. Project Management" [ref=e111] [cursor=pointer]:
+      - /url: 16-implementation-plan.html
+      - generic [ref=e112]: 🗓️
+      - generic [ref=e113]: Implementation Plan
+      - generic [ref=e114]: Detailed project roadmap with phases and milestones.
+      - generic [ref=e115]: Project Management
+  - generic [ref=e116]:
+    - heading "💼 CRM & Business Applications" [level=2] [ref=e117]
+    - generic [ref=e118]:
+      - link "🏦 Credit Officer Dashboard Loan management with credit scoring and risk assessment. Financial Services" [ref=e119] [cursor=pointer]:
+        - /url: 21-credit-officer-crm.html
+        - generic [ref=e120]: 🏦
+        - generic [ref=e121]: Credit Officer Dashboard
+        - generic [ref=e122]: Loan management with credit scoring and risk assessment.
+        - generic [ref=e123]: Financial Services
+      - link "📊 Sales Pipeline Deal management with kanban pipeline and forecasting. Sales Management" [ref=e124] [cursor=pointer]:
+        - /url: 22-sales-crm.html
+        - generic [ref=e125]: 📊
+        - generic [ref=e126]: Sales Pipeline
+        - generic [ref=e127]: Deal management with kanban pipeline and forecasting.
+        - generic [ref=e128]: Sales Management
+      - link "🎧 Customer Support Portal Support ticket queue with SLA tracking. Customer Service" [ref=e129] [cursor=pointer]:
+        - /url: 23-service-crm.html
+        - generic [ref=e130]: 🎧
+        - generic [ref=e131]: Customer Support Portal
+        - generic [ref=e132]: Support ticket queue with SLA tracking.
+        - generic [ref=e133]: Customer Service
+  - generic [ref=e134]:
+    - heading "✏️ Custom Editors & Tools" [level=2] [ref=e135]
+    - generic [ref=e136]:
+      - link "📋 Triage Board Drag-and-drop interface for managing issues. Workflow Tool" [ref=e137] [cursor=pointer]:
+        - /url: 18-editor-triage-board.html
+        - generic [ref=e138]: 📋
+        - generic [ref=e139]: Triage Board
+        - generic [ref=e140]: Drag-and-drop interface for managing issues.
+        - generic [ref=e141]: Workflow Tool
+      - link "🚩 Feature Flags Visual feature flag management dashboard. DevOps Tool" [ref=e142] [cursor=pointer]:
+        - /url: 19-editor-feature-flags.html
+        - generic [ref=e143]: 🚩
+        - generic [ref=e144]: Feature Flags
+        - generic [ref=e145]: Visual feature flag management dashboard.
+        - generic [ref=e146]: DevOps Tool
+      - link "🎚️ Prompt Tuner Interactive AI prompt optimizer. AI Tool" [ref=e147] [cursor=pointer]:
+        - /url: 20-editor-prompt-tuner.html
+        - generic [ref=e148]: 🎚️
+        - generic [ref=e149]: Prompt Tuner
+        - generic [ref=e150]: Interactive AI prompt optimizer.
+        - generic [ref=e151]: AI Tool
+  - contentinfo [ref=e152]:
+    - paragraph [ref=e153]:
+      - strong [ref=e154]: Attio Venture HTML Effectiveness
+      - text: — Adapted from
+      - link "html-effectiveness" [ref=e155] [cursor=pointer]:
+        - /url: https://github.com/ThariqS/html-effectiveness
+    - paragraph [ref=e156]: Combining Attio's design philosophy with Attio Venture's brand. All examples are self-contained, require no build steps, and demonstrate modern HTML/CSS/JS patterns.
+    - paragraph [ref=e157]: Licensed under Apache 2.0 · Built for Attio Venture Studio

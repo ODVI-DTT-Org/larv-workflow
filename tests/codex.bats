@@ -12,7 +12,7 @@ load helpers
     run jq -r '.name' .codex-plugin/plugin.json
     [ "$output" = "larv" ]
     run jq -r '.skills' .codex-plugin/plugin.json
-    [ "$output" = "./skills/" ]
+    [ "$output" = "./codex-skills/" ]
     run jq -r '.commands' .codex-plugin/plugin.json
     [ "$output" = "./commands/" ]
 }
@@ -31,7 +31,7 @@ load helpers
     run jq empty .agents/plugins/marketplace.json
     [ "$status" -eq 0 ]
     run jq -r '.plugins[] | select(.name == "larv") | .source.path' .agents/plugins/marketplace.json
-    [ "$output" = "./plugins/larv" ]
+    [ "$output" = "./" ]
 }
 
 @test "Codex local marketplace entry includes required policies" {
@@ -52,7 +52,7 @@ load helpers
 }
 
 @test "Codex skill namespace exposes larv slash command equivalents" {
-    for skill in full status resume adopt brainstorm feature debug learn sandbox sandbox-start sandbox-stop sandbox-reset; do
+    for skill in full status resume adopt brainstorm feature debug learn sandbox sandbox-start sandbox-stop sandbox-reset presentation redesign-attio-finance redesign-attio-venture feature-how-it-works feature-feedback feature-onboarding-helper; do
         [ -f "codex-skills/${skill}/SKILL.md" ] || { echo "missing codex-skills/${skill}/SKILL.md"; return 1; }
     done
     run grep -F "/larv:full" codex-skills/full/SKILL.md
@@ -62,5 +62,19 @@ load helpers
     run grep -F "sandbox.sh" codex-skills/sandbox-start/SKILL.md
     [ "$status" -eq 0 ]
     run grep -F "LARV_APP_PORT" codex-skills/sandbox-start/SKILL.md
+    [ "$status" -eq 0 ]
+    run grep -F "/larv:presentation" codex-skills/presentation/SKILL.md
+    [ "$status" -eq 0 ]
+    run grep -F "presentation.sh" codex-skills/presentation/SKILL.md
+    [ "$status" -eq 0 ]
+    run grep -F "/larv:redesign-attio-finance" codex-skills/redesign-attio-finance/SKILL.md
+    [ "$status" -eq 0 ]
+    run grep -F "/larv:redesign-attio-venture" codex-skills/redesign-attio-venture/SKILL.md
+    [ "$status" -eq 0 ]
+    run grep -F "/larv-feature-how-it-works" codex-skills/feature-how-it-works/SKILL.md
+    [ "$status" -eq 0 ]
+    run grep -F "/larv-feature-feedback" codex-skills/feature-feedback/SKILL.md
+    [ "$status" -eq 0 ]
+    run grep -F "/larv-feature-onboarding-helper" codex-skills/feature-onboarding-helper/SKILL.md
     [ "$status" -eq 0 ]
 }

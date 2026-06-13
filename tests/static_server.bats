@@ -18,7 +18,7 @@ setup() {
 @test "static_server_url returns http url with VM host and port" {
     run bash -c "source $PROJECT_ROOT/scripts/lib/vm.sh && source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_url 8001"
     [ "$status" -eq 0 ]
-    [ "$output" = "http://31.220.79.31:8001" ]
+    [ "$output" = "http://sandbox.example.com:8001" ]
 }
 
 @test "static_server_compose_command rejects empty arguments" {

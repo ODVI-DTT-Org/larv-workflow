@@ -1,9 +1,9 @@
 {
-  "name": "larv-local",
-  "description": "Local marketplace for the larv Laravel workflow plugin",
+  "name": "larv",
+  "description": "Marketplace metadata for the larv Laravel workflow plugin",
   "owner": {
-    "name": "your-org",
-    "email": "itranario@oakdriveventures.com"
+    "name": "larv-workflow",
+    "email": "maintainers@example.org"
   },
   "plugins": [
     {
@@ -12,8 +12,8 @@
       "version": "0.4.29",
       "source": "./",
       "author": {
-        "name": "your-org",
-        "email": "itranario@oakdriveventures.com"
+        "name": "larv-workflow",
+        "email": "maintainers@example.org"
       }
     }
   ]

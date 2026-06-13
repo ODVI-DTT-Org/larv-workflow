@@ -68,7 +68,7 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
     [ -f .codex/AGENTS.md ]
     [ -f docs/larv/implementation-tracker.yaml ]
 
-    grep -q "31.220.79.31" docs/Handsoff.md
+    grep -q "sandbox.example.com" docs/Handsoff.md
     grep -q "9001" docs/Handsoff.md
     ! grep -q "8001" docs/Handsoff.md
     ! grep -q "larv_todo_app_2026_05" docs/Handsoff.md

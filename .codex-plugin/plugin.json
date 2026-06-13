@@ -1,15 +1,15 @@
 {
   "name": "larv",
   "version": "0.4.29",
-  "description": "AI-driven Laravel app development plugin orchestrating masterplan, superpowers-laravel, domain-driven-design, and huashu-design into an end-to-end workflow.",
+  "description": "AI-driven Laravel app development plugin orchestrating masterplan, superpowers-laravel, and domain-driven-design into an end-to-end workflow.",
   "author": {
-    "name": "your-org",
-    "email": "itranario@oakdriveventures.com",
-    "url": "https://github.com/your-org/larv"
+    "name": "larv-workflow",
+    "email": "maintainers@example.org",
+    "url": "https://github.com/larv-workflow/larv"
   },
-  "homepage": "https://github.com/your-org/larv",
-  "repository": "https://github.com/your-org/larv",
-  "license": "UNLICENSED",
+  "homepage": "https://github.com/larv-workflow/larv",
+  "repository": "https://github.com/larv-workflow/larv",
+  "license": "MIT",
   "keywords": [
     "laravel",
     "codex",
@@ -18,22 +18,22 @@
     "workflow",
     "plugin"
   ],
-  "skills": "./skills/",
+  "skills": "./codex-skills/",
   "commands": "./commands/",
   "interface": {
     "displayName": "larv",
     "shortDescription": "End-to-end Laravel app workflow for Codex and Claude Code.",
     "longDescription": "larv orchestrates brainstorm, domain modeling, architecture, design, tests, premortem, implementation slices, sandbox deployment, final verification, and learning loops for Laravel applications.",
-    "developerName": "your-org",
+    "developerName": "larv-workflow",
     "category": "Coding",
     "capabilities": [
       "Code",
       "Plan",
       "Verify"
     ],
-    "websiteURL": "https://github.com/your-org/larv",
-    "privacyPolicyURL": "https://github.com/your-org/larv",
-    "termsOfServiceURL": "https://github.com/your-org/larv",
+    "websiteURL": "https://github.com/larv-workflow/larv",
+    "privacyPolicyURL": "https://github.com/larv-workflow/larv",
+    "termsOfServiceURL": "https://github.com/larv-workflow/larv",
     "defaultPrompt": [
       "Use larv to plan a new Laravel app.",
       "Run larv status for this project.",

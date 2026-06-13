@@ -13,7 +13,7 @@ Use this guide to turn Phase 0 package choices into implementation, tests, envir
 
 | Package area | If selected, implementation must include | Tests must include | Env/deploy notes |
 |---|---|---|---|
-| Filament | Panels, Resources, Relation Managers, table filters, actions, policies, widgets when useful | resource authorization, form validation, table filters/actions, policy coverage | admin route/domain, staff roles, production asset build |
+| Filament | Panels, Resources, Relation Managers, table filters, actions, policies, widgets when useful. Prefer the policy-app pattern: admin routes share the main app shell/layout/sidebar and admin-only menus/resources/actions are shown or hidden by authorization, not by a separate-looking admin app. | resource authorization, form validation, table filters/actions, policy coverage, shared-layout visual parity across roles | admin route/domain, staff roles, production asset build, shared theme/layout tokens |
 | Nova | Resources, lenses, actions, policies | resource authorization, action tests, lens/query behavior | license/secrets if applicable |
 | Sanctum | API tokens or SPA auth, middleware, token abilities if used | authenticated/unauthenticated API feature tests, ability checks | session/cors config when SPA |
 | Fortify | login, registration, password reset, email verification if selected | auth flow feature tests, throttling, password reset | mail provider required for reset/verification |

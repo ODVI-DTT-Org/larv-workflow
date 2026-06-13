@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="attio-venture-logo.png">
+  <link rel="apple-touch-icon" href="attio-venture-logo.png">
+  <title>Sales Dashboard — Attio Finance CRM</title>
+  <link rel="stylesheet" href="design-system.css">
+  <link rel="stylesheet" href="crm-shared-styles.css">
+  <style>
+    .header {
+      padding: var(--space-24) 0;
+      border-bottom: var(--border-light);
+      background: linear-gradient(135deg, #FFFBF0 0%, #FFFEF9 100%);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-24);
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 var(--space-24);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-12);
+    }
+
+    .logo img {
+      height: 40px;
+      width: auto;
+      border-radius: var(--radius-md);
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-text .org {
+      font-size: 12px;
+      color: var(--gray-600);
+    }
+
+    .logo-text .app {
+      font-weight: 700;
+      color: var(--attio-finance-primary);
+      font-size: 14px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-24);
+    }
+
+    .search-box {
+      width: 280px;
+      padding: var(--space-12) var(--space-16);
+      border: var(--border-light);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      background: var(--white);
+    }
+
+    .nav-item {
+      padding: var(--space-12) var(--space-16);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      color: var(--gray-700);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .nav-item:hover {
+      background: var(--gray-100);
+      color: var(--attio-finance-primary);
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin: 0 0 var(--space-8) 0;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--gray-600);
+      margin: 0;
+    }
+
+    .deal-card {
+      background: var(--white);
+      border: var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: var(--space-16);
+      margin-bottom: var(--space-12);
+      transition: all var(--transition-base);
+      cursor: pointer;
+    }
+
+    .deal-card:hover {
+      border-color: var(--attio-finance-primary);
+      box-shadow: var(--shadow-md);
+    }
+
+    .deal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--space-8);
+    }
+
+    .deal-name {
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    .deal-amount {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--attio-finance-primary);
+    }
+
+    .deal-company {
+      font-size: 13px;
+      color: var(--gray-600);
+      margin-bottom: var(--space-8);
+    }
+
+    .deal-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--gray-500);
+    }
+
+    .pipeline-column {
+      background: var(--gray-50);
+      border-radius: var(--radius-lg);
+      padding: var(--space-16);
+      min-height: 400px;
+    }
+
+    .pipeline-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gray-900);
+      margin-bottom: var(--space-16);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pipeline-count {
+      font-size: 12px;
+      background: var(--attio-finance-primary);
+      color: white;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+    }
+
+    .stage-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--space-16);
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-16);
+      margin-bottom: var(--space-24);
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <img src="attio-venture-logo.png" alt="Attio Finance Logo">
+        <div class="logo-text">
+          <div class="org">Attio Venture</div>
+          <div class="app">Sales Dashboard</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <input type="text" class="search-box" placeholder="Search deals...">
+        <div class="nav-item">Notifications</div>
+        <div class="nav-item">Settings</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="crm-container">
+    <!-- Sidebar -->
+    <aside class="crm-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Forecasting</div>
+        <div class="metric-card">
+          <div class="metric-label">Total Pipeline Value</div>
+          <div class="metric-value">$2.8M</div>
+          <div class="metric-subtext">20 active deals</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Win Rate</div>
+          <div class="metric-value">68%</div>
+          <div class="metric-subtext">30-day average</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Avg Deal Size</div>
+          <div class="metric-value">$140K</div>
+          <div class="metric-subtext">Across all stages</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Sales Performance</div>
+        <div class="metric-card">
+          <div class="metric-label">Q2 Revenue</div>
+          <div class="metric-value">$1.9M</div>
+          <div class="metric-subtext">+18% vs Q1</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Closed This Month</div>
+          <div class="metric-value">12</div>
+          <div class="metric-subtext">$420K funded</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="crm-main">
+      <div>
+        <h1 class="page-title">Sales Pipeline</h1>
+        <p class="page-subtitle">Manage deals across all stages</p>
+      </div>
+
+      <!-- Forecasting Metrics -->
+      <div class="metric-row" style="margin-top: var(--space-24); margin-bottom: var(--space-24);">
+        <div class="card">
+          <div class="card-title">Prospecting Stage</div>
+          <div style="font-size: 24px; font-weight: 700; color: var(--attio-finance-primary); margin-bottom: var(--space-8);">$450K</div>
+          <div class="card-description">4 deals</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Qualification Stage</div>
+          <div style="font-size: 24px; font-weight: 700; color: var(--attio-finance-primary); margin-bottom: var(--space-8);">$520K</div>
+          <div class="card-description">5 deals</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Negotiation Stage</div>
+          <div style="font-size: 24px; font-weight: 700; color: var(--attio-finance-primary); margin-bottom: var(--space-8);">$680K</div>
+          <div class="card-description">6 deals</div>
+        </div>
+      </div>
+
+      <!-- Pipeline Kanban -->
+      <div style="overflow-x: auto;">
+        <div class="stage-grid" style="min-width: 1400px;">
+          <!-- Prospecting -->
+          <div class="pipeline-column">
+            <div class="pipeline-title">
+              Prospecting
+              <span class="pipeline-count">4</span>
+            </div>
+            <div class="deal-card" onclick="CRMModal.open('deal-modal-1')">
+              <div class="deal-header">
+                <div class="deal-name">Tech Startup A</div>
+                <div class="deal-amount">$120K</div>
+              </div>
+              <div class="deal-company">TechFlow Solutions</div>
+              <div class="deal-meta">
+                <span>Account: $5.2M ARR</span>
+                <span>3 days old</span>
+              </div>
+            </div>
+            <div class="deal-card" onclick="CRMModal.open('deal-modal-2')">
+              <div class="deal-header">
+                <div class="deal-name">Retail Chain B</div>
+                <div class="deal-amount">$95K</div>
+              </div>
+              <div class="deal-company">Fashion Plus Stores</div>
+              <div class="deal-meta">
+                <span>Account: $8.1M ARR</span>
+                <span>1 day old</span>
+              </div>
+            </div>
+            <div class="deal-card" onclick="CRMModal.open('deal-modal-3')">
+              <div class="deal-header">
+                <div class="deal-name">Manufacturing Firm C</div>
+                <div class="deal-amount">$235K</div>
+              </div>
+              <div class="deal-company">Precision Industrial</div>
+              <div class="deal-meta">
+                <span>Account: $12.3M ARR</span>
+                <span>5 days old</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Qualification -->
+          <div class="pipeline-column">
+            <div class="pipeline-title">
+              Qualification
+              <span class="pipeline-count">5</span>
+            </div>
+            <div class="deal-card" onclick="CRMModal.open('deal-modal-4')">
+              <div class="deal-header">
+                <div class="deal-name">Healthcare Provider D</div>
+                <div class="deal-amount">$180K</div>
+              </div>
+              <div class="deal-company">MediCare Systems</div>
+              <div class="deal-meta">
+                <span>Probability: 40%</span>
+                <span>10 days in stage</span>
+              </div>
+            </div>
+            <div class="deal-card" onclick="CRMModal.open('deal-modal-5')">
+              <div class="deal-header">
+                <div class="deal-name">Financial Services E</div>
+                <div class="deal-amount">$220K</div>
+              </div>
+              <div class="deal-company">CapitalEdge Finance</div>
+              <div class="deal-meta">
+                <span>Probability: 45%</span>
+                <span>8 days in stage</span>
+              </div>
+            </div>
+            <div class="deal-card" onclick="CRMModal.open('deal-modal-6')">
+              <div class="deal-header">
+                <div class="deal-name">Energy Company F</div>
+                <div class="deal-amount">$120K</div>
+              </div>
+              <div class="deal-company">GreenPower Corp</div>
+              <div class="deal-meta">
+                <span>Probability: 35%</span>
+                <span>15 days in stage</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Proposal -->
+          <div class="pipeline-column">
+            <div class="pipeline-title">
+              Proposal
+              <span class="pipeline-count">3</span>
+            </div>
+            <div class="deal-card" onclick="CRMModal.open('deal-modal-7')">
+              <div class="deal-header">
+                <div class="deal-name">Insurance Agency G</div>
+                <div class="deal-amount">$165K</div>
+              </div>
+              <div class="deal-company">Alliance Insurance</div>
+              <div class="deal-meta">
+                <span>Probability: 60%</span>
+                <span>Sent 3 days ago</span>
+              </div>
+            </div>
+            <div class="deal-card" onclick="CRMModal.open('deal-modal-8')">
+              <div class="deal-header">
+                <div class="deal-name">Tech Consulting H</div>
+                <div class="deal-amount">$205K</div>
+              </div>
+              <div class="deal-company">Digital Nexus Ltd</div>
+              <div class="deal-meta">
+                <span>Probability: 65%</span>
+                <span>Sent 1 day ago</span>
+              </div>
+            </div>
+            <div class="deal-card" onclick="CRMModal.open('deal-modal-9')">
+              <div class="deal-header">
+                <div class="deal-name">Real Estate Developer I</div>
+                <div class="deal-amount">$310K</div>
+              </div>
+              <div class="deal-company">Prime Construction</div>
+              <div class="deal-meta">
+                <span>Probability: 70%</span>
+                <span>Sent 2 days ago</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Negotiation -->
+          <div class="pipeline-column">
+            <div class="pipeline-title">
+              Negotiation
+              <span class="pipeline-count">4</span>
+            </div>
+            <div class="deal-card" onclick="CRMModal.open('deal-modal-10')">
+              <div class="deal-header">
+                <div class="deal-name">Logistics Company J</div>
+                <div class="deal-amount">$275K</div>
+              </div>
+              <div class="deal-company">ShipFast International</div>
+              <div class="deal-meta">
+                <span>Probability: 75%</span>
+                <span>Negotiating 5 days</span>
+              </div>
+            </div>
+            <div class="deal-card" onclick="CRMModal.open('deal-modal-11')">
+              <div class="deal-header">
+                <div class="deal-name">Publishing House K</div>
+                <div class="deal-amount">$145K</div>
+              </div>
+              <div class="deal-company">MediaPress Group</div>
+              <div class="deal-meta">
+                <span>Probability: 80%</span>
+                <span>Negotiating 3 days</span>
+              </div>
+            </div>
+            <div class="deal-card" onclick="CRMModal.open('deal-modal-12')">
+              <div class="deal-header">
+                <div class="deal-name">Telecommunications L</div>
+                <div class="deal-amount">$385K</div>
+              </div>
+              <div class="deal-company">NetConnect Solutions</div>
+              <div class="deal-meta">
+                <span>Probability: 82%</span>
+                <span>Negotiating 7 days</span>
+              </div>
+            </div>
+            <div class="deal-card" onclick="CRMModal.open('deal-modal-13')">
+              <div class="deal-header">
+                <div class="deal-name">Automotive Supplier M</div>
+                <div class="deal-amount">$220K</div>
+              </div>
+              <div class="deal-company">EngineFirst Parts</div>
+              <div class="deal-meta">
+                <span>Probability: 78%</span>
+                <span>Negotiating 6 days</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Closed/Won -->
+          <div class="pipeline-column">
+            <div class="pipeline-title">
+              Closed/Won
+              <span class="pipeline-count">4</span>
+            </div>
+            <div class="deal-card" style="background: rgba(16, 185, 129, 0.05);" onclick="CRMModal.open('deal-modal-14')">
+              <div class="deal-header">
+                <div class="deal-name">Pharma Research N</div>
+                <div class="deal-amount">$425K</div>
+              </div>
+              <div class="deal-company">BioMed Innovations</div>
+              <div class="deal-meta">
+                <span>✓ Closed Jan 15</span>
+                <span>Probability: 100%</span>
+              </div>
+            </div>
+            <div class="deal-card" style="background: rgba(16, 185, 129, 0.05);" onclick="CRMModal.open('deal-modal-15')">
+              <div class="deal-header">
+                <div class="deal-name">Education Network O</div>
+                <div class="deal-amount">$310K</div>
+              </div>
+              <div class="deal-company">Learning Plus</div>
+              <div class="deal-meta">
+                <span>✓ Closed Feb 8</span>
+                <span>Probability: 100%</span>
+              </div>
+            </div>
+            <div class="deal-card" style="background: rgba(16, 185, 129, 0.05);" onclick="CRMModal.open('deal-modal-16')">
+              <div class="deal-header">
+                <div class="deal-name">Hospitality Chain P</div>
+                <div class="deal-amount">$275K</div>
+              </div>
+              <div class="deal-company">Golden Hotels</div>
+              <div class="deal-meta">
+                <span>✓ Closed Mar 1</span>
+                <span>Probability: 100%</span>
+              </div>
+            </div>
+            <div class="deal-card" style="background: rgba(16, 185, 129, 0.05);" onclick="CRMModal.open('deal-modal-17')">
+              <div class="deal-header">
+                <div class="deal-name">Aerospace Supplier Q</div>
+                <div class="deal-amount">$490K</div>
+              </div>
+              <div class="deal-company">SkyTech Industries</div>
+              <div class="deal-meta">
+                <span>✓ Closed Mar 20</span>
+                <span>Probability: 100%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Deal Detail Modals -->
+  <div id="deal-modal-1" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Deal Details</h2>
+        <button class="modal-close" onclick="CRMModal.close('deal-modal-1')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <div class="modal-section-title">Deal Information</div>
+          <div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Tech Startup A</span></div>
+          <div class="modal-row"><span class="modal-label">Account</span><span class="modal-value">TechFlow Solutions</span></div>
+          <div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$120,000</span></div>
+          <div class="modal-row"><span class="modal-label">Stage</span><span class="modal-value">Prospecting</span></div>
+          <div class="modal-row"><span class="modal-label">Owner</span><span class="modal-value">Sarah Chen</span></div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">Activities</div>
+          <div class="modal-row"><span class="modal-label">Last Call</span><span class="modal-value">Mar 18 (2 days ago)</span></div>
+          <div class="modal-row"><span class="modal-label">Last Email</span><span class="modal-value">Mar 15 (5 days ago)</span></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-1')">Close</button>
+        <button class="btn btn-primary" onclick="moveDeal('deal-modal-1', 'qual')">Move to Qualification</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Abbreviated modals for other deals -->
+  <div id="deal-modal-2" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-2')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Retail Chain B</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$95,000</span></div><div class="modal-row"><span class="modal-label">Account</span><span class="modal-value">Fashion Plus Stores</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-2')">Close</button></div></div></div>
+
+  <div id="deal-modal-3" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-3')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Manufacturing Firm C</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$235,000</span></div><div class="modal-row"><span class="modal-label">Account</span><span class="modal-value">Precision Industrial</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-3')">Close</button></div></div></div>
+
+  <div id="deal-modal-4" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-4')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Healthcare Provider D</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$180,000</span></div><div class="modal-row"><span class="modal-label">Probability</span><span class="modal-value">40%</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-4')">Close</button></div></div></div>
+
+  <div id="deal-modal-5" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-5')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Financial Services E</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$220,000</span></div><div class="modal-row"><span class="modal-label">Probability</span><span class="modal-value">45%</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-5')">Close</button></div></div></div>
+
+  <div id="deal-modal-6" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-6')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Energy Company F</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$120,000</span></div><div class="modal-row"><span class="modal-label">Probability</span><span class="modal-value">35%</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-6')">Close</button></div></div></div>
+
+  <div id="deal-modal-7" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-7')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Insurance Agency G</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$165,000</span></div><div class="modal-row"><span class="modal-label">Probability</span><span class="modal-value">60%</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-7')">Close</button></div></div></div>
+
+  <div id="deal-modal-8" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-8')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Tech Consulting H</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$205,000</span></div><div class="modal-row"><span class="modal-label">Probability</span><span class="modal-value">65%</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-8')">Close</button></div></div></div>
+
+  <div id="deal-modal-9" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-9')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Real Estate Developer I</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$310,000</span></div><div class="modal-row"><span class="modal-label">Probability</span><span class="modal-value">70%</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-9')">Close</button></div></div></div>
+
+  <div id="deal-modal-10" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-10')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Logistics Company J</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$275,000</span></div><div class="modal-row"><span class="modal-label">Probability</span><span class="modal-value">75%</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-10')">Close</button></div></div></div>
+
+  <div id="deal-modal-11" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-11')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Publishing House K</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$145,000</span></div><div class="modal-row"><span class="modal-label">Probability</span><span class="modal-value">80%</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-11')">Close</button></div></div></div>
+
+  <div id="deal-modal-12" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-12')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Telecommunications L</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$385,000</span></div><div class="modal-row"><span class="modal-label">Probability</span><span class="modal-value">82%</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-12')">Close</button></div></div></div>
+
+  <div id="deal-modal-13" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-13')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Automotive Supplier M</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$220,000</span></div><div class="modal-row"><span class="modal-label">Probability</span><span class="modal-value">78%</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-13')">Close</button></div></div></div>
+
+  <div id="deal-modal-14" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-14')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Pharma Research N</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$425,000</span></div><div class="modal-row"><span class="modal-label">Status</span><span class="modal-value">✓ Closed</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-14')">Close</button></div></div></div>
+
+  <div id="deal-modal-15" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-15')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Education Network O</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$310,000</span></div><div class="modal-row"><span class="modal-label">Status</span><span class="modal-value">✓ Closed</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-15')">Close</button></div></div></div>
+
+  <div id="deal-modal-16" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-16')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Hospitality Chain P</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$275,000</span></div><div class="modal-row"><span class="modal-label">Status</span><span class="modal-value">✓ Closed</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-16')">Close</button></div></div></div>
+
+  <div id="deal-modal-17" class="modal"><div class="modal-content"><div class="modal-header"><h2>Deal Details</h2><button class="modal-close" onclick="CRMModal.close('deal-modal-17')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Deal Information</div><div class="modal-row"><span class="modal-label">Deal Name</span><span class="modal-value">Aerospace Supplier Q</span></div><div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$490,000</span></div><div class="modal-row"><span class="modal-label">Status</span><span class="modal-value">✓ Closed</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('deal-modal-17')">Close</button></div></div></div>
+
+  <script src="crm-shared.js"></script>
+  <script>
+    function moveDeal(modalId, stage) {
+      Notifications.show('Deal moved to next stage', 'success');
+      CRMModal.close(modalId);
+    }
+  </script>
+</body>
+</html>

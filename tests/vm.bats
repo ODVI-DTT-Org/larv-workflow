@@ -2,16 +2,16 @@
 
 load helpers
 
-@test "vm.sh exports LARV_VM_HOST as 31.220.79.31" {
+@test "vm.sh exports LARV_VM_HOST as sandbox.example.com" {
     run bash -c 'source scripts/lib/vm.sh && echo "$LARV_VM_HOST"'
     [ "$status" -eq 0 ]
-    [ "$output" = "31.220.79.31" ]
+    [ "$output" = "sandbox.example.com" ]
 }
 
 @test "vm.sh sets LARV_VM_HOST_SSH_USER to a non-empty string" {
     run bash -c 'source scripts/lib/vm.sh && echo "$LARV_VM_HOST_SSH_USER"'
     [ "$status" -eq 0 ]
-    [ "$output" = "claude-team" ]
+    [ "$output" = "larv-user" ]
 }
 
 @test "vm.sh defaults to local runtime mode" {

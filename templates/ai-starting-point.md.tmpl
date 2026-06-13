@@ -38,6 +38,8 @@ This project is managed by the **larv** Laravel workflow plugin. The full plan a
    - Update `STATE.yaml.slices.<slice-id>.status` (snippet in the slice handsoff).
    - Write the implementation report under `docs/larv/08-implementation/reports/`.
    - If UI changed, make it match `docs/larv/03-design/visual-implementation-contract.md` and the chosen mockups, save desktop/mobile screenshots under `docs/larv/08-implementation/screenshots/`, and record reference paths plus any approved deviations.
+   - Verify source code against the PRD/product brief and `docs/larv` plan. Fix missing features, contradictions, incomplete workflows, weak seed data, missing tests, and undocumented scope cuts before reporting completion.
+   - Keep one coherent app layout/design system for all roles. Prefer the policy-app pattern: admin routes use the same main app shell/layout/sidebar as normal routes, while admin menu groups/actions are conditionally visible by role. If Filament/admin features are used, admin resources and menus must be shown or hidden by authorization inside the shared layout, not implemented as a separate-looking admin app.
    - Write or update the per-slice guide in `docs/user-manual/testing/`.
    - Update `docs/user-manual/seed-data.md` with seeded records, test credentials for every role/persona needed for full-flow QA, reset commands, and test-data removal notes.
    - Do not add a navbar impersonation/user-switching UI unless the product requirements explicitly ask for one. Reviewers must use normal login with seeded credentials.
@@ -63,6 +65,23 @@ When opening a new AI session because context is high or the previous session en
 10. If all slices are complete, run verification or deployment depending on the user's request.
 
 If larv commands are available, `/larv:resume` can do the same state lookup for a managed project.
+
+## Model switch starter prompt
+
+Before continuing in a new AI tool or fresh session, switch to the user's preferred model. If no preference was given, use the strongest coding model available in this tool for long-context Laravel implementation.
+
+## Model split: planning vs execution
+
+- **Planning** (brainstorm, design, ADRs, slice writing, premortem, handoff generation, debugging hard architectural issues): use **Opus**. Planning needs the strongest reasoning.
+- **Execution** (implementing an already-written slice, running tests, applying lints, mechanical edits, doc updates, sandbox restarts, screenshot capture): use a **cheaper/faster model** — Sonnet, Haiku, or Codex CLI. Execution should burn the lighter model so Opus context stays available for the next planning pass.
+- When you (Opus) finish a planning artifact, hand it off explicitly: tell the user the next step is execution on Sonnet/Haiku/Codex and stop. Do not continue executing the slice yourself unless the user asks.
+- When you (Sonnet/Haiku/Codex) hit a real planning question — ambiguous slice, missing ADR, contradicting plan — stop and tell the user to switch back to Opus. Do not improvise plan-level decisions.
+
+Starter prompt:
+
+```text
+You are continuing a larv-managed Laravel implementation in this same repository. Do not rely on previous chat context. Start by reading DOCS.md, docs/Handsoff.md, docs/larv/STATE.yaml, docs/larv/implementation-tracker.yaml if present, and the latest docs/larv/08-implementation/reports/. If docs/larv/07-runtime/sandbox-url.txt is missing, run docs/Handsoff/bootstrap-sandbox.md before app code edits. Find the first incomplete slice in STATE, open the matching docs/Handsoff/slice-NN-<name>.md, execute its instructions, run required Laravel/frontend commands yourself, restart/probe the sandbox when needed, and report the public URL plus the testing guide path. Do not SSH; this session is already inside the VM.
+```
 
 ## New feature requests
 

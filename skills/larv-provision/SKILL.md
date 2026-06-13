@@ -36,7 +36,7 @@ Keep this skill only as a reference for the required invariants in the bootstrap
 - Update `STATE.yaml.execution.allocations`.
 - Update `STATE.yaml.sandbox.app_url` and `STATE.yaml.sandbox.status`.
 - Print the sandbox URL only after both probes pass.
-- Never SSH to `31.220.79.31` in the default flow; the AI is expected to already be running on that VM. Remote SSH is only for explicit `LARV_RUNTIME_MODE=remote` workflows.
+- Never SSH to `sandbox.example.com` in the default flow; the AI is expected to already be running on that VM. Remote SSH is only for explicit `LARV_RUNTIME_MODE=remote` workflows.
 
 ## What You Do Not Do
 

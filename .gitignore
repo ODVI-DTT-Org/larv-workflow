@@ -1,0 +1,38 @@
+.DS_Store
+
+# Local larv runtime state
+.larv/
+.superpowers/
+.playwright-mcp/
+
+# Local dependency/runtime caches
+node_modules/
+vendor/
+.venv/
+.venv-*/
+**/.venv/
+**/.venv-*/
+__pycache__/
+*.py[cod]
+
+# Logs and generated reports
+*.log
+logs/
+storage/logs/
+bootstrap/cache/
+
+# Secrets and local credentials
+.env
+.env.*
+!.env.example
+*id_rsa*
+*id_ed25519*
+*.pem
+*.key
+*credentials*
+*secret*
+
+# Nested repositories and generated gallery source checkouts
+**/.git/
+attio-finance-html-effectiveness-design/source/
+attio-venture-html-effectiveness-design/.git/

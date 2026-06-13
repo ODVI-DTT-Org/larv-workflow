@@ -17,7 +17,7 @@
       "matchManagers": ["regex"],
       "matchUpdateTypes": ["minor", "major"],
       "automerge": false,
-      "reviewers": ["@your-org/larv-maintainers"]
+      "reviewers": ["@larv-workflow/larv-maintainers"]
     }
   ],
   "regexManagers": [
@@ -25,7 +25,7 @@
       "fileMatch": ["^bundle/VERSIONS\\.yaml$"],
       "matchStrings": ["(?<depName>[a-z-]+):\\s+\"(?<currentValue>[0-9.]+)\""],
       "datasourceTemplate": "github-releases",
-      "lookupNameTemplate": "your-org/{{depName}}"
+      "lookupNameTemplate": "larv-workflow/{{depName}}"
     }
   ]
 }

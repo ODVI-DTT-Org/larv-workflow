@@ -28,9 +28,12 @@ teardown() { teardown_tmp_project "$TMP"; }
     [ "$status" -eq 0 ]
     [ -f "$TMP/docs/Handsoff.md" ]
     grep -q "Handsoff — my-app" "$TMP/docs/Handsoff.md"
-    grep -q "31.220.79.31" "$TMP/docs/Handsoff.md"
+    grep -q "sandbox.example.com" "$TMP/docs/Handsoff.md"
     grep -q "docs/larv/03-design/visual-implementation-contract.md" "$TMP/docs/Handsoff.md"
     grep -q "docs/larv/03-design/mockups/" "$TMP/docs/Handsoff.md"
+    grep -q "Model switch and starter prompt" "$TMP/docs/Handsoff.md"
+    grep -q "switch that tool to the user's preferred model" "$TMP/docs/Handsoff.md"
+    grep -q "You are continuing a larv-managed Laravel implementation" "$TMP/docs/Handsoff.md"
 }
 
 @test "handsoff_render_index inlines C4 content (does not link only)" {
@@ -58,6 +61,9 @@ teardown() { teardown_tmp_project "$TMP"; }
     grep -q "docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-slice-01.md" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "Visual implementation contract" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "docs/larv/03-design/visual-implementation-contract.md" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "interactive HTML Effectiveness prototypes" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "interaction-map.md" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "browser-click the same primary workflow paths" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "default Tailwind panels" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "visual source of truth" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "docs/larv/08-implementation/screenshots/slice-01/" "$TMP/docs/Handsoff/slice-01-auth.md"
@@ -66,8 +72,15 @@ teardown() { teardown_tmp_project "$TMP"; }
     grep -q "Visit every app page" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "Sign in with every seeded credential" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "Compare each UI route to its chosen mockup" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "Compare each UI workflow to its chosen mockup" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "Browser flow verification" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "Parity result: pass" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "Source-code parity and single-layout contract" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "PRD/product brief" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "policy-app pattern" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "admin views should extend the same main layout" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "Single-layout and Filament verification" "$TMP/docs/Handsoff/slice-01-auth.md"
+    grep -q "Source-code parity" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "Apply Laravel runtime changes" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "Do not ask the user to run migrations" "$TMP/docs/Handsoff/slice-01-auth.md"
     grep -q "php artisan migrate --force" "$TMP/docs/Handsoff/slice-01-auth.md"
@@ -211,6 +224,8 @@ EOF
         [ "$(wc -c < "$f")" -gt 500 ] || { echo "too small: $f"; return 1; }
         grep -q "docs/Handsoff.md" "$f" || { echo "missing handoff reference: $f"; return 1; }
         grep -q "bootstrap-sandbox.md" "$f" || { echo "missing bootstrap reference: $f"; return 1; }
+        grep -q "Model switch starter prompt" "$f" || { echo "missing model switch prompt: $f"; return 1; }
+        grep -q "You are continuing a larv-managed Laravel implementation" "$f" || { echo "missing starter prompt: $f"; return 1; }
     done
 }
 

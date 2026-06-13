@@ -18,7 +18,7 @@
 
 | File | Responsibility |
 |---|---|
-| `vm.sh` | Single source of truth for `LARV_VM_HOST=31.220.79.31` |
+| `vm.sh` | Single source of truth for `LARV_VM_HOST=sandbox.example.com` |
 | `probe.sh` | `probe_url_inside`, `probe_url_outside`, `probe_with_retries` per service profile |
 | `verifier.sh` | Live-scan ports/DBs/project-roots over SSH; allocate with auto-pick on conflict |
 | `git_safe.sh` | Default-branch detection, dirty-path guard, push-protected fallback to `larv/<slug>` |
@@ -75,10 +75,10 @@ Create `tests/vm.bats`:
 
 load helpers
 
-@test "vm.sh exports LARV_VM_HOST as 31.220.79.31" {
+@test "vm.sh exports LARV_VM_HOST as sandbox.example.com" {
     run bash -c 'source scripts/lib/vm.sh && echo "$LARV_VM_HOST"'
     [ "$status" -eq 0 ]
-    [ "$output" = "31.220.79.31" ]
+    [ "$output" = "sandbox.example.com" ]
 }
 
 @test "vm.sh sets LARV_VM_HOST_SSH_USER to a non-empty string" {
@@ -108,7 +108,7 @@ Create `scripts/lib/vm.sh`:
 # VM connection constants for larv. Single point of change for future
 # generalization (multi-VM support is out of scope for MVP).
 
-: "${LARV_VM_HOST:=31.220.79.31}"
+: "${LARV_VM_HOST:=sandbox.example.com}"
 : "${LARV_VM_HOST_SSH_USER:=larv}"
 : "${LARV_VM_PROJECT_ROOT:=/srv/larv}"
 
@@ -1422,7 +1422,7 @@ teardown() { teardown_tmp_project "$TMP"; }
     [ "$status" -eq 0 ]
     [ -f "$TMP/docs/Handsoff.md" ]
     grep -q "Handsoff — my-app" "$TMP/docs/Handsoff.md"
-    grep -q "31.220.79.31" "$TMP/docs/Handsoff.md"
+    grep -q "sandbox.example.com" "$TMP/docs/Handsoff.md"
 }
 
 @test "handsoff_render_index inlines C4 content (does not link only)" {
@@ -1518,7 +1518,7 @@ plugin_version=$plugin_version
 generated_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 git_sha=$git_sha
 git_default_branch=$git_default_branch
-vm_host=${LARV_VM_HOST:-31.220.79.31}
+vm_host=${LARV_VM_HOST:-sandbox.example.com}
 ssh_user=${LARV_VM_HOST_SSH_USER:-larv}
 app_port=${app_port:-TBD}
 mockup_port=${mockup_port:-TBD}
@@ -1601,7 +1601,7 @@ files_changed_yaml_array=
 related_adr_yaml_array=
 learnings_appended_bool=false
 seeded_email=admin@example.com
-seeded_password=password
+seeded_password=<generated-by-seeder>
 passed=
 total=
 EOF
@@ -2090,7 +2090,7 @@ files_written:
   - docs/larv/07-runtime/sandbox-runbook.md
 state_updates:
   execution.allocations: [...]
-  sandbox.app_url: "http://31.220.79.31:<port>"
+  sandbox.app_url: "http://sandbox.example.com:<port>"
   sandbox.status: provisioned
 plugin_improvement_notes: (none)
 ```
@@ -2588,7 +2588,7 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
     [ -f .codex/AGENTS.md ]
     [ -f docs/larv/implementation-tracker.yaml ]
 
-    grep -q "31.220.79.31" docs/Handsoff.md
+    grep -q "sandbox.example.com" docs/Handsoff.md
     grep -q "8001" docs/Handsoff.md
     grep -q "larv_todo_app_2026_05" docs/Handsoff.md
 
@@ -2683,7 +2683,7 @@ After the current entries, add:
 - **Implementation tracker**: `implementation-tracker.yaml` (canonical) + rendered `.md` view. Append protocol inlined in every slice handsoff.
 - **AI starting-point files**: `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `.cursor/rules/larv.mdc`, `.codex/AGENTS.md` — generated before the Phase 8 hard gate.
 - **/larv:feature** and **/larv:debug** preserve full discipline (gates, handsoff, tracker, starting-point regen).
-- **VM constant** `LARV_VM_HOST=31.220.79.31` isolated to `scripts/lib/vm.sh`.
+- **VM constant** `LARV_VM_HOST=sandbox.example.com` isolated to `scripts/lib/vm.sh`.
 
 Layer 2 (DDD interview, design picker, mockup server, doc-site, Discuss enrichment) is a separate plan.
 ```

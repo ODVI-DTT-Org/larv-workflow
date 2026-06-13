@@ -2,34 +2,58 @@
 
 This workflow contains two complete design system implementations based on the [html-effectiveness](https://github.com/ThariqS/html-effectiveness) repository, adapted to the Attio design philosophy.
 
+## Unified Attio Template Contract
+
+These galleries are the single source of truth for larv Phase 3 visual brainstorms, docs preview mockups, and new-app design templates. Do not send Phase 3 users to external design galleries; recommend local templates from this repository, then adapt the selected HTML into `docs/larv/03-design/mockups/`.
+
+The approved canonical component source is `templates/attio-crm-workspace.html`. Use it when a new app needs an Attio-style CRM/workspace shell before applying the canonical Attio Venture HTML Effectiveness reference (`attio-venture-html-effectiveness/`, alias of `attio-venture-html-effectiveness-design/`) or choosing a brand-specific Attio Finance or Custom variant.
+
+All three variants share the same Attio-style foundation:
+
+- Clean app-first surfaces with restrained contrast, not marketing-heavy pages
+- Dense but readable operational layouts for repeated developer and business workflows
+- Subtle borders, low shadows, 4-8px control/card radii, and predictable spacing
+- System typography, compact labels, clear tables, filters, badges, forms, modals, and toolbars
+- Brand tokens only change the accent layer; component structure and interaction density stay unified
+- Visible app logos in the product shell plus browser URL logo links through `rel="icon"` and `rel="apple-touch-icon"`
+
+The Design Choice System variants are:
+
+- **Custom** - neutral Attio layout with a purple gradient accent for unbranded/custom projects
+- **Attio Finance** - Attio layout with Attio Finance gold and blue for financial services workflows
+- **Attio Venture** - Attio layout with Attio Venture brown and tan for venture/investment workflows and the default Phase 3 mockup reference
+
 ## Projects
 
-### 1. PCNI HTML Effectiveness Design
-**Location:** `pcni-html-effectiveness-design/`
+### 1. Attio Finance HTML Effectiveness Design
+**Location:** `attio-finance-html-effectiveness-design/`
 
-Complete gallery with 23 self-contained HTML templates styled with PCNI's financial services branding:
+Complete gallery with 23 self-contained HTML templates styled with Attio Finance's financial services branding:
 - **Primary Color:** Gold (#FAA000)
 - **Accent Color:** Deep Blue (#1B5E7F)
+- **Logo:** `attio-finance-logo.png` is used as the in-app logo and favicon/URL logo
 - **Ideal for:** Financial services, credit, lending, banking mockups
 
 **Quick Start:**
 ```
-cd pcni-html-effectiveness-design
+cd attio-finance-html-effectiveness-design
 python -m http.server 8000
 # Open http://localhost:8000/setup.html
 ```
 
-### 2. Oak Drive HTML Effectiveness Design
-**Location:** `oak-drive-html-effectiveness-design/`
+### 2. Attio Venture HTML Effectiveness Design
+**Location:** `attio-venture-html-effectiveness-design/`
+**Canonical Phase 3 alias:** `attio-venture-html-effectiveness/`
 
-Parallel implementation with Oak Drive's venture/investment branding:
+Parallel implementation with Attio Venture's venture/investment branding:
 - **Primary Color:** Warm Brown (#9B6632)
 - **Accent Color:** Light Tan (#ECCDAE)
+- **Logo:** `attio-venture-logo.png` is used as the in-app logo and favicon/URL logo
 - **Ideal for:** Venture capital, investment, growth-focused mockups
 
 **Quick Start:**
 ```
-cd oak-drive-html-effectiveness-design
+cd attio-venture-html-effectiveness-design
 python -m http.server 8000
 # Open http://localhost:8000/setup.html
 ```
@@ -42,21 +66,21 @@ Both projects include a **Design System Chooser** that lets developers select be
 - Base gradient: #667eea → #764ba2
 - For custom branding projects
 
-### 2. **PCNI** (Gold + Blue)
+### 2. **Attio Finance** (Gold + Blue)
 - Primary: #FAA000 (Gold)
 - Accent: #1B5E7F (Deep Blue)
-- Perfect for PCNI templates and financial mockups
+- Perfect for Attio Finance templates and financial mockups
 
-### 3. **Oak Drive** (Brown + Tan)
+### 3. **Attio Venture** (Brown + Tan)
 - Primary: #9B6632 (Warm Brown)
 - Accent: #ECCDAE (Light Tan)
-- Perfect for Oak Drive templates and venture mockups
+- Perfect for Attio Venture templates and venture mockups
 
 ## Workflow
 
 ### First Visit
 1. Navigate to `setup.html` in either project
-2. Select your preferred design system (Custom, PCNI, or Oak Drive)
+2. Select your preferred design system (Custom, Attio Finance, or Attio Venture)
 3. System automatically redirects to `index.html` with your choice
 4. Choice is saved to browser localStorage
 
@@ -78,8 +102,8 @@ project-folder/
 ├── setup.html                    # Design system chooser (entry point)
 ├── index.html                    # Template gallery
 ├── design-system.css             # Attio design system with brand colors
-├── oak-drive-logo.png           # Brand asset (Oak Drive project only)
-├── pcni-logo.png                # Brand asset (PCNI project only)
+├── attio-venture-logo.png           # Brand asset (Attio Venture project only)
+├── attio-finance-logo.png                # Brand asset (Attio Finance project only)
 ├── crm-shared.js                # Shared CRM utilities
 ├── crm-shared-styles.css        # Shared CRM component styles
 │
@@ -158,6 +182,14 @@ To customize a template for your project:
 3. Styling comes from `design-system.css` — override with inline `<style>` if needed
 4. No build step required
 
+When adapting a template for larv Phase 3, preserve both brand placements:
+
+1. Keep a visible app logo in the shell, sidebar, header, login, or equivalent app chrome.
+2. Keep browser URL logo tags in every HTML mockup:
+   `<link rel="icon" type="image/png" href="...">` and `<link rel="apple-touch-icon" href="...">`.
+
+For Attio Venture mockups, cite the source as `attio-venture-html-effectiveness/<template-file>` in `docs/larv/03-design/picks/*.md`, `design-decision.md`, and `visual-implementation-contract.md`. The alias points to `attio-venture-html-effectiveness-design/`, but the mockup contract should use the Attio Venture name so implementation agents know which design system was approved.
+
 ## Development Server
 
 For development with live reload capabilities:
@@ -187,4 +219,4 @@ Licensed under Apache 2.0, adapted from [html-effectiveness](https://github.com/
 
 ---
 
-**Built for Oak Drive Ventures** — Combining Attio's design philosophy with brand-specific implementations.
+**Built for Attio Venture Studio** — Combining Attio's design philosophy with brand-specific implementations.

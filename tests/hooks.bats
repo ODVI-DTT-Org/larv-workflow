@@ -25,7 +25,7 @@ load helpers
     TMP="$(setup_tmp_project)"
     mkdir -p "$TMP/docs/Handsoff" "$TMP/docs/larv/07-runtime" "$TMP/app/Models"
     echo "# Handsoff" > "$TMP/docs/Handsoff.md"
-    echo "http://31.220.79.31:8001/" > "$TMP/docs/larv/07-runtime/sandbox-url.txt"
+    echo "http://sandbox.example.com:8001/" > "$TMP/docs/larv/07-runtime/sandbox-url.txt"
     run bash -c "cd '$TMP' && printf '%s\n' '{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"app/Models/Loan.php\"}}' | '$PROJECT_ROOT/hooks/guard-pre-tool.sh'"
     [ "$status" -eq 0 ]
     run bash -c "cd '$TMP' && printf '%s\n' '{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"docs/larv/notes.md\"}}' | '$PROJECT_ROOT/hooks/guard-pre-tool.sh'"
@@ -45,7 +45,7 @@ load helpers
     TMP="$(setup_tmp_project)"
     mkdir -p "$TMP/docs/Handsoff" "$TMP/docs/larv/07-runtime" "$TMP/app/Models"
     echo "# Handsoff" > "$TMP/docs/Handsoff.md"
-    echo "http://31.220.79.31:8001/" > "$TMP/docs/larv/07-runtime/sandbox-url.txt"
+    echo "http://sandbox.example.com:8001/" > "$TMP/docs/larv/07-runtime/sandbox-url.txt"
     run bash -c "cd '$TMP' && printf '%s\n' '{\"tool_name\":\"Edit\",\"tool_input\":{\"file_path\":\"app/Models/Loan.php\"}}' | '$PROJECT_ROOT/hooks/guard-post-tool.sh'"
     [ "$status" -eq 0 ]
     echo "$output" | grep -q "implementation-tracker.yaml"

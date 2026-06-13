@@ -1,14 +1,14 @@
 {
-  "name": "larv-local",
+  "name": "larv",
   "interface": {
-    "displayName": "larv Local"
+    "displayName": "larv"
   },
   "plugins": [
     {
       "name": "larv",
       "source": {
         "source": "local",
-        "path": "./plugins/larv"
+        "path": "./"
       },
       "policy": {
         "installation": "AVAILABLE",

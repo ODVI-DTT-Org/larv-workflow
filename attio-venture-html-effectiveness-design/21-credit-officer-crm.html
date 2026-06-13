@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="attio-venture-logo.png">
+  <link rel="apple-touch-icon" href="attio-venture-logo.png">
+  <title>Credit Officer Dashboard — Attio Finance CRM</title>
+  <link rel="stylesheet" href="design-system.css">
+  <link rel="stylesheet" href="crm-shared-styles.css">
+  <style>
+    .header {
+      padding: var(--space-24) 0;
+      border-bottom: var(--border-light);
+      background: linear-gradient(135deg, #FFFBF0 0%, #FFFEF9 100%);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-24);
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 var(--space-24);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-12);
+    }
+
+    .logo img {
+      height: 40px;
+      width: auto;
+      border-radius: var(--radius-md);
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo-text .org {
+      font-size: 12px;
+      color: var(--gray-600);
+    }
+
+    .logo-text .app {
+      font-weight: 700;
+      color: var(--attio-finance-primary);
+      font-size: 14px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-24);
+    }
+
+    .search-box {
+      width: 280px;
+      padding: var(--space-12) var(--space-16);
+      border: var(--border-light);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      background: var(--white);
+    }
+
+    .nav-item {
+      padding: var(--space-12) var(--space-16);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      color: var(--gray-700);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .nav-item:hover {
+      background: var(--gray-100);
+      color: var(--attio-finance-primary);
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin: 0 0 var(--space-8) 0;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--gray-600);
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <img src="attio-venture-logo.png" alt="Attio Finance Logo">
+        <div class="logo-text">
+          <div class="org">Attio Venture</div>
+          <div class="app">Credit Officer Portal</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <input type="text" class="search-box" placeholder="Search applications...">
+        <div class="nav-item">Notifications</div>
+        <div class="nav-item">Settings</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="crm-container">
+    <!-- Sidebar -->
+    <aside class="crm-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-title">Quick Stats</div>
+        <div class="metric-card">
+          <div class="metric-label">Pending Applications</div>
+          <div class="metric-value">12</div>
+          <div class="metric-subtext">Awaiting review</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Approved (30d)</div>
+          <div class="metric-value">28</div>
+          <div class="metric-subtext">$1.2M funded</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Avg Credit Score</div>
+          <div class="metric-value">742</div>
+          <div class="metric-subtext">Current portfolio</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Approval Rate</div>
+          <div class="metric-value">85%</div>
+          <div class="metric-subtext">30-day average</div>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Pipeline Value</div>
+        <div class="metric-card">
+          <div class="metric-label">Under Review</div>
+          <div class="metric-value">$3.2M</div>
+          <div class="metric-subtext">47 applications</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="crm-main">
+      <div>
+        <h1 class="page-title">Loan Applications</h1>
+        <p class="page-subtitle">Review and manage credit applications</p>
+      </div>
+
+      <!-- Filter Panel -->
+      <div class="filter-panel">
+        <div class="filter-title">Filters</div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-16);">
+          <div class="filter-group">
+            <label><input type="checkbox" name="status" value="pending"> Pending</label>
+            <label><input type="checkbox" name="status" value="approved"> Approved</label>
+            <label><input type="checkbox" name="status" value="rejected"> Rejected</label>
+          </div>
+          <div class="filter-group">
+            <label>Credit Score Min</label>
+            <input type="number" placeholder="500" min="300" max="850">
+          </div>
+          <div class="filter-group">
+            <label>Risk Level</label>
+            <label><input type="checkbox" name="risk" value="low"> Low</label>
+            <label><input type="checkbox" name="risk" value="medium"> Medium</label>
+            <label><input type="checkbox" name="risk" value="high"> High</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bulk Action Bar -->
+      <div class="bulk-action-bar">
+        <span class="action-count">0 selected</span>
+        <div class="bulk-actions">
+          <button class="btn btn-secondary" onclick="approveSelected()">Approve Selected</button>
+          <button class="btn btn-secondary" onclick="rejectSelected()">Reject Selected</button>
+          <button class="btn btn-secondary" onclick="requestInfo()">Request Info</button>
+        </div>
+      </div>
+
+      <!-- Applications Table -->
+      <div class="table-wrapper card">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 40px;"><input type="checkbox" onchange="TableSelection.toggleAll(this)"></th>
+              <th>Applicant</th>
+              <th>Credit Score</th>
+              <th>Loan Amount</th>
+              <th>Status</th>
+              <th>Risk Level</th>
+              <th>Interest Rate</th>
+              <th>Term</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-id="APP-001" data-status="pending" data-credit="756" data-risk="low">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'APP-001')"></td>
+              <td>Sarah Johnson</td>
+              <td data-credit="756">756</td>
+              <td>$25,000</td>
+              <td><span class="badge status-pending">Pending</span></td>
+              <td><span class="risk-low">Low</span></td>
+              <td>4.5%</td>
+              <td>60 months</td>
+              <td><button class="btn btn-small btn-primary" onclick="CRMModal.open('detail-modal-001')">Review</button></td>
+            </tr>
+            <tr data-id="APP-002" data-status="pending" data-credit="812" data-risk="low">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'APP-002')"></td>
+              <td>Michael Chen</td>
+              <td data-credit="812">812</td>
+              <td>$50,000</td>
+              <td><span class="badge status-pending">Pending</span></td>
+              <td><span class="risk-low">Low</span></td>
+              <td>3.8%</td>
+              <td>84 months</td>
+              <td><button class="btn btn-small btn-primary" onclick="CRMModal.open('detail-modal-002')">Review</button></td>
+            </tr>
+            <tr data-id="APP-003" data-status="approved" data-credit="628" data-risk="medium">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'APP-003')"></td>
+              <td>Jessica Martinez</td>
+              <td data-credit="628">628</td>
+              <td>$15,000</td>
+              <td><span class="badge status-approved">Approved</span></td>
+              <td><span class="risk-medium">Medium</span></td>
+              <td>7.2%</td>
+              <td>36 months</td>
+              <td><button class="btn btn-small btn-secondary" onclick="CRMModal.open('detail-modal-003')">View</button></td>
+            </tr>
+            <tr data-id="APP-004" data-status="rejected" data-credit="542" data-risk="high">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'APP-004')"></td>
+              <td>David Park</td>
+              <td data-credit="542">542</td>
+              <td>$8,500</td>
+              <td><span class="badge status-rejected">Rejected</span></td>
+              <td><span class="risk-high">High</span></td>
+              <td>11.2%</td>
+              <td>24 months</td>
+              <td><button class="btn btn-small btn-secondary" onclick="CRMModal.open('detail-modal-004')">View</button></td>
+            </tr>
+            <tr data-id="APP-005" data-status="pending" data-credit="798" data-risk="low">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'APP-005')"></td>
+              <td>Amanda Rodriguez</td>
+              <td data-credit="798">798</td>
+              <td>$75,000</td>
+              <td><span class="badge status-pending">Pending</span></td>
+              <td><span class="risk-low">Low</span></td>
+              <td>3.9%</td>
+              <td>120 months</td>
+              <td><button class="btn btn-small btn-primary" onclick="CRMModal.open('detail-modal-005')">Review</button></td>
+            </tr>
+            <tr data-id="APP-006" data-status="pending" data-credit="721" data-risk="medium">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'APP-006')"></td>
+              <td>Robert Thompson</td>
+              <td data-credit="721">721</td>
+              <td>$35,000</td>
+              <td><span class="badge status-pending">Pending</span></td>
+              <td><span class="risk-medium">Medium</span></td>
+              <td>6.1%</td>
+              <td>72 months</td>
+              <td><button class="btn btn-small btn-primary" onclick="CRMModal.open('detail-modal-006')">Review</button></td>
+            </tr>
+            <tr data-id="APP-007" data-status="approved" data-credit="510" data-risk="high">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'APP-007')"></td>
+              <td>Lisa Anderson</td>
+              <td data-credit="510">510</td>
+              <td>$20,000</td>
+              <td><span class="badge status-approved">Approved</span></td>
+              <td><span class="risk-high">High</span></td>
+              <td>9.8%</td>
+              <td>48 months</td>
+              <td><button class="btn btn-small btn-secondary" onclick="CRMModal.open('detail-modal-007')">View</button></td>
+            </tr>
+            <tr data-id="APP-008" data-status="pending" data-credit="744" data-risk="low">
+              <td><input type="checkbox" class="table-row-checkbox" onchange="TableSelection.toggleRow(this.parentElement.parentElement, 'APP-008')"></td>
+              <td>James Wilson</td>
+              <td data-credit="744">744</td>
+              <td>$42,000</td>
+              <td><span class="badge status-pending">Pending</span></td>
+              <td><span class="risk-low">Low</span></td>
+              <td>5.3%</td>
+              <td>84 months</td>
+              <td><button class="btn btn-small btn-primary" onclick="CRMModal.open('detail-modal-008')">Review</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Detail Modals -->
+  <div id="detail-modal-001" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Application Details</h2>
+        <button class="modal-close" onclick="CRMModal.close('detail-modal-001')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <div class="modal-section-title">Personal Information</div>
+          <div class="modal-row">
+            <span class="modal-label">Name</span>
+            <span class="modal-value">Sarah Johnson</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Email</span>
+            <span class="modal-value">sarah.johnson@email.com</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Phone</span>
+            <span class="modal-value">(555) 123-4567</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Address</span>
+            <span class="modal-value">123 Oak Street, Portland, OR 97201</span>
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">Credit Profile</div>
+          <div class="modal-row">
+            <span class="modal-label">Credit Score</span>
+            <span class="modal-value">756</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Years of History</span>
+            <span class="modal-value">12</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Current Debts</span>
+            <span class="modal-value">$18,500</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Payment History</span>
+            <span class="modal-value">Perfect (no late payments)</span>
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">Loan Request</div>
+          <div class="modal-row">
+            <span class="modal-label">Amount</span>
+            <span class="modal-value">$25,000</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Purpose</span>
+            <span class="modal-value">Debt Consolidation</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Term</span>
+            <span class="modal-value">60 months</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Proposed Rate</span>
+            <span class="modal-value">4.5%</span>
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <div class="modal-section-title">Risk Assessment</div>
+          <div class="modal-row">
+            <span class="modal-label">Risk Level</span>
+            <span class="modal-value"><span class="risk-low">Low Risk</span></span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Debt-to-Income</span>
+            <span class="modal-value">18%</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Employment Status</span>
+            <span class="modal-value">Stable (12+ years)</span>
+          </div>
+          <div class="modal-row">
+            <span class="modal-label">Recommendation</span>
+            <span class="modal-value" style="color: var(--attio-finance-success); font-weight: 600;">Approve</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="CRMModal.close('detail-modal-001')">Close</button>
+        <button class="btn btn-success" onclick="approveApplication('APP-001')">Approve</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Repeat detail modals for remaining applications (showing template for others) -->
+  <div id="detail-modal-002" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Application Details</h2>
+        <button class="modal-close" onclick="CRMModal.close('detail-modal-002')">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-section">
+          <div class="modal-section-title">Personal Information</div>
+          <div class="modal-row"><span class="modal-label">Name</span><span class="modal-value">Michael Chen</span></div>
+          <div class="modal-row"><span class="modal-label">Email</span><span class="modal-value">michael.chen@email.com</span></div>
+          <div class="modal-row"><span class="modal-label">Phone</span><span class="modal-value">(555) 234-5678</span></div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">Credit Profile</div>
+          <div class="modal-row"><span class="modal-label">Credit Score</span><span class="modal-value">812</span></div>
+          <div class="modal-row"><span class="modal-label">Risk Level</span><span class="modal-value"><span class="risk-low">Low</span></span></div>
+        </div>
+        <div class="modal-section">
+          <div class="modal-section-title">Loan Request</div>
+          <div class="modal-row"><span class="modal-label">Amount</span><span class="modal-value">$50,000</span></div>
+          <div class="modal-row"><span class="modal-label">Term</span><span class="modal-value">84 months</span></div>
+          <div class="modal-row"><span class="modal-label">Rate</span><span class="modal-value">3.8%</span></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="CRMModal.close('detail-modal-002')">Close</button>
+        <button class="btn btn-success" onclick="approveApplication('APP-002')">Approve</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Additional modals (simplified for space) -->
+  <div id="detail-modal-003" class="modal"><div class="modal-content"><div class="modal-header"><h2>Application Details</h2><button class="modal-close" onclick="CRMModal.close('detail-modal-003')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Personal Information</div><div class="modal-row"><span class="modal-label">Name</span><span class="modal-value">Jessica Martinez</span></div></div><div class="modal-section"><div class="modal-section-title">Credit Profile</div><div class="modal-row"><span class="modal-label">Credit Score</span><span class="modal-value">628</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('detail-modal-003')">Close</button></div></div></div>
+
+  <div id="detail-modal-004" class="modal"><div class="modal-content"><div class="modal-header"><h2>Application Details</h2><button class="modal-close" onclick="CRMModal.close('detail-modal-004')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Personal Information</div><div class="modal-row"><span class="modal-label">Name</span><span class="modal-value">David Park</span></div></div><div class="modal-section"><div class="modal-section-title">Credit Profile</div><div class="modal-row"><span class="modal-label">Credit Score</span><span class="modal-value">542</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('detail-modal-004')">Close</button></div></div></div>
+
+  <div id="detail-modal-005" class="modal"><div class="modal-content"><div class="modal-header"><h2>Application Details</h2><button class="modal-close" onclick="CRMModal.close('detail-modal-005')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Personal Information</div><div class="modal-row"><span class="modal-label">Name</span><span class="modal-value">Amanda Rodriguez</span></div></div><div class="modal-section"><div class="modal-section-title">Credit Profile</div><div class="modal-row"><span class="modal-label">Credit Score</span><span class="modal-value">798</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('detail-modal-005')">Close</button><button class="btn btn-success" onclick="approveApplication('APP-005')">Approve</button></div></div></div>
+
+  <div id="detail-modal-006" class="modal"><div class="modal-content"><div class="modal-header"><h2>Application Details</h2><button class="modal-close" onclick="CRMModal.close('detail-modal-006')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Personal Information</div><div class="modal-row"><span class="modal-label">Name</span><span class="modal-value">Robert Thompson</span></div></div><div class="modal-section"><div class="modal-section-title">Credit Profile</div><div class="modal-row"><span class="modal-label">Credit Score</span><span class="modal-value">721</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('detail-modal-006')">Close</button><button class="btn btn-success" onclick="approveApplication('APP-006')">Approve</button></div></div></div>
+
+  <div id="detail-modal-007" class="modal"><div class="modal-content"><div class="modal-header"><h2>Application Details</h2><button class="modal-close" onclick="CRMModal.close('detail-modal-007')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Personal Information</div><div class="modal-row"><span class="modal-label">Name</span><span class="modal-value">Lisa Anderson</span></div></div><div class="modal-section"><div class="modal-section-title">Credit Profile</div><div class="modal-row"><span class="modal-label">Credit Score</span><span class="modal-value">510</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('detail-modal-007')">Close</button></div></div></div>
+
+  <div id="detail-modal-008" class="modal"><div class="modal-content"><div class="modal-header"><h2>Application Details</h2><button class="modal-close" onclick="CRMModal.close('detail-modal-008')">×</button></div><div class="modal-body"><div class="modal-section"><div class="modal-section-title">Personal Information</div><div class="modal-row"><span class="modal-label">Name</span><span class="modal-value">James Wilson</span></div></div><div class="modal-section"><div class="modal-section-title">Credit Profile</div><div class="modal-row"><span class="modal-label">Credit Score</span><span class="modal-value">744</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary" onclick="CRMModal.close('detail-modal-008')">Close</button><button class="btn btn-success" onclick="approveApplication('APP-008')">Approve</button></div></div></div>
+
+  <script src="crm-shared.js"></script>
+  <script>
+    function approveApplication(appId) {
+      Notifications.show(`Application ${appId} approved`, 'success');
+      CRMModal.close(`detail-modal-${appId.split('-')[1]}`);
+      TableSelection.selectedIds.clear();
+      TableSelection.updateBulkActionBar();
+    }
+
+    function approveSelected() {
+      const selected = TableSelection.getSelectedIds();
+      if (selected.length === 0) return;
+      Notifications.show(`${selected.length} applications approved`, 'success');
+      selected.forEach(id => {
+        const row = document.querySelector(`tr[data-id="${id}"]`);
+        if (row) row.remove();
+      });
+      TableSelection.selectedIds.clear();
+      TableSelection.updateBulkActionBar();
+    }
+
+    function rejectSelected() {
+      const selected = TableSelection.getSelectedIds();
+      if (selected.length === 0) return;
+      Notifications.show(`${selected.length} applications rejected`, 'warning');
+      selected.forEach(id => {
+        const row = document.querySelector(`tr[data-id="${id}"]`);
+        if (row) row.remove();
+      });
+      TableSelection.selectedIds.clear();
+      TableSelection.updateBulkActionBar();
+    }
+
+    function requestInfo() {
+      const selected = TableSelection.getSelectedIds();
+      if (selected.length === 0) return;
+      Notifications.show(`Information requests sent to ${selected.length} applicants`, 'info');
+      TableSelection.selectedIds.clear();
+      TableSelection.updateBulkActionBar();
+    }
+  </script>
+</body>
+</html>

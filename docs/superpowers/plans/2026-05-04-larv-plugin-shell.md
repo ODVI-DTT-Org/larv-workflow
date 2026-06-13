@@ -15,7 +15,7 @@
 - GitHub Actions for CI
 - Renovate for dependency updates
 
-**Project root:** `/home/claude-team/kaito/workflow/` (existing git repo). The plugin lives at root; the design `docs/` already exists from brainstorming.
+**Project root:** `<larv-plugin-root>/` (existing git repo). The plugin lives at root; the design `docs/` already exists from brainstorming.
 
 ---
 
@@ -58,7 +58,7 @@ workflow/                                    # the plugin repo root
 │   ├── masterplan/                          # vendored
 │   ├── superpowers-laravel/                 # vendored
 │   ├── domain-driven-design/                # vendored (single skill)
-│   └── huashu-design/                       # vendored
+│   └── local Attio-style galleries/                       # vendored
 ├── templates/                               # Task 11: .md templates copied into user projects
 │   ├── slice-handoff.md
 │   ├── sandbox-runbook.md
@@ -221,15 +221,15 @@ Expected: All tests fail with "no such file" or similar.
 ```json
 {
   "name": "larv",
-  "description": "AI-driven Laravel app development plugin orchestrating masterplan, superpowers-laravel, domain-driven-design, and huashu-design into an end-to-end workflow.",
+  "description": "AI-driven Laravel app development plugin orchestrating masterplan, superpowers-laravel, and domain-driven-design into an end-to-end workflow.",
   "version": "0.1.0",
   "author": {
-    "name": "your-org",
-    "url": "https://github.com/your-org/larv"
+    "name": "larv-workflow",
+    "url": "https://github.com/larv-workflow/larv"
   },
-  "homepage": "https://github.com/your-org/larv",
-  "repository": "https://github.com/your-org/larv",
-  "license": "UNLICENSED",
+  "homepage": "https://github.com/larv-workflow/larv",
+  "repository": "https://github.com/larv-workflow/larv",
+  "license": "MIT",
   "keywords": [
     "laravel",
     "claude-code",
@@ -678,7 +678,7 @@ Run brainstorming with Laravel-specific framing. Ask multiple-choice questions a
 
 - `superpowers-laravel:brainstorm`
 - `masterplan-discuss`
-- `huashu-design` (truth-first guard via context7 MCP)
+- local Attio-style galleries (truth-first guard via context7 MCP)
 
 ## Required outputs
 
@@ -768,12 +768,12 @@ description: Phase 3 wrapper - data model, API surface, UI screens, brand spec.
 
 ## Phase responsibility
 
-Produce data model (Eloquent + DDD aggregates if applicable), API surface, UI screen inventory, brand spec via huashu protocol (forces context7 MCP for any library claim).
+Produce data model (Eloquent + DDD aggregates if applicable), API surface, UI screen inventory, brand spec via local Attio-style references protocol (forces context7 MCP for any library claim).
 
 ## Upstream skills invoked
 
 - `masterplan-master-design`
-- `huashu-design` (UI/UX + brand spec)
+- local Attio-style galleries (UI/UX + brand spec)
 
 ## Required outputs
 
@@ -1093,8 +1093,7 @@ plugin:
     masterplan: "0.0.0"
     superpowers-laravel: "0.0.0"
     domain-driven-design: "0.0.0"
-    huashu-design: "0.0.0"
-  learnings_digest_hash: "0000000"
+      learnings_digest_hash: "0000000"
 phase:
   current: -1
   last_completed: null
@@ -1145,14 +1144,13 @@ plugin:
     masterplan: "0.0.0"
     superpowers-laravel: "0.0.0"
     domain-driven-design: "0.0.0"
-    huashu-design: "0.0.0"
-  learnings_digest_hash: "abc1234"
+      learnings_digest_hash: "abc1234"
 phase:
   current: 0
   last_completed: -1
   gates_pending: [0]
 gates:
-  - { phase: -1, passed_at: "2026-05-04T10:05:00Z", approved_by: itranario@oakdriveventures.com }
+  - { phase: -1, passed_at: "2026-05-04T10:05:00Z", approved_by: maintainers@example.org }
 slices:
   total: 0
   status: {}
@@ -1198,8 +1196,7 @@ plugin:
     masterplan: "0.0.0"
     superpowers-laravel: "0.0.0"
     domain-driven-design: "0.0.0"
-    huashu-design: "0.0.0"
-  learnings_digest_hash: "abc1234"
+      learnings_digest_hash: "abc1234"
 phase:
   current: 8
   last_completed: 7
@@ -1258,8 +1255,7 @@ plugin:
     masterplan: "0.0.0"
     superpowers-laravel: "0.0.0"
     domain-driven-design: "0.0.0"
-    huashu-design: "0.0.0"
-  learnings_digest_hash: "abc1234"
+      learnings_digest_hash: "abc1234"
 phase:
   current: 8
   last_completed: 7
@@ -1314,8 +1310,7 @@ plugin:
     masterplan: "0.0.0"
     superpowers-laravel: "0.0.0"
     domain-driven-design: "0.0.0"
-    huashu-design: "0.0.0"
-  learnings_digest_hash: "abc1234"
+      learnings_digest_hash: "abc1234"
 phase:
   current: 8
   last_completed: 7
@@ -1341,7 +1336,7 @@ budget:
   cap_policy: pause_at_120pct
 learn:
   last_quick_at: "2026-05-04T14:30:00Z"
-  last_quick_pr: "https://github.com/your-org/larv/pull/42"
+  last_quick_pr: "https://github.com/larv-workflow/larv/pull/42"
   last_full_at: null
   pending_notes_count: 3
 errors_unresolved: []
@@ -1579,8 +1574,7 @@ plugin:
     masterplan: "0.0.0"
     superpowers-laravel: "0.0.0"
     domain-driven-design: "0.0.0"
-    huashu-design: "0.0.0"
-  learnings_digest_hash: "0000000"
+      learnings_digest_hash: "0000000"
 phase:
   current: -1
   last_completed: null
@@ -2188,7 +2182,7 @@ main() {
     bm="$(yq -r '.plugin.bundle_versions.masterplan' "$sp")"
     bs="$(yq -r '.plugin.bundle_versions["superpowers-laravel"]' "$sp")"
     bd="$(yq -r '.plugin.bundle_versions["domain-driven-design"]' "$sp")"
-    bh="$(yq -r '.plugin.bundle_versions["huashu-design"]' "$sp")"
+    bh="$(yq -r '.plugin.bundle_versions["local Attio-style galleries"]' "$sp")"
 
     local cur last gates_pending
     cur="$(yq -r '.phase.current' "$sp")"
@@ -2223,7 +2217,7 @@ main() {
 
     # --- format and print ---
     echo "Project: $name  ($([ "$greenfield" = "true" ] && echo "greenfield" || echo "adopted"), started $started_at)"
-    echo "Plugin:  larv $plug_ver  bundles: masterplan $bm · sp-laravel $bs · ddd $bd · huashu $bh"
+    echo "Plugin:  larv $plug_ver  bundles: masterplan $bm · sp-laravel $bs · ddd $bd · local Attio-style galleries $bh"
     echo
     if [ "$cur" = "-1" ]; then
         echo "Phase −1 (pre-flight)"
@@ -2621,7 +2615,7 @@ main() {
     # 1. Bundle check
     echo "Bundle check:"
     local missing=0
-    for b in masterplan superpowers-laravel domain-driven-design huashu-design; do
+    for b in masterplan superpowers-laravel domain-driven-design local Attio-style galleries; do
         if bundle_present "$b"; then
             echo "  ✅ $b ($(read_bundle_version "$b"))"
         else
@@ -2647,9 +2641,9 @@ main() {
     bm="$(read_bundle_version masterplan)"
     bs="$(read_bundle_version superpowers-laravel)"
     bd="$(read_bundle_version domain-driven-design)"
-    bh="$(read_bundle_version huashu-design)"
+    bh="$(read_bundle_version local Attio-style galleries)"
     bash "$PLUGIN_ROOT/scripts/state.sh" update "$dir" \
-        ".plugin.bundle_versions = {\"masterplan\": \"$bm\", \"superpowers-laravel\": \"$bs\", \"domain-driven-design\": \"$bd\", \"huashu-design\": \"$bh\"}"
+        ".plugin.bundle_versions = {\"masterplan\": \"$bm\", \"superpowers-laravel\": \"$bs\", \"domain-driven-design\": \"$bd\", \"local Attio-style galleries\": \"$bh\"}"
 
     bash "$PLUGIN_ROOT/scripts/state.sh" update "$dir" \
         ".budget.estimated_total = {\"tokens\": $DEFAULT_BUDGET_TOKENS, \"minutes\": $DEFAULT_BUDGET_MINUTES, \"cost_usd\": $DEFAULT_BUDGET_COST}"
@@ -2665,7 +2659,7 @@ Bundle versions:
   - masterplan: $bm
   - superpowers-laravel: $bs
   - domain-driven-design: $bd
-  - huashu-design: $bh
+  - local Attio-style galleries: $bh
 
 Estimated budget: ~$DEFAULT_BUDGET_MINUTES min, ~\$$DEFAULT_BUDGET_COST
 Cap policy: pause_at_120pct
@@ -2834,7 +2828,6 @@ Bundle versions:
   - masterplan: {{ver}}
   - superpowers-laravel: {{ver}}
   - domain-driven-design: {{ver}}
-  - huashu-design: {{ver}}
 
 Estimated budget: ~{{minutes}} min, ~${{cost}}
 Cap policy: {{cap-policy}}
@@ -2999,7 +2992,7 @@ Entries are indexed (not chronological). Add to the matching section.
 
 ## Composition lessons
 
-<!-- Insights about how upstream skills interact (masterplan + superpowers-laravel + huashu + ddd) -->
+<!-- Insights about how upstream skills interact (masterplan + superpowers-laravel + local Attio-style galleries + ddd) -->
 
 ---
 
@@ -3155,7 +3148,7 @@ git commit -m "feat: existing-blog fixture (lite) for sub-project B (Task 14)"
 - Create: `bundle/masterplan/PLACEHOLDER.md`
 - Create: `bundle/superpowers-laravel/PLACEHOLDER.md`
 - Create: `bundle/domain-driven-design/PLACEHOLDER.md`
-- Create: `bundle/huashu-design/PLACEHOLDER.md`
+- Create: `bundle/local Attio-style galleries/PLACEHOLDER.md`
 - Create: `scripts/bundle-update.sh`
 - Create: `tests/bundle.bats`
 
@@ -3169,7 +3162,7 @@ For sub-project A, the bundle is **directories with a placeholder file**. Real v
 
 load helpers
 
-BUNDLES=(masterplan superpowers-laravel domain-driven-design huashu-design)
+BUNDLES=(masterplan superpowers-laravel domain-driven-design local Attio-style galleries)
 
 @test "bundle/VERSIONS.yaml exists and is valid YAML" {
     [ -f bundle/VERSIONS.yaml ]
@@ -3177,7 +3170,7 @@ BUNDLES=(masterplan superpowers-laravel domain-driven-design huashu-design)
     [ "$status" -eq 0 ]
 }
 
-@test "bundle/VERSIONS.yaml lists all 4 dependencies" {
+@test "bundle/VERSIONS.yaml lists all 3 dependencies" {
     for b in "${BUNDLES[@]}"; do
         run yq -r ".[\"$b\"]" bundle/VERSIONS.yaml
         [ "$status" -eq 0 ]
@@ -3185,7 +3178,7 @@ BUNDLES=(masterplan superpowers-laravel domain-driven-design huashu-design)
     done
 }
 
-@test "all 4 bundle directories exist" {
+@test "all 3 bundle directories exist" {
     for b in "${BUNDLES[@]}"; do
         [ -d "bundle/$b" ] || { echo "missing bundle/$b"; return 1; }
     done
@@ -3215,12 +3208,11 @@ Expected: All tests fail.
 masterplan: "4.2.0"
 superpowers-laravel: "0.1.5"
 domain-driven-design: "10.5.0"
-huashu-design: "1.2.0"
 ```
 
 - [ ] **Step 4: Create bundle directory placeholders**
 
-For each of the 4 bundles, create `bundle/<name>/PLACEHOLDER.md`:
+For each of the 3 bundles, create `bundle/<name>/PLACEHOLDER.md`:
 
 `bundle/masterplan/PLACEHOLDER.md`:
 ```markdown
@@ -3231,7 +3223,7 @@ Pinned to version listed in `bundle/VERSIONS.yaml`. Replace this file with the r
 Until then this directory exists so `pre-flight.sh` bundle-check passes structurally.
 ```
 
-(Repeat the pattern for `superpowers-laravel`, `domain-driven-design`, `huashu-design`.)
+(Repeat the pattern for `superpowers-laravel`, `domain-driven-design`, local Attio-style galleries.)
 
 - [ ] **Step 5: Create bundle-update.sh**
 
@@ -3248,7 +3240,7 @@ usage() {
     cat <<EOF
 Usage: bundle-update.sh <name>
 
-Names: masterplan | superpowers-laravel | domain-driven-design | huashu-design
+Names: masterplan | superpowers-laravel | domain-driven-design | local Attio-style galleries
 
 This is a manual vendor command for v0.1.0. From v0.2.0 onward, Renovate handles
 updates automatically (patch versions auto-merge if CI passes; minor/major opens PR).
@@ -3269,7 +3261,7 @@ EOF
 NAME="$1"
 
 case "$NAME" in
-    masterplan|superpowers-laravel|domain-driven-design|huashu-design) ;;
+    masterplan|superpowers-laravel|domain-driven-design|local Attio-style galleries) ;;
     *) echo "ERROR: unknown bundle name '$NAME'" >&2; usage; exit 1 ;;
 esac
 
@@ -3317,11 +3309,11 @@ git commit -m "feat: bundle scaffolding with pinned versions + update script (Ta
 
 Date: 2026-05-04
 Status: Accepted
-Decision-makers: itranario@oakdriveventures.com
+Decision-makers: maintainers@example.org
 
 ## Context
 
-`larv` orchestrates four upstream sources: `masterplan`, `superpowers-laravel`, `domain-driven-design` (single skill from antigravity-awesome-skills), and `huashu-design`. The plugin must be installable by team members in one step, reproducible across machines, and resilient to upstream changes that might break composition.
+`larv` orchestrates three upstream sources: `masterplan`, `superpowers-laravel`, `domain-driven-design` (single skill from antigravity-awesome-skills), and local Attio-style galleries. The plugin must be installable by team members in one step, reproducible across machines, and resilient to upstream changes that might break composition.
 
 Three distribution models were considered:
 
@@ -3351,7 +3343,7 @@ Adopt **option 2 — bundled marketplace**.
 - `masterplan` → user's local skills directory at `~/.claude/skills/masterplan-*`
 - `superpowers-laravel` → `~/.claude/plugins/cache/superpowers-laravel-marketplace/superpowers-laravel/0.1.5/`
 - `domain-driven-design` → single skill at `~/.claude/plugins/cache/antigravity-awesome-skills/.../skills/domain-driven-design/`
-- `huashu-design` → `~/.agents/skills/huashu-design/`
+- local Attio-style galleries → `~/.agents/skills/local Attio-style galleries/`
 
 These are local paths in the maintainer's environment for v0.1.0. From v0.2.0, Renovate config will reference upstream Git URLs once the plugin is hosted on the team's GitHub org.
 
@@ -3470,7 +3462,7 @@ git commit -m "ci: GitHub Actions workflow (bats + shellcheck) (Task 17)"
       "matchManagers": ["regex"],
       "matchUpdateTypes": ["minor", "major"],
       "automerge": false,
-      "reviewers": ["@your-org/larv-maintainers"]
+      "reviewers": ["@larv-workflow/larv-maintainers"]
     }
   ],
   "regexManagers": [
@@ -3480,7 +3472,7 @@ git commit -m "ci: GitHub Actions workflow (bats + shellcheck) (Task 17)"
         "(?<depName>[a-z-]+):\\s+\"(?<currentValue>[0-9.]+)\""
       ],
       "datasourceTemplate": "github-releases",
-      "lookupNameTemplate": "your-org/{{depName}}"
+      "lookupNameTemplate": "larv-workflow/{{depName}}"
     }
   ]
 }

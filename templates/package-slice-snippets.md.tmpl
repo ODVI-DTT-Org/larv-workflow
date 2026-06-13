@@ -7,7 +7,8 @@ Use these snippets when turning approved Laravel packages into `docs/larv/06-imp
 - Create panel/resource classes for selected domain models.
 - Add table filters, row actions, bulk actions, form schemas, relation managers, and widgets where the workflow needs them.
 - Add policy-backed authorization.
-- Tests: authorization, form validation, filters/actions, relation managers.
+- Keep Filament inside the shared app design system. Prefer the policy-app pattern: admin routes share the main app shell/layout/sidebar and admin menus/resources/actions are shown or hidden by policies, gates, roles, and navigation visibility. Do not create a separate-looking admin layout.
+- Tests: authorization, form validation, filters/actions, relation managers, shared-layout role navigation.
 
 ## Cashier billing slice
 

@@ -13,7 +13,6 @@ plugin:
     masterplan: "0.0.0"
     superpowers-laravel: "0.0.0"
     domain-driven-design: "0.0.0"
-    huashu-design: "0.0.0"
   learnings_digest_hash: "0000000"
 phase:
   current: -1

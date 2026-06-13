@@ -27,6 +27,17 @@ Drive the larv workflow. Read `STATE.yaml`, decide the next phase, dispatch the 
 # 4. Determine next phase from STATE.yaml.phase.current.
 ```
 
+## Security gates
+
+Security checks are hard gates for greenfield execution. Use `larv-security` as the shared repository guard; it wraps the static, non-executing `scripts/security-scan.sh` scanner.
+
+- **Phase -1 baseline**: `scripts/pre-flight.sh` runs `scripts/security-scan.sh` before creating `STATE.yaml`. If the scanner fails, stop the workflow before planning, dependency installation, app bootstrap, or implementation. The report path is `docs/larv/security/pre-flight-security.md`.
+- **Before Phase 8**: Re-run `bash <larv-plugin-root>/scripts/security-scan.sh "$dir" "$dir/docs/larv/security/pre-implementation-security.md"` after handoff/docsite generation and before the routing menu dispatches implementation. If it fails, write `errors_unresolved` to `STATE.yaml` with the report path and stop.
+- **Phase 8 slices**: `larv-implement` must run the same scanner before and after each slice, writing reports under `docs/larv/security/slices/`. A post-slice failure blocks the next slice and requires user review.
+- **Bypass policy**: Do not bypass failed security scans automatically. `LARV_SECURITY_ALLOW_FAIL=1` is only acceptable when the user explicitly acknowledges the report path and asks to continue for a controlled test or false positive.
+
+The scanner is intentionally static and non-executing. Do not source repository scripts, install dependencies, run package lifecycle scripts, or execute unknown binaries while investigating a failed security check.
+
 ## Per-phase loop
 
 For each phase `N`:
@@ -52,7 +63,7 @@ Required runtime fields:
 | 3 | `larv-design` | `mockup_url` | `docs/larv/03-design/mockup-url.txt` |
 | 6.5 | `larv-docsite` | `docsite_url` | `docs/larv/docsite-url.txt` |
 
-Each URL must start with `http://31.220.79.31:` and must only be accepted after the phase subagent reports firewall handling plus both inside-VM and outside probe success. Missing URL, missing artifact, `null`, `TBD`, `127.0.0.1`, `localhost`, or "skipped" means failure.
+Each URL must start with `http://sandbox.example.com:` and must only be accepted after the phase subagent reports firewall handling plus both inside-VM and outside probe success. Missing URL, missing artifact, `null`, `TBD`, `127.0.0.1`, `localhost`, or "skipped" means failure.
 
 ## Phase sequence (greenfield)
 
@@ -92,6 +103,7 @@ For `/larv:feature <name>`, do not run the greenfield phases and do not implemen
 
 ## Hard gates
 
+- **Security baseline**: `STATE.yaml.security.baseline.status` must be `passed` before any phase after Phase -1. `bypassed` is acceptable only when the user explicitly acknowledged the report path and requested continuation. Missing security state means failure for greenfield mode.
 - **Before Phase 8**: After `larv-handoff` and `larv-docsite` succeed, print the next-step paths:
   - `docs/Handsoff.md`
   - `docs/Handsoff/bootstrap-sandbox.md`
@@ -101,7 +113,7 @@ For `/larv:feature <name>`, do not run the greenfield phases and do not implemen
   - `docs/Handsoff/package-guide.md`
   - `docs/Handsoff/slice-NN-<name>.md`
   - `docs/larv/docsite-url.txt`
-  Then call `routing_menu "$dir"`. If `mode=handed-off-external`, mark `/larv:full` complete and exit after telling the user to open `docs/Handsoff.md` first and run `docs/Handsoff/bootstrap-sandbox.md` before any slice. Otherwise, dispatch `larv-implement`.
+  Then run the pre-implementation security scan described above and call `routing_menu "$dir"`. If `mode=handed-off-external`, mark `/larv:full` complete and exit after telling the user to open `docs/Handsoff.md` first and run `docs/Handsoff/bootstrap-sandbox.md` before any slice. Otherwise, dispatch `larv-implement`.
 
 ## Mode handling
 

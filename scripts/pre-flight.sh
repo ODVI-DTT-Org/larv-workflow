@@ -26,7 +26,7 @@ read_plugin_version() {
 }
 
 vm_runtime_check() {
-    local ssh_target="${LARV_VM_HOST_SSH_USER:-claude-team}@${LARV_VM_HOST:-31.220.79.31}"
+    local ssh_target="${LARV_VM_HOST_SSH_USER:-larv-user}@${LARV_VM_HOST:-sandbox.example.com}"
     local required="php curl ss setsid"
     if [ "${LARV_PREFLIGHT_SKIP_VM_CHECK:-0}" = "1" ]; then
         echo "  skipped (LARV_PREFLIGHT_SKIP_VM_CHECK=1)"
@@ -72,7 +72,7 @@ main() {
     echo "[larv pre-flight]"
     echo "Bundle check:"
     local b
-    for b in masterplan superpowers-laravel domain-driven-design huashu-design; do
+    for b in masterplan superpowers-laravel domain-driven-design; do
         if [ -d "$PLUGIN_ROOT/bundle/$b" ]; then
             echo "  ok $b $(read_bundle_version "$b")"
         else
@@ -85,22 +85,35 @@ main() {
     local vm_runtime
     vm_runtime="$(vm_runtime_check)"
     printf "%s\n" "$vm_runtime"
+    echo "Security check:"
+    local security_report security_output
+    security_report="$dir/docs/larv/security/pre-flight-security.md"
+    if security_output="$(bash "$PLUGIN_ROOT/scripts/security-scan.sh" "$dir" "$security_report" 2>&1)"; then
+        printf "  %s\n" "$security_output"
+    else
+        printf "  %s\n" "$security_output"
+        exit 1
+    fi
+    local security_status
+    security_status="$(awk -F': ' '/^- Status:/ {print $2}' "$security_report" | tail -n 1)"
+    [ -n "$security_status" ] || security_status="unknown"
 
     bash "$PLUGIN_ROOT/scripts/state.sh" init "$dir" "$name" "$mode"
 
-    local bm bs bd bh
+    local bm bs bd
     bm="$(read_bundle_version masterplan)"
     bs="$(read_bundle_version superpowers-laravel)"
     bd="$(read_bundle_version domain-driven-design)"
-    bh="$(read_bundle_version huashu-design)"
     bash "$PLUGIN_ROOT/scripts/state.sh" update "$dir" \
-        ".plugin.bundle_versions = {\"masterplan\": \"$bm\", \"superpowers-laravel\": \"$bs\", \"domain-driven-design\": \"$bd\", \"huashu-design\": \"$bh\"}"
+        ".plugin.bundle_versions = {\"masterplan\": \"$bm\", \"superpowers-laravel\": \"$bs\", \"domain-driven-design\": \"$bd\"}"
     local pv
     pv="$(read_plugin_version)"
     bash "$PLUGIN_ROOT/scripts/state.sh" update "$dir" \
         ".plugin.version = \"$pv\""
     bash "$PLUGIN_ROOT/scripts/state.sh" update "$dir" \
         ".budget.estimated_total = {\"tokens\": $DEFAULT_BUDGET_TOKENS, \"minutes\": $DEFAULT_BUDGET_MINUTES, \"cost_usd\": $DEFAULT_BUDGET_COST}"
+    bash "$PLUGIN_ROOT/scripts/state.sh" update "$dir" \
+        ".security = {\"baseline\": {\"status\": \"$security_status\", \"report\": \"docs/larv/security/pre-flight-security.md\", \"checked_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}, \"policy\": {\"pre_implementation_gate\": true, \"per_slice_gate\": true, \"allow_bypass_env\": \"LARV_SECURITY_ALLOW_FAIL\"}}"
 
     cat >"$dir/docs/larv/pre-flight.md" <<EOF
 # Pre-flight report
@@ -112,13 +125,15 @@ Bundle versions:
   - masterplan: $bm
   - superpowers-laravel: $bs
   - domain-driven-design: $bd
-  - huashu-design: $bh
 
 Estimated budget: ~$DEFAULT_BUDGET_MINUTES min, ~\$$DEFAULT_BUDGET_COST
 Cap policy: pause_at_120pct
 
 VM runtime check:
 $vm_runtime
+
+Security check:
+$security_output
 EOF
 
     echo "Project: $name"

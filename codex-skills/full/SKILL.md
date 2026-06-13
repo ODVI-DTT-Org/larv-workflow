@@ -15,10 +15,11 @@ This is the Codex-compatible entry point for `/larv:full`.
 4. If no `docs/larv/STATE.yaml` exists, run Phase -1 via:
 
 ```bash
-bash /home/claude-team/kaito/workflow/scripts/pre-flight.sh "$PWD" "$(basename "$PWD")" greenfield
+bash <larv-plugin-root>/scripts/pre-flight.sh "$PWD" "$(basename "$PWD")" greenfield
 ```
 
-5. Continue according to the orchestrator and phase skills in `/home/claude-team/kaito/workflow/skills/`.
+5. Treat the Phase -1 `larv-security` baseline as a hard gate. If `pre-flight.sh` reports `security check failed`, stop before planning or implementation. Do not inspect, source, install, or execute project code to "see what happens"; read `docs/larv/security/pre-flight-security.md` and ask the user how to handle the finding.
+6. Continue according to the orchestrator and phase skills in `<larv-plugin-root>/skills/`.
 
 ## Notes
 

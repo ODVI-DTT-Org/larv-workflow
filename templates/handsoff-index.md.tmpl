@@ -147,3 +147,13 @@ If you are not Claude Code: ignore any references to "superpowers" or "skills" o
 - Seed data and reset guide: `docs/user-manual/seed-data.md`
 - Root docs index: `DOCS.md`
 - Implementation reports: `docs/larv/08-implementation/reports/`
+
+## 19. Model switch and starter prompt
+
+When handing this project to another AI tool or a fresh session, first switch that tool to the user's preferred model. If the user did not specify one, use the strongest coding model available in that tool for long-context Laravel implementation.
+
+Starter prompt to paste after switching models:
+
+```text
+You are continuing a larv-managed Laravel implementation in this same repository. Do not rely on previous chat context. Start by reading DOCS.md, docs/Handsoff.md, docs/larv/STATE.yaml, docs/larv/implementation-tracker.yaml if present, and the latest docs/larv/08-implementation/reports/. If docs/larv/07-runtime/sandbox-url.txt is missing, run docs/Handsoff/bootstrap-sandbox.md before app code edits. Find the first incomplete slice in STATE, open the matching docs/Handsoff/slice-NN-<name>.md, execute its instructions, run required Laravel/frontend commands yourself, restart/probe the sandbox when needed, and report the public URL plus the testing guide path. Do not SSH; this session is already inside the VM.
+```

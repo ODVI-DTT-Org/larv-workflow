@@ -39,7 +39,7 @@ Two further requirements emerge from the larger workflow:
 
 - Replacing the existing 12-phase orchestration shape. The phase numbering, skill names, and orchestrator entry points stay; this overhaul fills in the stubs and adds Phase 0a / Phase 6.5 without renumbering existing phases.
 - Multi-VM or multi-tenant deployment. The VM constant is hardcoded for this team; isolating it to one module is the only generalization.
-- Replacing or repackaging bundled upstream skills (masterplan, superpowers-laravel, domain-driven-design, huashu-design). Phase wrappers continue to invoke them.
+- Replacing or repackaging bundled upstream skills (masterplan, superpowers-laravel, domain-driven-design). Phase wrappers continue to invoke them.
 - A rich registry service for VM allocations. Live-scan only.
 
 ## 3. Core invariants
@@ -267,7 +267,7 @@ ADRs are created in `adr/` (one per decision). A flat aggregator `docs/larv/deci
 3. **User browses on their own** at `https://getdesign.md/` in their browser. Agent does not WebFetch yet. User returns with ≥3 picks as URLs or slugs (e.g., `picked: vercel/design-md, stripe/design-md, linear/design-md`).
 4. **Agent fetches and confirms.** WebFetches each pick from getdesign.md, caches at `03-design/picks/<slug>.md` with frontmatter (`source_url`, `fetched_at`, `attribution`). Prints a 1-line summary per pick. User confirms (`yes` / `swap A for X` / `add Y`).
 5. **Verifier allocates mockup port** in range 9000–9499 (live-scan, auto-pick on conflict, firewall opened, probe-verified per §3.3).
-6. **Huashu generates this app's screens in each picked style.** 5–7 key screens per pick. Output: `03-design/mockups/<pick-slug>/<screen>.html`. **Feasibility fallback:** if huashu cannot sustain consistency across the full set, runtime degrades to one mockup per pick (hero/dashboard only). Decision is made by the skill at runtime and recorded in the design log.
+6. **design reference generates this app's screens in each picked style.** 5–7 key screens per pick. Output: `03-design/mockups/<pick-slug>/<screen>.html`. **Feasibility fallback:** if local Attio-style galleries cannot sustain consistency across the full set, runtime degrades to one mockup per pick (hero/dashboard only). Decision is made by the skill at runtime and recorded in the design log.
 7. **Mockup server.** Static server at `http://<LARV_VM_HOST>:<port>` (PHP `php -S 0.0.0.0:<port>` against `03-design/mockups/`), where `<port>` is the value allocated in step 5. Index page is a comparison harness: top tabs (Pick A / Pick B / Pick C / Compare) · left sidebar (your app's screens) · main area (selected screen in selected style). Compare tab shows side-by-side per screen.
 8. **User picks one or hybrids.** `pick: B` or `hybrid: B layout + A palette` — agent regenerates a "Hybrid" tab and iterates until the user commits with `pick: hybrid` (or any single slug).
 9. **Finalize brand spec** from the winner only: `03-design/brand-spec.md` and `ui-design.md`.
@@ -378,7 +378,7 @@ See §3.3. Implemented in `scripts/lib/probe.sh` with per-service timeout polici
 
 ### 14.4 VM constant
 
-`scripts/lib/vm.sh` exports `LARV_VM_HOST=31.220.79.31`. Single point of change for future generalization. Hardcoded as a known team-locked constant; spec explicitly notes this limitation.
+`scripts/lib/vm.sh` exports `LARV_VM_HOST=sandbox.example.com`. Single point of change for future generalization. Hardcoded as a known team-locked constant; spec explicitly notes this limitation.
 
 ## 15. Cross-cutting: handsoff system
 
@@ -623,7 +623,7 @@ A second implementation plan covering:
 - Phase 0a DDD interview (§5)
 - Phase 0 Discuss Laravel ecosystem checklist enrichment (§6.2)
 - Phase 1 Laravel-DDD mapping (§7.2)
-- Phase 3 design picker + huashu mockup server (§9)
+- Phase 3 design picker + Attio-style mockup server (§9)
 - Phase 6.5 doc-site review (§11)
 
 ### 22.3 Order of execution
@@ -634,7 +634,7 @@ MVP plan written and executed end-to-end, including a working `/larv:full` again
 
 Items the spec acknowledges but defers to implementation-time validation:
 
-1. **Huashu cross-pick consistency.** Can huashu produce 5–7 screens × 3 picks (15–21 mockups) while keeping screen shape consistent? If not, fallback per §9.1 step 6 (one mockup per pick). Decision recorded in design log at runtime.
+1. **design reference cross-pick consistency.** Can local Attio-style galleries produce 5–7 screens × 3 picks (15–21 mockups) while keeping screen shape consistent? If not, fallback per §9.1 step 6 (one mockup per pick). Decision recorded in design log at runtime.
 2. **Push-protected default branch detection.** The `git push --dry-run` heuristic in §18 is approximate. Implementation may need refinement based on CI/branch-protection conventions in the team's GitHub setup.
 3. **Foreign-AI tooling assumptions.** Handsoff inline snippets assume the foreign-AI venue has `bash`, `yq`, `git`, `curl`, `ssh`, and `docker` available. Spec assumes typical developer machines satisfy this; implementation may need to add a "preflight check for foreign AI" snippet at the top of `docs/Handsoff.md`.
 
@@ -647,7 +647,7 @@ This brainstorm session resolved the following decisions:
 - Design picker: user browses getdesign.md in their own browser; agent provides recommendation memo and fetches selected picks; mockup server shows the user's app in each picked style (§9).
 - Mockup storage: WebFetch on pick (no full vendored catalog); cached under `03-design/picks/<slug>.md`.
 - Verifier strategy: live-scan only with auto-pick on conflict and probe-before-announce (§14, §3.3).
-- VM IP: hardcoded to `31.220.79.31` in `scripts/lib/vm.sh`.
+- VM IP: hardcoded to `sandbox.example.com` in `scripts/lib/vm.sh`.
 - Handsoff: mandatory, venue-agnostic, per-slice + index, self-contained (§15).
 - Routing menu: same-session / subagents / handoff; mixed dropped (§4.3).
 - Phase numbering: preserved; insert Phase 0a and Phase 6.5 without renumbering.

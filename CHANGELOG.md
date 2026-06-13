@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Adds the Attio Finance and Attio Venture HTML Effectiveness galleries as first-class Phase 3 design sources for visual brainstorms, docs preview mockups, and new-app design templates.
+- Requires Attio Finance and Attio Venture template adaptations to include both a visible app logo and browser URL logo/favicon, and records those assets in the Phase 3 visual implementation contract.
+- Requires Phase 3 mockups to be interactive HTML Effectiveness prototypes with clickable navigation, workflow paths, primary actions, state changes, and `interaction-map.md` parity contracts.
+- Makes `attio-venture-html-effectiveness/` the canonical Attio Venture mockup reference path for Phase 3, backed by the existing Attio Venture HTML Effectiveness gallery.
+- Moves the design-direction choice into the first Phase 0 Discuss question and saves it as `docs/larv/00-discuss/design-preferences.md` for Phase 3 to honor.
+- Adds `/larv:presentation`, which reads the current repo, generates an HTML Effectiveness-style role workflow presentation, and serves it on public VM ports `2000-2999`.
+- Extends `/larv:presentation` with focus arguments such as `skills visual representation`, `dataflow <feature>`, and `feature <name>`.
+- Extends `/larv:presentation` output with visual graph artifacts: a core business database flowchart, a rendered Mermaid diagram that analyzes backend code plus database schema for CREATE/UPDATE/DELETE flows, role-based demo/training/go-live wizard steppers, and a complete workflow graph for launch review.
+- Adds `/larv:redesign-attio-finance` and `/larv:redesign-attio-venture` to redesign an existing Laravel frontend into the Attio Finance or Attio Venture HTML Effectiveness CRM template systems, with screen inventory, implementation report, visual parity evidence, sandbox restart/probe, and public test URL requirements.
+- Adds `/larv-feature-how-it-works`, an in-app guide feature command that references `examples/rfp` and `examples/interview` examples to build a real `/guide` or `/how-it-works` page from the current app workflow.
+- Tightens `/larv-feature-how-it-works` so the generated guide must include How It Works sections for every detected app role/persona and write `role-flow-inventory.md`.
+- Adds `/larv-feature-feedback`, an in-app feedback feature command using the `examples/rfp` and `examples/imu` feedback references, with Resend API mail delivery, persisted reports, screenshot/context capture, and admin triage requirements.
+- Adds `/larv-feature-onboarding-helper`, an onboarding/helper feature command that references `examples/rfp`, `examples/imu`, and `examples/async` patterns and requires a full user-flow inventory before implementation.
+- Updates generated handoff docs and AI starting-point files with a final model-switch instruction and starter prompt for fresh sessions or external AI tools.
+- Removes the active Phase 3 dependency on browsing external design galleries; local Attio templates are now the design source of truth.
+- Changes Phase 3 design selection to ask whether the user wants PRD-based recommendations or a specific direction first; Attio workspace is always the first recommendation and one pick is enough to proceed.
+- Adds hard post-implementation verification for PRD/docs-to-source parity, approved mockup visual parity, and policy-app-style shared layout/admin menu behavior, including Filament guidance that admin features must use the same app shell unless the PRD explicitly requires a separate product.
+- Adds unified Attio foundation tokens to the Attio Finance and Attio Venture gallery stylesheets so brand variants share the same surface, border, radius, typography, and density contract.
+- Adds `templates/attio-crm-workspace.html` as the approved reusable Attio CRM/workspace component baseline for shell, sidebar, command bar, metrics, records, and agent activity.
+- Documents the shared Design Choice System: Custom purple gradient, Attio Finance gold/blue, and Attio Venture brown/tan.
+
 ## 0.4.29 (next) - User-selected sandbox ports and stricter mockup contract
 
 - Requires `/larv:sandbox-start` to ask for app, docs, and mockup ports before exposing servers; explicit ports can also be passed through `LARV_APP_PORT`, `LARV_DOCS_PORT`, and `LARV_MOCKUPS_PORT`.
@@ -60,7 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.4.21 (next) - Handoff design artifact links
 
-- Makes `larv-handoff` explicitly depend on the Huashu-derived `visual-implementation-contract.md` and approved mockups directory.
+- Makes `larv-handoff` explicitly depend on the design reference-derived `visual-implementation-contract.md` and approved mockups directory.
 - Adds direct visual contract, UI design, and approved mockup links to the generated `docs/Handsoff.md` index.
 
 ## 0.4.20 (next) - Demo mode seeders and user switcher
@@ -77,7 +98,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.4.18 (next) - Design-to-implementation visual parity gates
 
-- Makes Huashu design output a mandatory `docs/larv/03-design/visual-implementation-contract.md` that bridges approved mockups to production UI.
+- Makes design reference design output a mandatory `docs/larv/03-design/visual-implementation-contract.md` that bridges approved mockups to production UI.
 - Requires UI implementation slices to read the approved design contract and mockups, capture desktop/mobile screenshots, and document visual parity before completion.
 - Updates `/larv:feature`, handoff, implementation, planning, docs index, and AI starting-point guidance so UI work cannot silently fall back to plain starter screens.
 
@@ -137,9 +158,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.4.9 (next) - Local VM runtime default
 
-- Changes the sandbox runtime model to default to local execution on the VM instead of SSHing to `31.220.79.31`.
-- Sets the default runtime user metadata to `claude-team` and keeps SSH-only behavior behind explicit `LARV_RUNTIME_MODE=remote`.
-- Updates mockup, doc-site, verifier, probe, pre-flight, and handoff bootstrap flows to execute locally while still serving browser URLs at `http://31.220.79.31:<port>`.
+- Changes the sandbox runtime model to default to local execution on the VM instead of SSHing to `sandbox.example.com`.
+- Sets the default runtime user metadata to `larv-user` and keeps SSH-only behavior behind explicit `LARV_RUNTIME_MODE=remote`.
+- Updates mockup, doc-site, verifier, probe, pre-flight, and handoff bootstrap flows to execute locally while still serving browser URLs at `http://sandbox.example.com:<port>`.
 - Updates generated handoff, starting-point, runbook, and README guidance to warn agents not to SSH for the normal larv flow.
 
 ## 0.4.8 (next) - Deployment automation and continuation
@@ -178,7 +199,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Hardens the sandbox bootstrap handoff to detect/start MySQL, MariaDB, or PostgreSQL, create the app database when missing, configure a database user, write `.env` database/app values, and record database details in `STATE.yaml`.
 - Fills `larv-verify` with concrete Pint, Pest, Larastan, asset build, migration, Playwright-if-present, and sandbox smoke checks.
 - Fills `larv-deploy` with Laravel Cloud and Namecheap defaults, user questions, env-var handling, DNS instructions, production smoke checks, and rollback reporting.
-- Adds explicit bundled-skill references for domain-driven-design, masterplan, huashu-design, and superpowers-laravel in the phase prompts.
+- Adds explicit bundled-skill references for domain-driven-design, masterplan, and superpowers-laravel in the phase prompts.
 
 ## 0.4.3 (next) - Handoff sandbox flow
 
@@ -206,7 +227,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Phase 0a - DDD interview** (new skill `larv-domain-interview`): business-process-only interview before Discuss. 9 sections, about 15-20 questions, tech-leak guard, 8 output files in `docs/larv/ddd-interview/`.
 - **Phase 0 enrichment**: `larv-discuss` filled with the full Laravel ecosystem checklist (Filament/Nova, Sanctum/Passport/Fortify, Horizon, Reverb, Pulse, Telescope, Octane, Cashier, multi-tenancy options, Scout, MCPs, Pest/Pint/Larastan/Rector). Each ask is paired with a recommendation citing the DDD interview.
 - **Phase 1 - Laravel-DDD mapping** (`larv-domain` filled): WebFetches the linked medium article at runtime for current Laravel-DDD guidance; produces full DDD layout when viability passes, flat Eloquent model otherwise.
-- **Phase 3 - design picker + mockup server** (`larv-design` filled): recommendation memo, user browses getdesign.md in their own browser, agent fetches picks, huashu renders this app's screens in each picked style, comparison harness served on a verifier-allocated port; user converges on one design or hybrid.
+- **Phase 3 - design picker + mockup server** (`larv-design` filled): recommendation memo, user chooses from bundled Attio HTML Effectiveness templates renders this app's screens in each picked style, comparison harness served on a verifier-allocated port; user converges on one design or hybrid.
 - **Phase 6.5 - doc-site review** (new skill `larv-docsite`): Docsify served on a docsite-range port (9500-9999), client-side rendering from CDN, no server-side build; allows browsing the entire plan before the Phase 7 hard gate.
 - **New shared lib `static_server.sh`**: shared lifecycle for any static server on the VM (mockups, doc-site).
 - **MVP follow-ups**: added bats coverage for `allocate_db`, `verify_allocation`, and `probe_url_inside`; fixed multi-line file inlining in `handsoff_collect_tokens`.
@@ -222,7 +243,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Implementation tracker**: `implementation-tracker.yaml` (canonical) + rendered `.md` view. Append protocol inlined in every slice handsoff.
 - **AI starting-point files**: `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, `.cursor/rules/larv.mdc`, `.codex/AGENTS.md` — generated before the Phase 8 hard gate.
 - **/larv:feature** and **/larv:debug** preserve full discipline (gates, handsoff, tracker, starting-point regen).
-- **VM constant** `LARV_VM_HOST=31.220.79.31` isolated to `scripts/lib/vm.sh`.
+- **VM constant** `LARV_VM_HOST=sandbox.example.com` isolated to `scripts/lib/vm.sh`.
 
 Layer 2 shipped in 0.4.0.
 

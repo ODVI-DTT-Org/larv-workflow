@@ -73,7 +73,7 @@ setup() {
 @test "static_server_url returns http url with VM host and port" {
     run bash -c "source $PROJECT_ROOT/scripts/lib/vm.sh && source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_url 8001"
     [ "$status" -eq 0 ]
-    [ "$output" = "http://31.220.79.31:8001" ]
+    [ "$output" = "http://sandbox.example.com:8001" ]
 }
 
 @test "static_server_compose_command rejects empty arguments" {
@@ -585,11 +585,11 @@ ssh_target="${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}"
 static_server_open_firewall "$ssh_target" "$mockup_port"
 ```
 
-### 6. Huashu generates mockups
+### 6. design reference generates mockups
 
-Invoke the bundled `huashu-design` skill for each pick. Render 5–7 key screens per pick at `docs/larv/03-design/mockups/<pick-slug>/<screen>.html`.
+Use the bundled Attio-style galleries for each pick. Render 5–7 key screens per pick at `docs/larv/03-design/mockups/<pick-slug>/<screen>.html`.
 
-**Feasibility fallback (per spec §9.1 step 6):** if huashu cannot sustain consistency across all picks × screens, degrade to one mockup per pick (hero/dashboard only). Record the decision in `docs/larv/03-design/recommendations.md`.
+**Feasibility fallback (per spec §9.1 step 6):** if local Attio-style galleries cannot sustain consistency across all picks × screens, degrade to one mockup per pick (hero/dashboard only). Record the decision in `docs/larv/03-design/recommendations.md`.
 
 ### 7. Mockup server (probe-before-announce)
 
@@ -614,13 +614,13 @@ echo "Mockups ready at $(static_server_url "$mockup_port")"
 
 ### 8. User picks one (or hybrid)
 
-User replies in chat: `pick: <slug>` or `hybrid: <slug-A> layout + <slug-B> palette`. If hybrid, regenerate via huashu and re-probe; iterate until the user commits with a single slug.
+User replies in chat: `pick: <slug>` or `hybrid: <slug-A> layout + <slug-B> palette`. If hybrid, regenerate via local Attio-style references and re-probe; iterate until the user commits with a single slug.
 
 Record decision at `docs/larv/03-design/design-decision.md` with rationale (free-text from the user; the picks not chosen and why if the user volunteered).
 
 ### 9. Finalize brand spec
 
-Invoke huashu-design with the chosen pick only. Outputs:
+Use the selected Attio-style reference with the chosen pick only. Outputs:
 
 - `docs/larv/03-design/brand-spec.md`
 - `docs/larv/03-design/ui-design.md`
@@ -753,7 +753,7 @@ Stays up through the Phase 7 hard gate. Released after the routing menu is answe
 
 ## Required outputs
 
-- The doc-site is browsable at `http://31.220.79.31:<port>`.
+- The doc-site is browsable at `http://sandbox.example.com:<port>`.
 - `STATE.yaml.execution.allocations` includes a `docsite-port` entry.
 
 ## What you do not do
@@ -957,7 +957,7 @@ Insert at top of changelog entries (above the 0.3.0 entry):
 - **Phase 0a — DDD interview** (new skill `larv-domain-interview`): business-process-only interview before Discuss. 9 sections, ~15–20 questions, tech-leak guard, 8 output files in `docs/larv/ddd-interview/`.
 - **Phase 0 enrichment**: `larv-discuss` filled with the full Laravel ecosystem checklist (Filament/Nova, Sanctum/Passport/Fortify, Horizon, Reverb, Pulse, Telescope, Octane, Cashier, multi-tenancy options, Scout, MCPs, Pest/Pint/Larastan/Rector). Each ask paired with a recommendation citing the DDD interview.
 - **Phase 1 — Laravel-DDD mapping** (`larv-domain` filled): WebFetches the linked medium article at runtime for current Laravel-DDD guidance; produces full DDD layout when viability passes, flat Eloquent model otherwise.
-- **Phase 3 — design picker + mockup server** (`larv-design` filled): recommendation memo, user browses getdesign.md in their own browser, agent fetches picks, huashu renders this app's screens in each picked style, comparison harness served on a verifier-allocated port; user converges on one design (or hybrid).
+- **Phase 3 — design picker + mockup server** (`larv-design` filled): recommendation memo, user browses getdesign.md in their own browser, agent fetches picks renders this app's screens in each picked style, comparison harness served on a verifier-allocated port; user converges on one design (or hybrid).
 - **Phase 6.5 — doc-site review** (new skill `larv-docsite`): Docsify served on a docsite-range port (9500–9999), client-side rendering from CDN, no server-side build; allows browsing the entire plan before the Phase 7 hard gate.
 - **New shared lib `static_server.sh`**: shared lifecycle for any static server on the VM (mockups, doc-site).
 ```
@@ -974,8 +974,8 @@ Layer 2 adds richer per-phase content:
 - **Phase 0a** runs a business-process DDD interview *before* tech is discussed. Tech mentions are politely tabled.
 - **Phase 0 (Discuss)** uses the DDD interview to ground every Laravel ecosystem question — descriptions and recommendations cite your own answers.
 - **Phase 1 (Domain)** WebFetches a current Laravel-DDD reference and produces either a full DDD layout or a flat Eloquent model based on a viability gate.
-- **Phase 3 (Design)** asks you to browse https://getdesign.md/ in your own browser and pick ≥3 designs. The agent then renders *your app's screens* in each picked style and serves a comparison harness at `http://31.220.79.31:<port>` so you can pick one (or merge two).
-- **Phase 6.5 (Doc-site)** spins up a Docsify-rendered version of your entire plan at `http://31.220.79.31:<port>` for a final read-through before implementation begins.
+- **Phase 3 (Design)** asks you to browse https://getdesign.md/ in your own browser and pick ≥3 designs. The agent then renders *your app's screens* in each picked style and serves a comparison harness at `http://sandbox.example.com:<port>` so you can pick one (or merge two).
+- **Phase 6.5 (Doc-site)** spins up a Docsify-rendered version of your entire plan at `http://sandbox.example.com:<port>` for a final read-through before implementation begins.
 ```
 
 - [ ] **Step 11.3: Append to `LEARNINGS.md`**

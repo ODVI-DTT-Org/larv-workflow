@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="attio-venture-logo.png">
+  <link rel="apple-touch-icon" href="attio-venture-logo.png">
+  <title>Design System Setup — Choose Your Brand</title>
+  <link rel="stylesheet" href="design-system.css">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #FFF9F3 0%, #FBF6F1 100%);
+      padding: var(--space-24);
+    }
+
+    .setup-container {
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    .setup-header {
+      text-align: center;
+      margin-bottom: var(--space-64);
+    }
+
+    .setup-header h1 {
+      font-size: 42px;
+      margin-bottom: var(--space-16);
+      color: var(--oak-primary);
+    }
+
+    .setup-header p {
+      font-size: 18px;
+      color: var(--gray-600);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .design-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-32);
+      margin-bottom: var(--space-48);
+    }
+
+    .design-card {
+      background: var(--white);
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: var(--space-32);
+      cursor: pointer;
+      transition: all var(--transition-base);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .design-card:hover {
+      border-color: var(--oak-primary);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+    }
+
+    .design-card.selected {
+      border-color: var(--oak-primary);
+      background: rgba(155, 102, 50, 0.05);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .design-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-24);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+    }
+
+    .design-custom .design-preview {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .design-attio-finance .design-preview {
+      background: linear-gradient(135deg, #FAA000 0%, #1B5E7F 100%);
+    }
+
+    .design-oak .design-preview {
+      background: linear-gradient(135deg, #9B6632 0%, #ECCDAE 100%);
+    }
+
+    .design-card h3 {
+      font-size: 20px;
+      margin-bottom: var(--space-12);
+      color: var(--gray-900);
+    }
+
+    .design-card p {
+      font-size: 14px;
+      color: var(--gray-600);
+      margin-bottom: var(--space-16);
+    }
+
+    .design-colors {
+      display: flex;
+      gap: var(--space-8);
+      justify-content: center;
+      margin-bottom: var(--space-16);
+    }
+
+    .color-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--gray-300);
+    }
+
+    .design-meta {
+      font-size: 12px;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: var(--space-16);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-select {
+      padding: var(--space-12) var(--space-24);
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all var(--transition-fast);
+      display: none;
+    }
+
+    .design-card.selected .btn-select {
+      display: block;
+      background: var(--oak-primary);
+      color: white;
+    }
+
+    .design-card.selected .btn-select:hover {
+      background: var(--oak-primary-light);
+      box-shadow: var(--shadow-md);
+    }
+
+    .footer-text {
+      text-align: center;
+      color: var(--gray-500);
+      font-size: 12px;
+      margin-top: var(--space-32);
+    }
+
+    .footer-text a {
+      color: var(--oak-primary);
+    }
+
+    @media (max-width: 768px) {
+      .design-options {
+        grid-template-columns: 1fr;
+      }
+
+      .setup-header h1 {
+        font-size: 32px;
+      }
+
+      .setup-header p {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="setup-container">
+    <!-- Header -->
+    <div class="setup-header">
+      <h1>🎨 Choose Your Design System</h1>
+      <p>Select a design system for your mockups and templates. You can change this anytime from settings.</p>
+    </div>
+
+    <!-- Design Options -->
+    <div class="design-options">
+      <!-- Custom Design -->
+      <div class="design-card design-custom" onclick="selectDesign('custom', this)">
+        <div class="design-preview">✨</div>
+        <h3>Custom</h3>
+        <p>Create your own custom branding and color scheme</p>
+        <div class="design-colors">
+          <div class="color-swatch" style="background: #667eea;"></div>
+          <div class="color-swatch" style="background: #764ba2;"></div>
+          <div class="color-swatch" style="background: #f5f7fa;"></div>
+        </div>
+        <div class="design-meta">Your Colors</div>
+        <div class="action-buttons">
+          <button class="btn-select" onclick="confirmSelection('custom')">Use Custom</button>
+        </div>
+      </div>
+
+      <!-- Attio Finance Design -->
+      <div class="design-card design-attio-finance" onclick="selectDesign('attio-finance', this)">
+        <div class="design-preview">🏦</div>
+        <h3>Attio Finance</h3>
+        <p>Attio Finance Studio — Gold and deep blue financial branding</p>
+        <div class="design-colors">
+          <div class="color-swatch" style="background: #FAA000;"></div>
+          <div class="color-swatch" style="background: #1B5E7F;"></div>
+          <div class="color-swatch" style="background: #F3F4F6;"></div>
+        </div>
+        <div class="design-meta">Finance & Credit</div>
+        <div class="action-buttons">
+          <button class="btn-select" onclick="confirmSelection('attio-finance')">Use Attio Finance</button>
+        </div>
+      </div>
+
+      <!-- Attio Venture Design -->
+      <div class="design-card design-oak" onclick="selectDesign('attio-venture', this)">
+        <div class="design-preview">🌳</div>
+        <h3>Attio Venture</h3>
+        <p>Attio Venture Studio — Warm brown and light tan investment branding</p>
+        <div class="design-colors">
+          <div class="color-swatch" style="background: #9B6632;"></div>
+          <div class="color-swatch" style="background: #ECCDAE;"></div>
+          <div class="color-swatch" style="background: #FFF9F3;"></div>
+        </div>
+        <div class="design-meta">Ventures & Growth</div>
+        <div class="action-buttons">
+          <button class="btn-select" onclick="confirmSelection('attio-venture')">Use Attio Venture</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer-text">
+      <p>Design System Setup • Based on <a href="https://github.com/ThariqS/html-effectiveness" target="_blank">html-effectiveness</a> by Anthropic</p>
+      <p style="margin-top: var(--space-8);">All templates are self-contained, require no build steps, and work in any modern browser.</p>
+    </div>
+  </div>
+
+  <script>
+    function selectDesign(design, element) {
+      // Remove selected class from all cards
+      document.querySelectorAll('.design-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      // Add selected class to clicked card
+      element.classList.add('selected');
+    }
+
+    function confirmSelection(design) {
+      // Save design choice to localStorage
+      localStorage.setItem('designChoice', design);
+
+      // Show confirmation and redirect
+      showNotification(`Design system set to: ${design.toUpperCase()}`, 'success');
+
+      // Redirect to index.html after a short delay
+      setTimeout(() => {
+        window.location.href = 'index.html?design=' + design;
+      }, 800);
+    }
+
+    function showNotification(message, type) {
+      const notification = document.createElement('div');
+      notification.style.cssText = `
+        position: fixed;
+        top: var(--space-24);
+        right: var(--space-24);
+        background: var(--oak-success);
+        color: white;
+        padding: var(--space-16) var(--space-24);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
+        z-index: 1000;
+        animation: slideIn 300ms ease-out;
+      `;
+      notification.textContent = message;
+      document.body.appendChild(notification);
+
+      setTimeout(() => {
+        notification.remove();
+      }, 2000);
+    }
+
+    // Check if design has already been selected
+    window.addEventListener('load', () => {
+      const savedDesign = localStorage.getItem('designChoice');
+      if (savedDesign && !window.location.search.includes('setup=true')) {
+        // If design already chosen and not in setup mode, redirect to index
+        window.location.href = 'index.html?design=' + savedDesign;
+      }
+    });
+
+    // Add animation styles
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>

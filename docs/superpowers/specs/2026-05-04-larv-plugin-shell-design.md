@@ -1,7 +1,7 @@
 # larv Plugin — Shell + Composition Strategy (Sub-project A)
 
 **Date:** 2026-05-04
-**Author:** itranario@oakdriveventures.com
+**Author:** maintainers@example.org
 **Status:** Design — pending user review
 **Scope:** Sub-project A of the larv plugin project. Defines the plugin's shell, composition policy, command surface, orchestration model, state management, self-improvement loop, and adoption flow. **Does not** specify the per-phase prompts (sub-project B), the sandbox runtime (sub-project C), Laravel Cloud deployment (sub-project D), or the deep self-improvement governance details (sub-project E).
 
@@ -9,13 +9,13 @@
 
 ## 1. One-paragraph summary
 
-`larv` is a Claude Code plugin distributed as a **bundled marketplace** that orchestrates four upstream skills (`masterplan`, `superpowers-laravel`, `domain-driven-design`, `huashu-design`) into an opinionated end-to-end Laravel-app workflow. It exposes 8 commands; the flagship is `/larv:full`, which drives 12 numbered phases (0 through 11), preceded by a pre-flight setup step (Phase −1), from brainstorm through Laravel Cloud deployment. Each phase runs in a fresh subagent to keep context bounded; durable state lives in `docs/larv/STATE.yaml` so any team member can `/larv:resume`. A built-in self-improvement loop (`/larv:learn`) captures lessons from every run and proposes edits to the plugin's own skill files via PR. The plugin **wraps and composes** upstream skills — it never forks or duplicates them.
+`larv` is a Claude Code plugin distributed as a **bundled marketplace** that orchestrates four upstream skills (`masterplan`, `superpowers-laravel`, `domain-driven-design`) into an opinionated end-to-end Laravel-app workflow. It exposes 8 commands; the flagship is `/larv:full`, which drives 12 numbered phases (0 through 11), preceded by a pre-flight setup step (Phase −1), from brainstorm through Laravel Cloud deployment. Each phase runs in a fresh subagent to keep context bounded; durable state lives in `docs/larv/STATE.yaml` so any team member can `/larv:resume`. A built-in self-improvement loop (`/larv:learn`) captures lessons from every run and proposes edits to the plugin's own skill files via PR. The plugin **wraps and composes** upstream skills — it never forks or duplicates them.
 
 ## 2. Goals
 
 1. **End-to-end Laravel app delivery driven by AI** — the user answers questions, reviews docs, and QAs in a browser; never opens an editor.
 2. **Bounded context** — `/larv:full` must run a 12-phase project without context death.
-3. **Composes, doesn't duplicate** — wrap `masterplan`, `superpowers-laravel`, `domain-driven-design`, `huashu-design`. Track upstream improvements automatically.
+3. **Composes, doesn't duplicate** — wrap `masterplan`, `superpowers-laravel`, `domain-driven-design`. Track upstream improvements automatically.
 4. **Self-improving** — every run can propose edits to the plugin's own skills via PR. Compounds across the team.
 5. **Resumable + team-shareable** — durable `STATE.yaml` makes any project resumable by any team member.
 6. **Greenfield AND existing apps** — `/larv:full` for new projects, `/larv:adopt` for existing ones.
@@ -36,7 +36,7 @@ The plugin's own skills are **routing skills** — they invoke upstream skills w
 |---|---|---|
 | `superpowers-laravel:brainstorm` | Phase 0, `/larv:brainstorm` | DDD viability check trigger; library policy questions (Filament/Nova/Horizon/Reverb/Pulse/Cashier); MCP enablement Q's |
 | `masterplan-discuss` | Phase 0 | — |
-| `huashu-design` (truth-first) | Phases 0, 2, 3 | Forces context7 MCP lookups for any library claim; activates fallback advisor when design direction is missing |
+| local Attio-style galleries (truth-first) | Phases 0, 2, 3 | Forces context7 MCP lookups for any library claim; activates fallback advisor when design direction is missing |
 | `domain-driven-design` (gated) | Phase 1 | Gated by larv's viability check (≥2 of 4 criteria) |
 | `masterplan-c4-architecture` | Phase 2 | — |
 | `masterplan-master-design` | Phases 2, 3 | — |
@@ -56,7 +56,7 @@ The plugin's own skills are **routing skills** — they invoke upstream skills w
 
 ## 5. Distribution: bundled marketplace
 
-`larv` ships as a single Claude Code plugin marketplace that pins known-good versions of the four upstream sources in `bundle/`. One install, no missing dependencies.
+`larv` ships as a single Claude Code plugin marketplace that pins known-good versions of the three upstream sources in `bundle/`. One install, no missing dependencies.
 
 ### Plugin repo structure
 
@@ -95,7 +95,7 @@ larv/
 │   ├── masterplan/                      vendored, version-pinned
 │   ├── superpowers-laravel/             vendored, version-pinned
 │   ├── domain-driven-design/            single-skill vendor from antigravity-awesome-skills
-│   └── huashu-design/                   vendored, version-pinned
+│   └── local Attio-style galleries/                   vendored, version-pinned
 ├── templates/                           .md templates copied into user projects
 │   ├── slice-handoff.md
 │   ├── sandbox-runbook.md
@@ -143,10 +143,10 @@ larv/
 | # | Phase | Skills invoked | User does | Agent does | Outputs |
 |---|---|---|---|---|---|
 | −1 | Pre-flight | (larv) | confirm budget | load `LEARNINGS.md` digest, ping VM, verify bundle, check MCPs, estimate budget | `pre-flight.md`, init `STATE.yaml` |
-| 0 | Discuss | `superpowers-laravel:brainstorm` + `masterplan-discuss` + huashu truth-first | answer Qs | brainstorm; library/MCP Qs; DDD viability check | `00-discuss/{product-brief,stakeholder-map,glossary,handoff}.md` |
+| 0 | Discuss | `superpowers-laravel:brainstorm` + `masterplan-discuss` + local Attio-style galleries truth-first | answer Qs | brainstorm; library/MCP Qs; DDD viability check | `00-discuss/{product-brief,stakeholder-map,glossary,handoff}.md` |
 | 1 | Domain | `domain-driven-design` (gated) | review | DDD model OR flat domain model | `01-domain/*` |
 | 2 | Architecture | `masterplan-c4-architecture` + `masterplan-master-design` | review | C4 levels 1–3, **library policy locked**, ADRs | `02-architecture/*` |
-| 3 | Design | `masterplan-master-design` + `huashu-design` | review | data model, API surface, UI screens, brand spec | `03-design/*` |
+| 3 | Design | `masterplan-master-design` + local Attio-style galleries | review | data model, API surface, UI screens, brand spec | `03-design/*` |
 | 4 | Test strategy | `masterplan-test-strategy` + `superpowers-laravel:laravel-tdd` | review | Pest layers, Playwright flows, acceptance criteria per feature | `04-test-strategy/*` |
 | 5 | Premortem | `masterplan-bug-premortem` + `masterplan-adversarial-review` | review | failure modes, adversarial pass, risks register; **may loop back to 2/3/4** | `05-premortem/*` |
 | 6 | Slice plan | `superpowers-laravel:write-plan` + `masterplan-implementation` | approve slice list | Elephant Carpaccio: ~1-day vertical slices | `06-implementation/elephant-carpaccio.md` |
@@ -251,7 +251,7 @@ plugin:
     masterplan: <semver>
     superpowers-laravel: <semver>
     domain-driven-design: <semver>
-    huashu-design: <semver>
+    local Attio-style galleries: <semver>
   learnings_digest_hash: <hash>
 
 phase:
@@ -436,7 +436,7 @@ If A0 detects red flags (Laravel < 9, vendor-patched core, no tests, custom auto
 ## 13. Plugin name + repo
 
 - **Name:** `larv`
-- **Repo:** single private GitHub repo owned by the team's org (e.g., `<your-org>/larv`)
+- **Repo:** single private GitHub repo owned by the team's org (e.g., `<larv-workflow>/larv`)
 - **License:** internal/proprietary (private)
 - **Versioning:** SemVer
 
@@ -455,7 +455,7 @@ These were called out during brainstorm but don't block the spec:
 
 - **Doc collision strategy** — agent-owned sections vs `<!-- HUMAN NOTES -->` blocks preserved verbatim. Implementation detail in `larv-orchestrator` skill.
 - **Run telemetry** — `runs/<run-id>.jsonl` event log per project to feed `/larv:learn` with quantitative signal (time-per-phase, retry counts, etc.).
-- **Huashu fallback advisor** — auto-trigger in Phase 3 when user gives no design direction.
+- **design reference fallback advisor** — auto-trigger in Phase 3 when user gives no design direction.
 - **Plugin CI** — `tests/fixtures/{greenfield-todo,existing-blog}/` exercise the bundled + larv skills. CI pipeline definition in implementation plan.
 - **STATE.yaml schema migrations** — `migrations/state/` scripts; tested in CI.
 
@@ -465,7 +465,7 @@ The implementation of this spec is "done" when:
 
 1. The plugin repo is initialized with the structure in §5
 2. `.claude-plugin/plugin.json` is valid JSON with `name`, `version` (SemVer), object-form `author`, and `description`. Per Claude Code's auto-discovery convention, the manifest does NOT enumerate commands or skills; instead `commands/` contains 8 `.md` files (verified by Task 2's tests) and `skills/` contains 15 subdirectories each with `SKILL.md` (verified by Task 3's tests).
-3. The four upstream sources are vendored into `bundle/` at pinned versions (versions chosen in implementation plan)
+3. The three upstream sources are vendored into `bundle/` at pinned versions (versions chosen in implementation plan)
 4. `/larv:status` works against an empty `STATE.yaml`
 5. `/larv:resume` correctly handles the empty-state, gate-pending, and errors-unresolved branches of the decision tree
 6. `STATE.yaml` schema v1 has at least one passing migration test (v1-to-v1 noop)

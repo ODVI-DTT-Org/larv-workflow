@@ -2,7 +2,7 @@
 
 load helpers
 
-BUNDLES=(masterplan superpowers-laravel domain-driven-design huashu-design)
+BUNDLES=(masterplan superpowers-laravel domain-driven-design)
 
 @test "bundle/VERSIONS.yaml exists and is valid YAML" {
     [ -f bundle/VERSIONS.yaml ]
@@ -10,7 +10,7 @@ BUNDLES=(masterplan superpowers-laravel domain-driven-design huashu-design)
     [ "$status" -eq 0 ]
 }
 
-@test "bundle/VERSIONS.yaml lists all 4 dependencies" {
+@test "bundle/VERSIONS.yaml lists all 3 dependencies" {
     for b in "${BUNDLES[@]}"; do
         run yq -r ".[\"$b\"]" bundle/VERSIONS.yaml
         [ "$status" -eq 0 ]
@@ -18,7 +18,7 @@ BUNDLES=(masterplan superpowers-laravel domain-driven-design huashu-design)
     done
 }
 
-@test "all 4 bundle directories exist" {
+@test "all 3 bundle directories exist" {
     for b in "${BUNDLES[@]}"; do
         [ -d "bundle/$b" ] || { echo "missing bundle/$b"; return 1; }
     done
@@ -52,11 +52,6 @@ BUNDLES=(masterplan superpowers-laravel domain-driven-design huashu-design)
 
 @test "domain-driven-design bundle vendors its skill" {
     [ -f bundle/domain-driven-design/skills/domain-driven-design/SKILL.md ]
-}
-
-@test "huashu-design bundle vendors its skill and references" {
-    [ -f bundle/huashu-design/SKILL.md ]
-    [ -d bundle/huashu-design/references ]
 }
 
 @test "bundle-update.sh exists and is executable" {

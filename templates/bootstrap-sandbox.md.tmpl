@@ -27,9 +27,13 @@ DB_CONNECTION="${DB_CONNECTION:-pgsql}"
 DB_HOST="${DB_HOST:-127.0.0.1}"
 DB_PORT="${DB_PORT:-5432}"
 DB_USERNAME="${DB_USERNAME:-larv}"
-DB_PASSWORD="${DB_PASSWORD:-larv}"
+DB_PASSWORD="${DB_PASSWORD:-}"
 DB_INSTALL_MODE="${DB_INSTALL_MODE:-apt}"
 LARV_VM_INSTALL_MODE="${LARV_VM_INSTALL_MODE:-apt}"
+
+if [ -z "$DB_PASSWORD" ]; then
+    DB_PASSWORD="$(tr -dc 'A-Za-z0-9' </dev/urandom | head -c 32)"
+fi
 
 if [ "${LARV_RUNTIME_MODE:-local}" != "local" ]; then
     echo "ERROR: this handoff expects local execution on the sandbox VM. Do not SSH to $VM_HOST unless a separate remote-mode runbook was generated." >&2

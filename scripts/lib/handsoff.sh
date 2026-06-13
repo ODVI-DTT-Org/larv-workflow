@@ -52,8 +52,8 @@ handsoff_collect_tokens() {
     __handsoff_token generated_at "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
     __handsoff_token git_sha "$git_sha"
     __handsoff_token git_default_branch "$git_default_branch"
-    __handsoff_token vm_host "${LARV_VM_HOST:-31.220.79.31}"
-    __handsoff_token ssh_user "${LARV_VM_HOST_SSH_USER:-claude-team}"
+    __handsoff_token vm_host "${LARV_VM_HOST:-sandbox.example.com}"
+    __handsoff_token ssh_user "${LARV_VM_HOST_SSH_USER:-larv-user}"
     __handsoff_token app_port "${app_port:-TBD}"
     __handsoff_token mockup_port "${mockup_port:-TBD}"
     __handsoff_token db_name "${db_name:-TBD}"
@@ -217,7 +217,7 @@ files_changed_yaml_array=
 related_adr_yaml_array=
 learnings_appended_bool=false
 seeded_email=admin@example.com
-seeded_password=password
+seeded_password=<generated-by-seeder>
 passed=
 total=
 EOF

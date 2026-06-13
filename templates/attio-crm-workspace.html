@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Attio CRM Workspace Template</title>
+  <style>
+    :root {
+      --attio-bg: #f6f1e9;
+      --attio-ink: #151412;
+      --attio-muted: #766f63;
+      --attio-surface: #ffffff;
+      --attio-surface-muted: #fbf6ee;
+      --attio-surface-dark: #181612;
+      --attio-border: rgba(38, 34, 28, 0.13);
+      --attio-border-dark: rgba(255, 255, 255, 0.12);
+      --attio-accent: #d79f5f;
+      --attio-green: #4a7c59;
+      --attio-red: #a4524c;
+      --attio-blue: #486f95;
+      --attio-card-radius: 18px;
+      --attio-control-radius: 10px;
+      --attio-font: "Geist", "Satoshi", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --attio-mono: "Geist Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+      --attio-ease: cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      background: var(--attio-bg);
+      color: var(--attio-ink);
+      font-family: var(--attio-font);
+      letter-spacing: 0;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .attio-shell {
+      display: grid;
+      grid-template-columns: 236px minmax(0, 1fr);
+      min-height: 100dvh;
+      background: var(--attio-bg);
+    }
+
+    .attio-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 18px 14px;
+      background: linear-gradient(180deg, #191713, #11100e);
+      color: #efe5d6;
+      border-right: 1px solid var(--attio-border-dark);
+    }
+
+    .attio-workspace {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 8px 15px;
+      border-bottom: 1px solid var(--attio-border-dark);
+    }
+
+    .attio-avatar {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      background: linear-gradient(145deg, #d8ad73, #6e5134);
+      color: #17130f;
+      font-size: 11px;
+      font-weight: 720;
+    }
+
+    .attio-workspace strong,
+    .attio-nav-item,
+    .attio-section-title,
+    .attio-record-name {
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    .attio-workspace span,
+    .attio-nav-label,
+    .attio-help,
+    .attio-muted {
+      color: rgba(239, 229, 214, 0.56);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .attio-nav-label {
+      padding: 0 10px 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: rgba(239, 229, 214, 0.38);
+      font-size: 10px;
+    }
+
+    .attio-nav-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin: 2px 0;
+      padding: 8px 10px;
+      border-radius: var(--attio-control-radius);
+      color: rgba(239, 229, 214, 0.68);
+      transition: transform 420ms var(--attio-ease), background 420ms var(--attio-ease), color 420ms var(--attio-ease);
+    }
+
+    .attio-nav-item.is-active,
+    .attio-nav-item:hover {
+      color: #fff8ea;
+      background: rgba(255, 255, 255, 0.075);
+      transform: translateX(2px);
+    }
+
+    .attio-main {
+      min-width: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .attio-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 22px;
+      background: rgba(255, 255, 255, 0.33);
+      border-bottom: 1px solid var(--attio-border);
+    }
+
+    .attio-command-bar {
+      flex: 1;
+      max-width: 720px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 13px;
+      border: 1px solid var(--attio-border);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.74);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .attio-command-bar input {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      color: var(--attio-ink);
+      background: transparent;
+      font-size: 13px;
+    }
+
+    .attio-kbd,
+    .attio-number {
+      font-family: var(--attio-mono);
+    }
+
+    .attio-kbd {
+      border: 1px solid var(--attio-border);
+      border-radius: 7px;
+      padding: 3px 6px;
+      color: var(--attio-muted);
+      background: var(--attio-surface-muted);
+      font-size: 10px;
+    }
+
+    .attio-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .attio-button {
+      border: 1px solid var(--attio-border);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.62);
+      color: var(--attio-ink);
+      padding: 10px 12px;
+      font-size: 12px;
+      transition: transform 420ms var(--attio-ease), background 420ms var(--attio-ease);
+    }
+
+    .attio-button:hover {
+      transform: translateY(-1px);
+      background: #fffaf2;
+    }
+
+    .attio-button.is-primary {
+      background: var(--attio-ink);
+      color: #fbf3e6;
+      border-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .attio-content {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(310px, 0.82fr);
+      gap: 20px;
+      padding: 22px;
+      overflow: auto;
+    }
+
+    .attio-stack {
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .attio-panel {
+      border: 1px solid var(--attio-border);
+      border-radius: var(--attio-card-radius);
+      background: rgba(255, 255, 255, 0.62);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+    }
+
+    .attio-hero {
+      padding: 24px;
+      min-height: 186px;
+    }
+
+    .attio-eyebrow {
+      display: inline-flex;
+      border: 1px solid var(--attio-border);
+      border-radius: 999px;
+      padding: 6px 9px;
+      background: rgba(255, 255, 255, 0.58);
+      color: var(--attio-muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.13em;
+    }
+
+    .attio-hero h1 {
+      max-width: 760px;
+      margin: 18px 0 12px;
+      font-size: clamp(34px, 5vw, 64px);
+      line-height: 0.96;
+      letter-spacing: -0.045em;
+      font-weight: 680;
+    }
+
+    .attio-hero p {
+      max-width: 58ch;
+      margin: 0;
+      color: var(--attio-muted);
+      font-size: 15px;
+      line-height: 1.62;
+    }
+
+    .attio-metric-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .attio-metric {
+      padding: 14px;
+    }
+
+    .attio-metric label {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--attio-muted);
+      font-size: 11px;
+    }
+
+    .attio-metric strong {
+      display: block;
+      margin-bottom: 4px;
+      font-family: var(--attio-mono);
+      font-size: 22px;
+      letter-spacing: -0.04em;
+    }
+
+    .attio-metric span {
+      color: var(--attio-green);
+      font-size: 11px;
+    }
+
+    .attio-section-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .attio-section-title {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+    }
+
+    .attio-record-table {
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .attio-record-table table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .attio-record-table th,
+    .attio-record-table td {
+      padding: 11px 8px;
+      border-bottom: 1px solid var(--attio-border);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .attio-record-table th {
+      color: var(--attio-muted);
+      font-weight: 560;
+    }
+
+    .attio-record-name {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 620;
+    }
+
+    .attio-mini-logo {
+      width: 26px;
+      height: 26px;
+      border-radius: 9px;
+      background: linear-gradient(145deg, var(--attio-surface-dark), var(--attio-accent));
+      flex: 0 0 auto;
+    }
+
+    .attio-status {
+      display: inline-flex;
+      white-space: nowrap;
+      border: 1px solid var(--attio-border);
+      border-radius: 999px;
+      padding: 4px 7px;
+      background: var(--attio-surface-muted);
+      color: var(--attio-muted);
+      font-size: 11px;
+    }
+
+    .attio-status.is-green { color: var(--attio-green); }
+    .attio-status.is-red { color: var(--attio-red); }
+    .attio-status.is-blue { color: var(--attio-blue); }
+
+    .attio-agent-activity {
+      padding: 16px;
+      background: var(--attio-surface-dark);
+      color: #f7ead8;
+      border-color: rgba(0, 0, 0, 0.2);
+    }
+
+    .attio-agent-activity .attio-section-title {
+      color: #f7ead8;
+    }
+
+    .attio-agent-step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      padding: 10px 0;
+      border-top: 1px solid var(--attio-border-dark);
+    }
+
+    .attio-pulse {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      border-radius: 50%;
+      background: var(--attio-accent);
+      animation: attio-breathe 2.4s infinite var(--attio-ease);
+    }
+
+    .attio-agent-step strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #fff6e8;
+      font-size: 12px;
+    }
+
+    .attio-agent-step span {
+      color: rgba(247, 234, 216, 0.58);
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    @keyframes attio-breathe {
+      0% { box-shadow: 0 0 0 0 rgba(215, 159, 95, 0.28); transform: scale(0.95); }
+      70% { box-shadow: 0 0 0 12px rgba(215, 159, 95, 0); transform: scale(1); }
+      100% { box-shadow: 0 0 0 0 rgba(215, 159, 95, 0); transform: scale(0.95); }
+    }
+
+    @media (max-width: 980px) {
+      .attio-shell,
+      .attio-content {
+        grid-template-columns: 1fr;
+      }
+
+      .attio-sidebar {
+        display: none;
+      }
+
+      .attio-metric-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 680px) {
+      .attio-header {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 14px;
+      }
+
+      .attio-content {
+        padding: 14px;
+      }
+
+      .attio-metric-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .attio-record-table {
+        overflow-x: auto;
+      }
+
+      .attio-record-table table {
+        min-width: 640px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="attio-shell" data-component="attio-shell">
+    <aside class="attio-sidebar" data-component="attio-sidebar">
+      <div class="attio-workspace">
+        <div class="attio-avatar">BP</div>
+        <div>
+          <strong>Basepoint</strong><br>
+          <span>Revenue workspace</span>
+        </div>
+      </div>
+
+      <section>
+        <div class="attio-nav-label">Home</div>
+        <div class="attio-nav-item is-active"><span>Dashboard</span><span>12</span></div>
+        <div class="attio-nav-item"><span>Tasks</span><span>8</span></div>
+        <div class="attio-nav-item"><span>Calls</span><span></span></div>
+      </section>
+
+      <section>
+        <div class="attio-nav-label">Records</div>
+        <div class="attio-nav-item"><span>People</span><span>2.8k</span></div>
+        <div class="attio-nav-item"><span>Companies</span><span>3.1k</span></div>
+        <div class="attio-nav-item"><span>Deals</span><span>418</span></div>
+      </section>
+
+      <p class="attio-help">Agent queue active. Four records enriched, two renewal risks found, one draft ready.</p>
+    </aside>
+
+    <section class="attio-main">
+      <header class="attio-header">
+        <label class="attio-command-bar" data-component="attio-command-bar">
+          <span class="attio-number">/</span>
+          <input value="Ask anything about pipeline, renewals, or account health" aria-label="Ask anything">
+          <span class="attio-kbd">CMD K</span>
+        </label>
+        <div class="attio-actions">
+          <button class="attio-button">Automate</button>
+          <button class="attio-button is-primary">Create record</button>
+        </div>
+      </header>
+
+      <div class="attio-content">
+        <section class="attio-stack">
+          <article class="attio-panel attio-hero">
+            <span class="attio-eyebrow">Universal context</span>
+            <h1>Good morning, Alex. Your pipeline already moved.</h1>
+            <p>A reusable Attio-style CRM workspace shell with compact records, command search, agent activity, and dense operational states.</p>
+          </article>
+
+          <section class="attio-metric-strip" data-component="attio-metric-strip">
+            <article class="attio-panel attio-metric"><label>Weighted pipeline</label><strong>$2.84M</strong><span>up 18.6%</span></article>
+            <article class="attio-panel attio-metric"><label>Renewal risk</label><strong>14</strong><span class="attio-status is-red">3 urgent</span></article>
+            <article class="attio-panel attio-metric"><label>Agent actions</label><strong>286</strong><span>last 7 days</span></article>
+            <article class="attio-panel attio-metric"><label>Enriched records</label><strong>5,490</strong><span>99 new</span></article>
+          </section>
+
+          <article class="attio-panel attio-record-table" data-component="attio-record-table">
+            <div class="attio-section-header">
+              <div>
+                <h2 class="attio-section-title">Records</h2>
+                <div class="attio-muted">Compact, table-first CRM surface</div>
+              </div>
+              <button class="attio-button">Configure view</button>
+            </div>
+            <table>
+              <thead>
+                <tr><th>Company</th><th>Stage</th><th>Owner</th><th>Health</th><th>Value</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><div class="attio-record-name"><span class="attio-mini-logo"></span> Greenleaf</div></td><td><span class="attio-status is-green">Expansion</span></td><td>Nadia Cross</td><td>82</td><td>$428,400</td></tr>
+                <tr><td><div class="attio-record-name"><span class="attio-mini-logo"></span> Railway</div></td><td><span class="attio-status is-red">Renewal risk</span></td><td>Priya Nair</td><td>51</td><td>$196,250</td></tr>
+                <tr><td><div class="attio-record-name"><span class="attio-mini-logo"></span> Lovable</div></td><td><span class="attio-status is-blue">Commit</span></td><td>Elias Voss</td><td>88</td><td>$512,700</td></tr>
+              </tbody>
+            </table>
+          </article>
+        </section>
+
+        <aside class="attio-stack">
+          <article class="attio-panel attio-agent-activity" data-component="attio-agent-activity">
+            <div class="attio-section-header">
+              <div>
+                <h2 class="attio-section-title">Agent activity</h2>
+                <div class="attio-muted">Continuous context</div>
+              </div>
+            </div>
+            <div class="attio-agent-step"><div class="attio-pulse"></div><div><strong>Identify expansion opportunity</strong><span>Greenleaf crossed product activation threshold across 12 seats.</span></div></div>
+            <div class="attio-agent-step"><div class="attio-pulse"></div><div><strong>Draft sequence</strong><span>Created a three-step upsell sequence for qualified accounts.</span></div></div>
+            <div class="attio-agent-step"><div class="attio-pulse"></div><div><strong>Prepare meeting</strong><span>Compiled last call summary, stakeholder map, and renewal blockers.</span></div></div>
+          </article>
+        </aside>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

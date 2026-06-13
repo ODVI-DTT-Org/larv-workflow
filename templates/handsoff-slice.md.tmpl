@@ -62,6 +62,7 @@ If this slice creates or modifies auth, navigation, layout, middleware, users, r
 If this slice creates or modifies any UI screen, the implementation must match the approved design artifacts. The user chose the mockups and expects the production app to look like them. Treat the chosen mockup as the final UI contract and visual source of truth, not loose inspiration.
 
 Do not build generic Laravel starter UI, default Tailwind panels, or plain CRUD screens when a mockup/design contract exists.
+The approved mockups are interactive HTML Effectiveness prototypes. Production UI must preserve both visual parity and interaction parity: navigation, role entry points, primary actions, tabs, filters, modals/drawers, row actions, loading/empty/error states, and expected end states must behave like the approved mockup interaction map unless a deviation is explicitly documented and approved.
 
 Read these files before UI work:
 
@@ -70,17 +71,53 @@ Read these files before UI work:
 - `docs/larv/03-design/ui-design.md`
 - `docs/larv/03-design/visual-implementation-contract.md`
 - chosen mockups under `docs/larv/03-design/mockups/`
+- interaction maps under `docs/larv/03-design/mockups/<pick-slug>/interaction-map.md`
 
 For every screen listed in section 8:
 
 - map the app route to the exact chosen mockup file and viewport from `docs/larv/03-design/visual-implementation-contract.md`
+- map app interactions to the exact chosen mockup workflow in `interaction-map.md`
 - implement the same layout composition, typography hierarchy, color tokens, spacing rhythm, radius, borders, icons, table density, cards, forms, empty states, loading states, and responsive behavior from the visual implementation contract
 - use the seeded records from section 6.1 so the screen looks populated during browser review
 - capture desktop and mobile screenshots after implementation under `docs/larv/08-implementation/screenshots/{{slice_id}}/`
 - compare those screenshots against the chosen mockup and fix visual drift before marking the slice complete
+- browser-click the same primary workflow paths shown in `interaction-map.md` and fix dead links, non-working primary actions, broken navigation, missing modal/drawer behavior, filter/tab drift, and incorrect end states
 - browser-check every implemented page and user flow touched by this slice against the approved plan, user decisions, testing guide, and mockup route mapping
 - do not mark the slice complete with unexplained visual differences. The implemented app must match the approved mockups in layout, typography, colors, spacing, component styling, density, responsive behavior, and seeded-data feel. Any remaining difference must be documented in the implementation report and must be caused by real data, accessibility, browser constraints, or an explicit user-approved deviation.
 - document reference mockup paths, screenshot paths, and approved remaining visual differences in `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md`
+
+## 8.2 Source-code parity and single-layout contract
+
+After implementation, verify the source code for this slice against the PRD/product brief and `docs/larv` plan, then fix any gap before marking the slice complete.
+
+Read and compare:
+
+- original PRD or product requirements, if present
+- `docs/larv/00-discuss/product-brief.md`
+- `docs/larv/01-domain/`
+- `docs/larv/02-architecture/`
+- `docs/larv/03-design/`
+- `docs/larv/04-test-strategy/acceptance-criteria.md`
+- `docs/larv/06-implementation/elephant-carpaccio.md`
+- this slice handoff
+- all source code touched by this slice
+
+Required parity checks:
+
+- Every requirement, invariant, role, permission, workflow, screen, route, data field, state transition, and acceptance criterion touched by this slice has corresponding source code, tests or browser evidence, and seeded data where applicable.
+- No feature is only documented but missing from source code.
+- No implemented behavior contradicts the PRD, `docs/larv`, ADRs, package decisions, or approved mockups.
+- Any found gap must be fixed before completion; do not leave it as future work unless the user explicitly approves the scope cut.
+
+Single-layout rule:
+
+- The app must use one coherent application layout/design system for all roles.
+- Prefer the policy-app pattern: admin routes live inside the same main app shell as employee/user routes, using the same layout component, sidebar/header, CSS tokens, spacing, and mockup-derived components.
+- Admin-only features must appear or disappear through policies, gates, roles, menu visibility, navigation visibility, and route authorization.
+- Do not create a separate admin layout or visually different admin shell from the main app layout.
+- In Blade/Livewire apps, admin views should extend the same main layout (for example `layouts.app`) and show admin navigation groups conditionally (for example `@if(auth()->user()->isAdmin())`) rather than using a separate admin Blade layout.
+- If Filament is used, its panels/resources/widgets/actions must be themed and structured to match the approved mockups and the shared app shell. Filament may provide resources and admin behavior, but it must not become a separate-looking product for admin users.
+- Verify the layout with every seeded role relevant to this slice and fix any role-specific layout drift.
 
 ## 9. Dependencies
 
@@ -102,10 +139,14 @@ parallel: {{parallel_flag}}
 - [ ] `docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md` written with end-to-end browser testing instructions.
 - [ ] `docs/user-manual/seed-data.md` updated with credentials, seeded records, reset commands, and demo-data removal notes.
 - [ ] If UI was touched, each app route is mapped to a chosen mockup in `docs/larv/03-design/visual-implementation-contract.md`.
+- [ ] If UI was touched, each primary app interaction is mapped to a chosen mockup workflow in `docs/larv/03-design/mockups/<pick-slug>/interaction-map.md`.
 - [ ] If UI was touched, desktop and mobile screenshots were saved under `docs/larv/08-implementation/screenshots/{{slice_id}}/`.
 - [ ] If UI was touched, screenshots were compared against chosen mockups and all non-trivial visual differences were fixed or explicitly documented as approved deviations.
+- [ ] If UI was touched, the same clickable workflow paths from the mockup interaction map were browser-tested in the app and all broken or missing interactions were fixed.
 - [ ] Every page and user flow touched by this slice was browser-checked against `docs/larv/00-discuss/`, `docs/larv/01-domain/`, `docs/larv/03-design/visual-implementation-contract.md`, `docs/larv/04-test-strategy/acceptance-criteria.md`, and this slice's testing guide.
 - [ ] Any mismatch between implemented behavior, approved decisions, planned flows, or approved mockups was fixed before marking the slice complete, unless explicitly documented as a user-approved deviation.
+- [ ] Source code touched by this slice was checked against the PRD/product brief and `docs/larv`; missing features, contradictions, and incomplete workflows were fixed.
+- [ ] If this slice touches roles, admin behavior, navigation, layout, or Filament, every relevant role uses the same shared app layout/design system, with admin menus/actions shown or hidden by authorization.
 - [ ] `docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md` written
 - [ ] Tracker entry appended (see section 13)
 - [ ] Learnings appended if any (see section 14)
@@ -192,6 +233,9 @@ Required verification work:
 - Sign in with every seeded credential needed for this slice's roles and permission scopes.
 - Execute every planned happy path, denied/restricted path, approval/status transition, create/edit/delete path, and cross-role handoff documented for this slice.
 - Compare each UI route to its chosen mockup from `docs/larv/03-design/visual-implementation-contract.md`, including layout, spacing, typography, colors, density, icons, states, responsive behavior, and seeded-data presentation.
+- Compare each UI workflow to its chosen mockup from `docs/larv/03-design/mockups/<pick-slug>/interaction-map.md`, including navigation links, role-specific starts, primary actions, tabs, filters, row actions, modal/drawer behavior, state changes, and expected end screens.
+- Compare source code against the PRD/product brief and `docs/larv` plan for this slice. Fix missing features, incomplete workflows, contradictions, weak seed data, missing tests, and undocumented scope cuts.
+- If Filament/admin/role navigation is involved, verify every role uses the same visual shell/layout. Admin menus/actions must be visibility-controlled inside that shell; a separate-looking admin layout is a failure.
 - Capture proof screenshots for every checked route/state under `docs/larv/08-implementation/screenshots/{{slice_id}}/`.
 - Fix functional or visual mismatches before completion. Do not leave generic CRUD screens, starter UI, broken flows, missing seeded data, or design drift.
 
@@ -286,6 +330,24 @@ Result: pass | blocked | approved-with-deviations
 Unresolved behavior differences:
 - none, or list each user-approved deviation
 
+## Source-code parity
+PRD/docs requirements checked:
+- ...
+Implemented code paths verified:
+- ...
+Missing or contradicting items found:
+- none, or list and explain fixes
+Fixes applied:
+- none, or list changed files
+
+## Single-layout and Filament verification
+Shared layout verified for roles:
+- ...
+Admin menu/action visibility verified: yes | no | not applicable
+Separate admin layout found: no | fixed | user-approved exception
+Evidence:
+- screenshot paths, route paths, or component/layout files checked
+
 ## Notes for the next implementer
 - ...
 
@@ -293,6 +355,8 @@ Unresolved behavior differences:
 Design contract: docs/larv/03-design/visual-implementation-contract.md
 Mockup references:
 - docs/larv/03-design/mockups/...
+Interaction maps:
+- docs/larv/03-design/mockups/<pick-slug>/interaction-map.md
 Screenshots captured:
 - docs/larv/08-implementation/screenshots/{{slice_id}}/...
 Parity result: pass | blocked | approved-with-deviations
@@ -335,6 +399,8 @@ grep -qi "migrate:fresh --seed" docs/user-manual/testing/{{slice_id}}-{{slice_sl
 grep -qi "Runtime commands" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 grep -qi "Browser flow verification" docs/user-manual/testing/{{slice_id}}-{{slice_slug}}.md
 grep -qi "Browser flow verification" docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md
+grep -qi "Source-code parity" docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md
+grep -qi "Single-layout and Filament verification" docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md
 grep -qi "Parity result: pass" docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md
 grep -qi "Sandbox ready" docs/larv/08-implementation/reports/IMPLEMENTATION-REPORT-{{slice_id}}.md
 grep -qi "{{slice_id}}" docs/user-manual/seed-data.md

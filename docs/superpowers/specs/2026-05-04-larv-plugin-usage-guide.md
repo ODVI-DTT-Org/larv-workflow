@@ -8,7 +8,7 @@ A Claude Code plugin that turns AI into a full Laravel development team. You ans
 
 ## What `larv` is
 
-A bundled-marketplace Claude Code plugin. One install gives you 8 commands that orchestrate four underlying skills (`masterplan`, `superpowers-laravel`, `domain-driven-design`, `huashu-design`) into a complete Laravel-app workflow — from blank slate to production deploy.
+A bundled-marketplace Claude Code plugin. One install gives you 8 commands that orchestrate four underlying skills (`masterplan`, `superpowers-laravel`, `domain-driven-design`) into a complete Laravel-app workflow — from blank slate to production deploy.
 
 Five things it does that nothing else does together:
 
@@ -29,7 +29,7 @@ Five things it does that nothing else does together:
 ## Installation
 
 ```
-claude plugin install <your-org>/larv
+claude plugin install <larv-workflow>/larv
 ```
 
 After install, `/larv:status` works in any directory. New projects default to `docs/larv/` for artifacts.
@@ -84,10 +84,10 @@ billing later without a rewrite.
 
 Project: todo-app  (greenfield, slug: todo-app-2026-05)
 Plugin:  larv 0.3.1
-Bundles: masterplan 4.2.0 · sp-laravel 0.1.5 · ddd 10.5 · huashu 1.2
+Bundles: masterplan 4.2.0 · sp-laravel 0.1.5 · ddd 10.5
 
 VM check:     ✅ vm.example.com reachable
-Bundle check: ✅ all 4 bundled plugins present
+Bundle check: ✅ all 3 bundled plugins present
 MCP check:    ✅ context7 ✅ playwright (laravel-mcp not configured — recommend enabling)
 
 LEARNINGS digest loaded — 12 entries from prior runs:
@@ -193,7 +193,7 @@ The agent moves through:
 
 - **Phase 1 — Domain.** Flat model: `User`, `List`, `Todo`, `Invite`. Output: `docs/larv/01-domain/`.
 - **Phase 2 — Architecture.** C4 levels 1–3. Library policy locked: Laravel 12, Filament 4, Sanctum, MySQL, Redis, no Horizon for v1, Cashier deferred to billing slice. ADRs: 0001-laravel-12, 0002-filament-vs-nova (chose Filament), 0003-defer-billing. Output: `docs/larv/02-architecture/`.
-- **Phase 3 — Design.** Data model (4 tables, 3 pivots), API surface (REST + Filament), 7 UI screens, brand spec drafted via huashu (you upload your logo, agent extracts palette). Output: `docs/larv/03-design/`.
+- **Phase 3 — Design.** Data model (4 tables, 3 pivots), API surface (REST + Filament), 7 UI screens, brand spec drafted via local Attio-style references (you upload your logo, agent extracts palette). Output: `docs/larv/03-design/`.
 - **Phase 4 — Test strategy.** Pest unit + feature, Playwright for invite flow, 12 acceptance criteria. Output: `docs/larv/04-test-strategy/`.
 - **Phase 5 — Premortem.** Two showstoppers found:
   1. Email-invite race condition (two invites for same email + signup → duplicate access)
@@ -233,7 +233,7 @@ Seeded DB with admin user .................... ✅
 Smoke test: GET / returns 200 ................ ✅
 
 App URL:  https://todo-app-2026-05.vm.example
-Login:    test@example.com / password (seeded)
+Login:    test@example.com / <generated-by-seeder> (seeded)
 
 Output:   docs/larv/07-runtime/sandbox-runbook.md
 ```
@@ -370,14 +370,14 @@ Proposed plugin edits:
   - skills/larv-discuss/SKILL.md: add Q about shared-resource deletion policy
 
 Branch:  learn/todo-app-2026-05-2026-05-07
-PR:      https://github.com/your-org/larv/pull/47
+PR:      https://github.com/larv-workflow/larv/pull/47
          Status: open, awaiting review
 
 [/larv:full COMPLETE]
 
 Total time: 3h 22min      Total cost: $26.40 (94% of estimate)
 Output:    docs/larv/ (40 files), running app at todo-app.laravel.cloud
-Plugin PR: https://github.com/your-org/larv/pull/47
+Plugin PR: https://github.com/larv-workflow/larv/pull/47
 ```
 
 You're done. The app exists. The docs exist. The plugin got slightly smarter.
@@ -615,7 +615,7 @@ Next time anyone runs `/larv:full`, that LEARNINGS entry is in the context — t
 
 ## How to QA
 URL:        https://todo-app-2026-05.vm.example/lists
-Login:      test@example.com / password
+Login:      test@example.com / <generated-by-seeder>
 Walkthrough:
   1. Click "New list" → name it "Groceries"
   2. Click into it → click "New todo" → text "Milk"
@@ -644,7 +644,7 @@ Playwright:  ✅ 4/4
 
 ## App URL
 https://todo-app-2026-05.vm.example
-Login: test@example.com / password   (seeded)
+Login: test@example.com / <generated-by-seeder>   (seeded)
 
 ## VM
 Host:  vm.example.com   user: deploy
@@ -683,7 +683,7 @@ DNS: A record todo-app-2026-05.vm.example → VM
 ```
 $ /larv:status
 Project: todo-app  (greenfield, started 2026-05-04)
-Plugin:  larv 0.3.1  bundles: masterplan 4.2.0 · sp-laravel 0.1.5 · ddd 10.5 · huashu 1.2
+Plugin:  larv 0.3.1  bundles: masterplan 4.2.0 · sp-laravel 0.1.5 · ddd 10.5
 
 Phase 8 — Implementation loop  (in progress)
   ✅ Phases 0–7 done   ⏳ Slices 2/4 done · 1 in progress · 1 pending
@@ -808,4 +808,4 @@ At ~500 lines, `/larv:learn` will propose a structural split (per-section files)
 
 - See `2026-05-04-larv-plugin-shell-design.md` for the formal spec (what's being built and why).
 - After sub-project A is implemented, sub-project B (per-phase prompts and document model) gets its own design + plan cycle.
-- File improvement requests as PRs to `<your-org>/larv` — the plugin improves itself, but humans still drive intent.
+- File improvement requests as PRs to `<larv-workflow>/larv` — the plugin improves itself, but humans still drive intent.

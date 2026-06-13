@@ -109,7 +109,8 @@ release_port_reservation() {
 }
 
 # allocate_port <role> [owner]
-# Roles: mockup (9000-9499), docsite (9500-9999), app (8000-8999).
+# Roles: presentation (2000-2999), app (8000-8999), mockup (9000-9499),
+# docsite (9500-9999).
 # Strategy: live-scan via ss -tlnp, then reserve the selected port under a
 # VM-local flock so parallel larv runs cannot select the same free port before
 # their servers bind.
@@ -118,6 +119,7 @@ allocate_port() {
     local owner="${2:-larv-$$}"
     local lo hi lock_file
     case "$role" in
+        presentation) lo=2000; hi=2999 ;;
         mockup)  lo=9000; hi=9499 ;;
         docsite) lo=9500; hi=9999 ;;
         app)     lo=8000; hi=8999 ;;

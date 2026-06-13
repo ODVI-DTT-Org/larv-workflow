@@ -40,7 +40,7 @@ load helpers
     run jq empty .claude-plugin/marketplace.json
     [ "$status" -eq 0 ]
     run jq -r '.name' .claude-plugin/marketplace.json
-    [ "$output" = "larv-local" ]
+    [ "$output" = "larv" ]
     run jq -r '.plugins[] | select(.name == "larv") | .source' .claude-plugin/marketplace.json
     [ "$output" = "./" ]
 }

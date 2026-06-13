@@ -3,7 +3,7 @@
 
 runtime_gate_validate_url() {
     local url="$1"
-    local expected_host="${2:-31.220.79.31}"
+    local expected_host="${2:-sandbox.example.com}"
     [ -n "$url" ] || { echo "ERROR: runtime URL required" >&2; return 1; }
     case "$url" in
         *TBD*|*null*|*skipped*|"") echo "ERROR: invalid runtime URL: $url" >&2; return 1 ;;
@@ -16,7 +16,7 @@ runtime_gate_validate_url() {
 
 runtime_gate_require_artifact() {
     local artifact="$1"
-    local expected_host="${2:-31.220.79.31}"
+    local expected_host="${2:-sandbox.example.com}"
     [ -f "$artifact" ] || { echo "ERROR: missing runtime URL artifact: $artifact" >&2; return 1; }
     local url
     url="$(head -n 1 "$artifact" | tr -d '[:space:]')"
@@ -26,7 +26,7 @@ runtime_gate_require_artifact() {
 runtime_gate_require_phase_url() {
     local dir="$1"
     local phase="$2"
-    local expected_host="${3:-31.220.79.31}"
+    local expected_host="${3:-sandbox.example.com}"
     local artifact
     case "$phase" in
         design|mockup|3) artifact="$dir/docs/larv/03-design/mockup-url.txt" ;;

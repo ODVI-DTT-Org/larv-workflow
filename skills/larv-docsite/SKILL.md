@@ -240,7 +240,7 @@ Stays up through the Phase 8 routing menu and handoff decision. Released after t
 
 ## Required outputs
 
-- The doc-site is browsable at `http://31.220.79.31:<port>`.
+- The doc-site is browsable at `http://sandbox.example.com:<port>`.
 - `docs/larv/docsite-url.txt` contains the announced URL.
 - `STATE.yaml.execution.allocations` includes a `docsite-port` entry.
 
@@ -248,7 +248,7 @@ Stays up through the Phase 8 routing menu and handoff decision. Released after t
 
 - Do not modify any `docs/larv/` content. This skill is read-only on the plan.
 - Do not announce the URL until both probes succeed.
-- Do not announce `127.0.0.1` or `localhost`; always print the external URL `http://31.220.79.31:<port>/`.
+- Do not announce `127.0.0.1` or `localhost`; always print the external URL `http://sandbox.example.com:<port>/`.
 - Do not mark Phase 6.5 complete without a probe-confirmed `docsite_url`.
 - Do not require the user to install anything on their machine. The doc-site loads Docsify from CDN in their browser.
 
@@ -256,7 +256,7 @@ Stays up through the Phase 8 routing menu and handoff decision. Released after t
 
 ```yaml
 status: complete
-docsite_url: "http://31.220.79.31:<port>/"
+docsite_url: "http://sandbox.example.com:<port>/"
 files_written:
   - docs/larv/docsite-url.txt
 state_updates:

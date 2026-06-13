@@ -6,12 +6,59 @@ COMMANDS=(
     larv-full larv-adopt larv-feature larv-debug
     larv-brainstorm larv-learn larv-status larv-resume
     larv-sandbox larv-sandbox-start larv-sandbox-stop larv-sandbox-reset
+    larv-presentation larv-redesign-attio-finance larv-redesign-attio-venture larv-feature-how-it-works
+    larv-feature-feedback larv-feature-onboarding-helper larv-security
 )
 
-@test "all 12 command files exist" {
+@test "all 19 command files exist" {
     for cmd in "${COMMANDS[@]}"; do
         [ -f "commands/${cmd}.md" ] || { echo "missing commands/${cmd}.md"; return 1; }
     done
+}
+
+@test "larv-security command invokes security scan" {
+    grep -q "scripts/security-scan.sh" commands/larv-security.md
+    grep -q "manual-security-scan.md" commands/larv-security.md
+}
+
+@test "feedback and onboarding helper commands reference bundled examples" {
+    grep -q "larv-feature-feedback" commands/larv-feature-feedback.md
+    grep -q "Resend" commands/larv-feature-feedback.md
+    grep -q "examples/rfp/app/Domain/Feedback/Actions/SubmitFeedback.php" commands/larv-feature-feedback.md
+    grep -q "examples/imu/backend-imu/src/routes/feedback.ts" commands/larv-feature-feedback.md
+    grep -q "Feedback submission must persist even if email/webhook delivery fails" commands/larv-feature-feedback.md
+    grep -q "larv-feature-onboarding-helper" commands/larv-feature-onboarding-helper.md
+    grep -q "examples/rfp/app/Livewire/Onboarding.php" commands/larv-feature-onboarding-helper.md
+    grep -q "examples/imu/frontend-web-imu/docs/architecture/user-flows.md" commands/larv-feature-onboarding-helper.md
+    grep -q "capture all user flows" commands/larv-feature-onboarding-helper.md
+    grep -q "show the public URL" commands/larv-feature-onboarding-helper.md
+}
+
+@test "feature how it works command references bundled guide examples" {
+    grep -q "larv-feature-how-it-works" commands/larv-feature-how-it-works.md
+    grep -q "/guide" commands/larv-feature-how-it-works.md
+    grep -q "/how-it-works" commands/larv-feature-how-it-works.md
+    grep -q "examples/rfp/resources/views/livewire/guide.blade.php" commands/larv-feature-how-it-works.md
+    grep -q "examples/interview/visual-workflow/" commands/larv-feature-how-it-works.md
+    grep -q "real in-app feature page" commands/larv-feature-how-it-works.md
+    grep -q "each detected role/persona" commands/larv-feature-how-it-works.md
+    grep -q "role-flow-inventory.md" commands/larv-feature-how-it-works.md
+    grep -q "show the public URL" commands/larv-feature-how-it-works.md
+}
+
+@test "redesign commands require Attio HTML Effectiveness production redesigns" {
+    grep -q "attio-finance-html-effectiveness-design/" commands/larv-redesign-attio-finance.md
+    grep -q "attio-venture-html-effectiveness/" commands/larv-redesign-attio-venture.md
+    grep -q "21-credit-officer-crm.html" commands/larv-redesign-attio-finance.md
+    grep -q "21-credit-officer-crm.html" commands/larv-redesign-attio-venture.md
+    grep -q "Preserve all backend behavior" commands/larv-redesign-attio-finance.md
+    grep -q "Preserve all backend behavior" commands/larv-redesign-attio-venture.md
+    grep -q "whole frontend UI" commands/larv-redesign-attio-finance.md
+    grep -q "whole frontend UI" commands/larv-redesign-attio-venture.md
+    grep -q "sandbox restart/probe" commands/larv-redesign-attio-finance.md
+    grep -q "sandbox restart/probe" commands/larv-redesign-attio-venture.md
+    grep -q "visual-parity.md" commands/larv-redesign-attio-finance.md
+    grep -q "visual-parity.md" commands/larv-redesign-attio-venture.md
 }
 
 @test "every command file has frontmatter" {
@@ -50,6 +97,18 @@ COMMANDS=(
     grep -q "LARV_DOCS_PORT" commands/larv-sandbox-start.md
     grep -q "LARV_MOCKUPS_PORT" commands/larv-sandbox-start.md
     grep -q "migrate:fresh --seed --force" commands/larv-sandbox-reset.md
+}
+
+@test "larv-presentation command invokes presentation.sh with required port contract" {
+    grep -q 'scripts/presentation.sh "$PWD" start' commands/larv-presentation.md
+    grep -q "whole current repository" commands/larv-presentation.md
+    grep -q "HTML Effectiveness-style" commands/larv-presentation.md
+    grep -q "2000-2999" commands/larv-presentation.md
+    grep -q "http://sandbox.example.com:<port>/" commands/larv-presentation.md
+    grep -q "LARV_PRESENTATION_PORT" commands/larv-presentation.md
+    grep -q "skills visual representation" commands/larv-presentation.md
+    grep -q "dataflow loan approval" commands/larv-presentation.md
+    grep -q "feature onboarding" commands/larv-presentation.md
 }
 
 @test "every command file frontmatter is valid YAML" {

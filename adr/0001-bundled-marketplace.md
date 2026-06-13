@@ -2,11 +2,11 @@
 
 Date: 2026-05-04
 Status: Accepted
-Decision-makers: itranario@oakdriveventures.com
+Decision-makers: maintainers@example.org
 
 ## Context
 
-`larv` orchestrates four upstream sources: `masterplan`, `superpowers-laravel`, `domain-driven-design`, and `huashu-design`. The plugin must be installable in one step, reproducible across machines, and resilient to upstream changes.
+`larv` orchestrates three upstream sources: `masterplan`, `superpowers-laravel`, and `domain-driven-design`. The plugin must be installable in one step, reproducible across machines, and resilient to upstream changes.
 
 ## Decision
 
@@ -28,4 +28,4 @@ Renovate opens dependency PRs, CI runs fixture tests, and repo size grows modest
 - `masterplan`
 - `superpowers-laravel`
 - `domain-driven-design`
-- `huashu-design`
+- local Attio-style galleries
