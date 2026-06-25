@@ -33,6 +33,41 @@ The implementation loop must run static, non-executing security checks before an
 
 While investigating a security finding, do not source project scripts, run unknown binaries, or execute package lifecycle scripts. Prefer reading files and static command output.
 
+## YAGNI discipline — Ponytail (always-on during implementation)
+
+Before writing any code for a slice, stop at the first rung of this ladder
+that holds. The ladder runs after you understand the problem — read the
+slice spec and trace the real flow first, then climb.
+
+1. **Does this need to exist at all?** The slice handsoff defines scope.
+   If the handsoff does not require it, skip it.
+2. **Already in this codebase?** Reuse the shared helper, trait, or
+   pattern — do not re-implement what is a few files over.
+3. **Laravel / PHP stdlib does it?** Eloquent relationships, collections,
+   validation rules, middleware, jobs, events, policies — use the framework.
+4. **Native Laravel feature covers it?** A DB constraint beats app-code
+   validation. A route middleware beats per-controller logic. An attribute
+   cast beats a mutator.
+5. **Already-installed dependency solves it?** If Filament, Cashier,
+   Sanctum, Horizon, or another installed package provides it, use it.
+   Never add a new package for what a few lines can do.
+6. **Can it be one line?** One line.
+7. **Only then:** the minimum code the slice spec requires.
+
+Rules:
+- No abstractions not required by the slice spec.
+- No boilerplate "for later" — the next slice scaffolds for itself.
+- Deletion over addition when the slice requires a refactor.
+- Mark deliberate simplifications: `// ponytail: <trade-off and upgrade path>`.
+- Bug fix = root cause, not symptom. Grep every caller of the function
+  you touch and fix it once at the shared path.
+
+Never simplify away: input validation at trust boundaries, security measures,
+error handling that prevents data loss, accessibility basics, or anything the
+slice spec explicitly requires.
+
+Full specification: `bundle/ponytail/skills/ponytail/SKILL.md`.
+
 ## Execution cadence
 
 Before the loop, read `STATE.yaml.execution.review_mode`.
