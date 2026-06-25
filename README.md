@@ -31,6 +31,17 @@ Use `larv` when you want to:
 - **Self-contained handoff**: implementation reads `docs/Handsoff.md` and `docs/Handsoff/slice-NN-*.md`, not hidden chat context.
 - **Sandbox-first verification**: generated apps are expected to run in a browser-visible sandbox before production guidance.
 - **Security baseline**: static checks run before dependency installation, app bootstrap, and implementation slices.
+- **YAGNI-first implementation**: Ponytail's decision ladder is embedded in the implementation phase — every slice uses only what the spec requires, reaching for Laravel's framework and installed packages before writing new code.
+
+## Ponytail Integration
+
+larv bundles [Ponytail](https://github.com/DietrichGebert/ponytail) (v4.8.3, MIT) as a vendored skill in `bundle/ponytail/`. Ponytail's YAGNI decision ladder is embedded directly in `skills/larv-implement/SKILL.md` and is active automatically during Phase 8 — no separate plugin install required.
+
+The ladder stops at the first rung that holds before any code is written: Does it need to exist? Is it already in the codebase? Does Laravel's framework cover it? Is it already an installed dependency? Can it be one line? Only then: the minimum the slice spec requires.
+
+Security, validation, error handling, and anything explicitly required by the slice spec are never simplified away.
+
+**Standalone use:** Installing Ponytail as a Claude Code plugin (`/plugin install ponytail@ponytail`) extends the same YAGNI discipline to non-larv sessions.
 
 ## Repository Layout
 
