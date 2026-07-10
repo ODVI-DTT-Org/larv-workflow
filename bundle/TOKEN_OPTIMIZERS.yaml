@@ -1,0 +1,26 @@
+# Pinned metadata for optional token optimizer tools.
+#
+# Hashes intentionally default to reviewed placeholders. An optimizer is not
+# selected until its installed binary/package exactly matches the reviewed
+# version, hash, install path, and safe-mode checks.
+lean-ctx:
+  approved_version: "0.0.0"
+  source_url: "https://leanctx.com/"
+  release: "unapproved"
+  sha256: "REPLACE_WITH_REVIEWED_LEANCTX_SHA256"
+  approved_path_prefixes:
+    - "/usr/local/bin"
+    - "/opt/homebrew/bin"
+    - "${HOME}/.local/bin"
+  safe_mode: "local-only,no-onboarding-mutation,no-shell-hooks,no-update-checks,no-stats,workspace-bounded"
+headroom:
+  approved_version: "0.31.0"
+  source_url: "https://pypi.org/project/headroom-ai/"
+  release: "v0.31.0"
+  sha256: "a30238c3f14e6e12e730a0413ab286224bf14c4b0c8520a5eaef6f9ca8b3c733"
+  approved_path_prefixes:
+    - "/home/claude-team/kaito/workflow/.larv-tools/headroom/venv/bin"
+    - "/usr/local/bin"
+    - "/opt/homebrew/bin"
+    - "${HOME}/.local/bin"
+  safe_mode: "direct-compression-only,no-wrap,no-proxy,no-docker-wrapper,no-learning,no-telemetry,workspace-bounded-state"

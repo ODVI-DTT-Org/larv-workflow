@@ -3,6 +3,10 @@ name: sandbox
 description: Use when the user types /larv:sandbox or asks for current larv sandbox URLs, credentials, and testing instructions.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv:sandbox
 
 Run the larv sandbox helper for the current project:

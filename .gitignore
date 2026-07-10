@@ -2,6 +2,7 @@
 
 # Local larv runtime state
 .larv/
+.larv-tools/
 .superpowers/
 .playwright-mcp/
 

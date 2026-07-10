@@ -9,6 +9,23 @@ load helpers
     grep -q "SessionStart" hooks/hooks.json
     grep -q "guard-pre-tool.sh" hooks/hooks.json
     grep -q "guard-post-tool.sh" hooks/hooks.json
+    grep -q "session-start.sh" hooks/hooks.json
+}
+
+@test "Claude session start hook runs headroom combo for managed projects" {
+    TMP="$(setup_tmp_project)"
+    mkdir -p "$TMP/docs/larv"
+    cp tests/fixtures/state-empty.yaml "$TMP/docs/larv/STATE.yaml"
+
+    run bash -c "cd '$TMP' && CLAUDE_PLUGIN_ROOT='$PROJECT_ROOT' '$PROJECT_ROOT/hooks/session-start.sh'"
+
+    [ "$status" -eq 0 ]
+    echo "$output" | grep -q "larv-reminder"
+    echo "$output" | grep -q "larv Headroom combo"
+    echo "$output" | grep -q "Ponytail: active"
+    echo "$output" | grep -q "Headroom:"
+    echo "$output" | grep -q "Caveman:"
+    teardown_tmp_project "$TMP"
 }
 
 @test "pre tool hook blocks app edits before sandbox bootstrap" {

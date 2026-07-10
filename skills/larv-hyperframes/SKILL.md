@@ -3,6 +3,10 @@ name: larv-hyperframes
 description: "Use when creating a HyperFrames promo video for a Laravel or larv-managed app, especially when the app needs discovery, theme direction, app screenshots, role/workflow documentation, claim confirmation, or delegated rendering with hyperframes-codex."
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-hyperframes
 
 ## Overview

@@ -4,7 +4,7 @@ load helpers
 
 TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-report ddd-interview-questions bootstrap-sandbox.md.tmpl production-deploy.md.tmpl env-guide.md.tmpl operations-guide.md.tmpl package-matrix.md.tmpl package-slice-snippets.md.tmpl happy-path.md.tmpl user-manual-index.md.tmpl seed-data-guide.md.tmpl docs-index.md.tmpl)
 
-@test "all 16 markdown templates and the Attio workspace HTML template exist" {
+@test "all markdown templates and the Attio workspace HTML template exist" {
     for t in "${TEMPLATES[@]}"; do
         if [[ "$t" == *.tmpl ]]; then
             [ -f "templates/${t}" ] || { echo "missing templates/${t}"; return 1; }
@@ -135,12 +135,46 @@ TEMPLATES=(slice-handoff sandbox-runbook pre-flight project-lessons adoption-rep
 @test "handoff and starting point templates explain fresh context continuation" {
     grep -q "Fresh session recovery" templates/handsoff-index.md.tmpl
     grep -q "first slice whose STATE status is not completed" templates/handsoff-index.md.tmpl
-    grep -q "Fresh session recovery" templates/ai-starting-point.md.tmpl
-    grep -q "/larv:resume" templates/ai-starting-point.md.tmpl
-    grep -q "/larv:feature" templates/ai-starting-point.md.tmpl
-    grep -q "execution.review_mode" templates/ai-starting-point.md.tmpl
+    grep -q "Fresh Session Prompt" templates/ai-starting-point.md.tmpl
+    grep -q "first incomplete slice" templates/ai-starting-point.md.tmpl
+    grep -q "docs/larv/07-runtime/sandbox-url.txt" templates/ai-starting-point.md.tmpl
     grep -q "auto-all" templates/handsoff-index.md.tmpl
     grep -q "manual-slice" templates/handsoff-index.md.tmpl
+}
+
+@test "starting point templates include DOX-inspired local contract routing" {
+    for f in templates/ai-starting-point.md.tmpl templates/cursor-rule.mdc.tmpl; do
+        grep -Eq "Read before editing|Start Here" "$f" || { echo "missing read-before-editing section in $f"; return 1; }
+        grep -Eq "Nearest contract wins|Nearest Contract Wins" "$f" || { echo "missing nearest-contract precedence in $f"; return 1; }
+        grep -qi "freshness\|Only update local contracts" "$f" || { echo "missing doc freshness guidance in $f"; return 1; }
+        grep -q 'app/.*routes/.*database/.*resources/.*tests/' "$f" || { echo "missing app route table in $f"; return 1; }
+        grep -q "docs/larv/features/<feature-slug>/" "$f" || { echo "missing feature route in $f"; return 1; }
+        grep -q "docs/larv/09-verification/" "$f" || { echo "missing verification route in $f"; return 1; }
+        grep -q "docs/larv/10-deploy/" "$f" || { echo "missing deploy route in $f"; return 1; }
+    done
+}
+
+@test "DOX freshness rules avoid docs churn for non-durable edits" {
+    for f in templates/ai-starting-point.md.tmpl templates/cursor-rule.mdc.tmpl; do
+        grep -q "Do not update docs for formatting-only" "$f" || { echo "missing formatting-only exclusion in $f"; return 1; }
+        grep -q "refactor-only" "$f" || { echo "missing refactor-only exclusion in $f"; return 1; }
+        grep -q "test-only" "$f" || { echo "missing test-only exclusion in $f"; return 1; }
+    done
+}
+
+@test "new feature templates require durable Ponytail YAGNI audit" {
+    for f in templates/handsoff-index.md.tmpl; do
+        grep -q "Ponytail YAGNI audit" "$f" || { echo "missing Ponytail audit in $f"; return 1; }
+        grep -q "docs/larv/features/<feature-slug>/yagni-audit.md" "$f" || { echo "missing audit path in $f"; return 1; }
+        grep -q "before handoff generation" "$f" || { echo "missing pre-handoff refresh in $f"; return 1; }
+        grep -q "need/not-needed decision" "$f" || { echo "missing need decision in $f"; return 1; }
+        grep -q "removed scope" "$f" || { echo "missing removed scope in $f"; return 1; }
+        grep -q "reused existing screens/config/workflows" "$f" || { echo "missing reuse record in $f"; return 1; }
+        grep -q "rejected packages or abstractions" "$f" || { echo "missing rejected packages in $f"; return 1; }
+        grep -q "slice-count rationale" "$f" || { echo "missing slice-count rationale in $f"; return 1; }
+        grep -q "protected items not simplified away" "$f" || { echo "missing protected items in $f"; return 1; }
+        grep -q "do not remove security, validation, accessibility, or explicitly requested scope" "$f" || { echo "missing protected scope rule in $f"; return 1; }
+    done
 }
 
 @test "env and operations guide templates cover setup values" {

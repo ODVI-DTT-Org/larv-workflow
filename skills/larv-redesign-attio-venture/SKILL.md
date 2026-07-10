@@ -3,6 +3,10 @@ name: larv-redesign-attio-venture
 description: Use when the user types /larv:redesign-attio-venture or asks to redesign a Laravel frontend into the Attio Venture CRM visual system.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-redesign-attio-venture
 
 Redesign the current Laravel frontend using the bundled Attio Venture HTML Effectiveness CRM templates. This is a production app redesign command, not a mockup-only command.

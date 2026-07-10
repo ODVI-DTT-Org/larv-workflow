@@ -12,9 +12,40 @@ Probe-before-announce: never claim a service is running until curl confirms it. 
 
 Code conventions: Pint formatting, Pest tests, Larastan static analysis. Use the canonical ubiquitous-language terms from `docs/larv/01-domain/ubiquitous-language.md`.
 
-## Model switch starter prompt
+## Read before editing
 
-Before continuing in a new AI tool or fresh session, switch to the user's preferred model. If no preference was given, use the strongest coding model available in this tool for long-context Laravel implementation.
+1. Read `DOCS.md`.
+2. Read `docs/Handsoff.md`.
+3. Identify every file or folder you expect to touch.
+4. For each target path, read the nearest owning contract below before editing.
+5. If a target has both parent and local contracts, read both. Nearest contract wins for local details, while parent/root contracts still control global larv safety, verification, security, review, and user-approved scope.
+
+## Nearest contract wins
+
+Route table covers app/, routes/, database/, resources/, tests/, feature docs, handoff docs, user manual docs, verification, and deploy paths.
+
+| Target path | Nearest owning contract |
+|---|---|
+| `app/`, `routes/`, `database/`, `resources/`, `tests/` | `docs/Handsoff/slice-NN-<name>.md` for the active slice, or the active feature/debug slice if this is follow-up work. Also read relevant domain, design, and test docs named by that slice. |
+| `docs/larv/features/<feature-slug>/` | Feature design, Ponytail YAGNI audit, deltas, premortem, and plan in that feature folder before any implementation. |
+| `docs/Handsoff/` | `docs/Handsoff.md` plus the specific guide or slice handoff being changed. |
+| `docs/user-manual/` | The relevant install, environment, seed-data, deploy, or per-slice testing guide. |
+| `docs/larv/09-verification/` | Final verification contract, product/domain/design/test docs, implementation reports, and source paths being verified. |
+| `docs/larv/10-deploy/` | `docs/Handsoff/production-deploy.md`, `docs/Handsoff/env-guide.md`, `docs/Handsoff/operations-guide.md`, verification report, and deployment answers/report. |
+
+## Doc freshness pass
+
+After every meaningful change, check whether the closest owning contract or parent index changed. Update existing larv docs rather than duplicating rules: slice handoff, feature docs, user manual, seed data, tracker, implementation report, verification report, deploy report, or local learnings as appropriate. Meaningful changes include purpose, scope, workflow, operating rules, required inputs or outputs, permissions, constraints, artifacts, runtime values, or durable user preferences. Do not update docs for formatting-only, refactor-only, or test-only edits unless behavior, workflow, user-facing QA, or test strategy changed.
+
+Preserve unrelated user changes in a dirty worktree.
+
+If all slices are complete and the user asks for a hotfix or follow-up change, use the nearest affected slice, feature, or debug docs as the local contract before editing.
+
+Generated files should be updated by regenerating larv handoff outputs, not by hand-editing generated starting-point files or nested `AGENTS.md` contracts.
+
+## Model selection starter prompt
+
+Before continuing in a new AI tool or fresh session, use the user's preferred model if one was specified. If not, use the strongest available planning model for planning or ambiguous architecture work, and use a faster execution model for already-planned implementation, tests, formatting, docs, and sandbox operations.
 
 Starter prompt:
 

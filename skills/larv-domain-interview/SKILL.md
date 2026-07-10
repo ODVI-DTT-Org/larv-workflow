@@ -3,6 +3,10 @@ name: larv-domain-interview
 description: Phase 0a - business-process-only DDD interview. Runs before Discuss. Outputs ubiquitous language, business invariants, edge cases, and a draft subdomain clustering, all in plain English.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-domain-interview
 
 Conduct a structured business-process interview before any tech-stack discussion. The output of this skill grounds every subsequent phase. Pure business: no Laravel, no Postgres, no Filament. If the user mentions tech, acknowledge and redirect.

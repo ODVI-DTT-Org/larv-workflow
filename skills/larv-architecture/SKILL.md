@@ -3,6 +3,10 @@ name: larv-architecture
 description: Phase 2 - C4 architecture, ADRs, and Laravel package integration matrix from Phase 0 library decisions.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-architecture
 
 Produce C4 levels 1-3, lock package architecture decisions, and convert Phase 0 Laravel package choices into implementation constraints.

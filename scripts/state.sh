@@ -13,6 +13,9 @@ Commands:
   update <dir> <yq-expr>
   set-mode <dir> <mode>
   set-review-mode <dir> <review-mode>
+  set-caveman-style <dir> <mode>
+  get-caveman-style <dir>
+  clear-caveman-style <dir>
   record-allocation <dir> <kind> <value>
 EOF
     exit 64
@@ -92,6 +95,14 @@ plugin:
     superpowers-laravel: "0.0.0"
     domain-driven-design: "0.0.0"
   learnings_digest_hash: "0000000"
+token_optimizer:
+  selected: none
+  status: fallback
+  reason: ""
+  fallback_reason: "not evaluated"
+  binary: ""
+  version: ""
+  safe_mode: ""
 phase:
   current: -1
   last_completed: null
@@ -124,6 +135,7 @@ policies:
 execution:
   mode: not-yet-decided
   review_mode: not-yet-decided
+  caveman_style: null
   allocations: []
 features: []
 debugs: []
@@ -171,6 +183,43 @@ cmd_set_review_mode() {
     cmd_update "$dir" ".execution.review_mode = \"$mode\""
 }
 
+normalize_caveman_style() {
+    case "$1" in
+        full|lite|ultra) echo "$1" ;;
+        off|normal) echo "full" ;;
+        *) echo "" ;;
+    esac
+}
+
+cmd_set_caveman_style() {
+    local dir="$1"
+    local mode="$(normalize_caveman_style "$2")"
+    if [ -z "$mode" ]; then
+        echo "ERROR: invalid caveman mode: $2" >&2
+        return 1
+    fi
+
+    cmd_update "$dir" ".execution.caveman_style = \"$mode\""
+}
+
+cmd_get_caveman_style() {
+    local sp
+    sp="$(state_path "$1")"
+    [ -f "$sp" ] || { echo "ERROR: no STATE.yaml at $sp" >&2; return 1; }
+    local mode
+    mode="$(yq -r '.execution.caveman_style // "full"' "$sp")"
+    case "$mode" in
+        full|lite|ultra) ;;
+        normal|off|null|"" ) mode="full" ;;
+        *) mode="full" ;;
+    esac
+    echo "$mode"
+}
+
+cmd_clear_caveman_style() {
+    cmd_set_caveman_style "$1" "full"
+}
+
 cmd_record_allocation() {
     local dir="$1"
     local kind="$2"
@@ -188,6 +237,9 @@ main() {
         update) [ "$#" -eq 2 ] || usage; cmd_update "$@" ;;
         set-mode) [ "$#" -eq 2 ] || usage; cmd_set_mode "$@" ;;
         set-review-mode) [ "$#" -eq 2 ] || usage; cmd_set_review_mode "$@" ;;
+        set-caveman-style) [ "$#" -eq 2 ] || usage; cmd_set_caveman_style "$@" ;;
+        get-caveman-style) [ "$#" -eq 1 ] || usage; cmd_get_caveman_style "$@" ;;
+        clear-caveman-style) [ "$#" -eq 1 ] || usage; cmd_clear_caveman_style "$@" ;;
         record-allocation) [ "$#" -eq 3 ] || usage; cmd_record_allocation "$@" ;;
         *) usage ;;
     esac

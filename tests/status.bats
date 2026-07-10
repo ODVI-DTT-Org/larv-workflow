@@ -17,6 +17,7 @@ teardown() { teardown_tmp_project "$TMP"; }
     [ "$status" -eq 0 ]
     echo "$output" | grep -q "my-app"
     echo "$output" | grep -q "my-app-2026-05"
+    echo "$output" | grep -q "Caveman style: full"
 }
 
 @test "status against empty state shows pre-flight phase" {
@@ -52,4 +53,12 @@ teardown() { teardown_tmp_project "$TMP"; }
     run bash scripts/status.sh "$TMP"
     [ "$status" -eq 0 ]
     echo "$output" | grep -qiE "1.*error|unresolved.*error"
+}
+
+@test "status surfaces strict Caveman failure when dependency is missing" {
+    cp tests/fixtures/state-empty.yaml "$TMP/docs/larv/STATE.yaml"
+    bash scripts/state.sh set-caveman-style "$TMP" full
+    run bash -c "LARV_CAVEMAN_BIN=__missing_caveman_mode__ bash scripts/status.sh \"$TMP\""
+    [ "$status" -eq 0 ]
+    echo "$output" | grep -q "Caveman style: full-unavailable"
 }

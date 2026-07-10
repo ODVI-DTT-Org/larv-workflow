@@ -3,6 +3,10 @@ name: sandbox-start
 description: Use when the user types /larv:sandbox-start or asks to start the current larv sandbox URLs again.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv:sandbox-start
 
 Run the larv sandbox start helper for the current project:

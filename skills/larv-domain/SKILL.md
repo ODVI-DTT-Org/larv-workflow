@@ -3,6 +3,10 @@ name: larv-domain
 description: Phase 1 - DDD viability check, then either Laravel-DDD architecture mapping (WebFetches the linked medium article at runtime) or a flat Eloquent-friendly domain model.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-domain
 
 Map the Phase 0a DDD interview output to a Laravel architecture. If DDD viability passes, produce a full DDD layout; otherwise, produce a flat Eloquent model that still uses the canonical ubiquitous-language terms.

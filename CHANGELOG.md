@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Adds `/larv:full-test`, a production end-to-end feature sweep that requires login credentials and optional DB-revert consent, tours every feature collecting bugs without fixing, then fixes all bugs in one severity-ordered pass after the full sweep is complete.
+
 - Adds the Attio Finance and Attio Venture HTML Effectiveness galleries as first-class Phase 3 design sources for visual brainstorms, docs preview mockups, and new-app design templates.
 - Requires Attio Finance and Attio Venture template adaptations to include both a visible app logo and browser URL logo/favicon, and records those assets in the Phase 3 visual implementation contract.
 - Requires Phase 3 mockups to be interactive HTML Effectiveness prototypes with clickable navigation, workflow paths, primary actions, state changes, and `interaction-map.md` parity contracts.

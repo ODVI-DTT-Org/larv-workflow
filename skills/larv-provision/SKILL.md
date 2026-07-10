@@ -3,6 +3,10 @@ name: larv-provision
 description: Legacy helper reference for sandbox provisioning. The current /larv:full flow does not dispatch this skill; app sandbox startup is generated as docs/Handsoff/bootstrap-sandbox.md and run by the implementation venue.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-provision
 
 Do not dispatch this during `/larv:full`.

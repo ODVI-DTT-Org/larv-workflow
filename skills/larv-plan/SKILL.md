@@ -3,6 +3,10 @@ name: larv-plan
 description: Phase 6 - Elephant Carpaccio slice plan with parallelism annotations, token budget, and the mandatory sandbox deploy/start script consumed by handoff bootstrap.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-plan
 
 Turn the approved design, architecture, and test strategy into implementation slices and write the exact sandbox deployment script that `docs/Handsoff/bootstrap-sandbox.md` will run locally on the sandbox VM during implementation.

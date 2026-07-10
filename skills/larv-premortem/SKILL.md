@@ -3,6 +3,10 @@ name: larv-premortem
 description: Phase 5 wrapper - failure modes, adversarial review, risks register. May loop back to phases 2/3/4.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-premortem
 
 > **STUB — sub-project A scaffolding only. The full prompt for this skill is defined in sub-project B.**

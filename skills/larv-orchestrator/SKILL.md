@@ -3,6 +3,10 @@ name: larv-orchestrator
 description: Top-level dispatcher. Per-phase soft gate, required mockup/docsite URLs, mandatory handoff generation, and routing menu before Phase 8. Spawns fresh subagents per phase.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-orchestrator
 
 Drive the larv workflow. Read `STATE.yaml`, decide the next phase, dispatch the appropriate skill, gate on its output, commit, and advance.
@@ -24,7 +28,8 @@ Drive the larv workflow. Read `STATE.yaml`, decide the next phase, dispatch the 
 # 1. Read STATE.yaml; refuse mode mismatch.
 # 2. Acquire lock via scripts/lock.sh.
 # 3. Load LEARNINGS digest from plugin repo's LEARNINGS.md.
-# 4. Determine next phase from STATE.yaml.phase.current.
+# 4. Run scripts/token-optimizer.sh status "$dir"; use only the gate's run path if safe.
+# 5. Determine next phase from STATE.yaml.phase.current.
 ```
 
 ## Security gates
@@ -37,6 +42,16 @@ Security checks are hard gates for greenfield execution. Use `larv-security` as 
 - **Bypass policy**: Do not bypass failed security scans automatically. `LARV_SECURITY_ALLOW_FAIL=1` is only acceptable when the user explicitly acknowledges the report path and asks to continue for a controlled test or false positive.
 
 The scanner is intentionally static and non-executing. Do not source repository scripts, install dependencies, run package lifecycle scripts, or execute unknown binaries while investigating a failed security check.
+
+## Token optimizer gate
+
+Headroom and LeanCTX are optional. They must never be invoked directly from a larv workflow. Before context-heavy work, run:
+
+```bash
+bash scripts/token-optimizer.sh status "$dir"
+```
+
+Only a `safe` result may be used, and execution must route through `scripts/token-optimizer.sh run`. If the gate reports fallback, continue without an optimizer and surface the fallback reason in status/pre-flight. Do not use Headroom wrap/proxy/Docker-wrapper/memory/telemetry modes. Do not let LeanCTX run onboarding/setup mutation, shell/autostart hooks, update checks, stats, or reads outside the workspace.
 
 ## Per-phase loop
 
@@ -93,13 +108,15 @@ For `/larv:feature <name>`, do not run the greenfield phases and do not implemen
 1. Verify `docs/larv/STATE.yaml` exists and the working tree is clean outside `docs/` and `adr/`.
 2. Create `docs/larv/features/<feature-slug>/`.
 3. Invoke Laravel Superpowers brainstorming from `bundle/superpowers-laravel/skills/brainstorming/SKILL.md`; save the approved design to `docs/larv/features/<feature-slug>/design.md` and `docs/superpowers/specs/YYYY-MM-DD-<feature-slug>-design.md`.
-4. Update `STATE.yaml.features[]` with `status: design-approved`, `design_path`, and timestamps.
-5. Produce DDD/package/design/architecture deltas only where the feature requires them. Save durable feature-local files under `docs/larv/features/<feature-slug>/` and append stable project decisions to existing `docs/larv/` docs or `adr/`.
-6. Invoke Laravel Superpowers writing-plans from `bundle/superpowers-laravel/skills/writing-plans/SKILL.md`; save to `docs/larv/features/<feature-slug>/plan.md` and `docs/superpowers/plans/YYYY-MM-DD-<feature-slug>-plan.md`.
-7. Append feature slices to `docs/larv/06-implementation/elephant-carpaccio.md` and update `STATE.yaml.slices`.
-8. Regenerate per-slice handoff, `docs/Handsoff.md`, AI starting-point files, and doc-site.
-9. Append tracker entries with `type: feature_planning` for planning and `type: feature` for implementation slices. Append `docs/larv/local-learnings.md` if anything useful was learned.
-10. Call `routing_menu "$dir"` so the user chooses venue and review cadence (`auto`, `manual-slice`, `manual-adr`, or `manual-phase`) before implementation.
+4. Run a larv-owned **Ponytail YAGNI audit** on the approved design and save it to `docs/larv/features/<feature-slug>/yagni-audit.md`. This wrapper audit must record the need/not-needed decision, removed scope, reused existing screens/config/workflows, rejected packages or abstractions, slice-count rationale, and protected items not simplified away. It must decide whether the feature needs to exist, remove unrequested feature scope, prefer existing screens/config/workflows and native Laravel behavior, reject new packages or abstractions for future use, and collapse the plan to one small slice instead of several when that satisfies the approved need. It must not remove security, validation, accessibility, or explicitly requested scope.
+5. Update `STATE.yaml.features[]` with `status: design-approved`, `design_path`, `yagni_audit_path`, and timestamps.
+6. Produce DDD/package/design/architecture deltas only where the feature requires them. Save durable feature-local files under `docs/larv/features/<feature-slug>/` and append stable project decisions to existing `docs/larv/` docs or `adr/`.
+7. Invoke Laravel Superpowers writing-plans from `bundle/superpowers-laravel/skills/writing-plans/SKILL.md`; save to `docs/larv/features/<feature-slug>/plan.md` and `docs/superpowers/plans/YYYY-MM-DD-<feature-slug>-plan.md`.
+8. Re-run the Ponytail YAGNI audit against the written plan before handoff generation; update `yagni-audit.md` with any removed scope, reused existing paths, rejected packages or abstractions, protected items, and why the remaining slices are the minimum needed.
+9. Append feature slices to `docs/larv/06-implementation/elephant-carpaccio.md` and update `STATE.yaml.slices`.
+10. Regenerate per-slice handoff, `docs/Handsoff.md`, AI starting-point files, and doc-site.
+11. Append tracker entries with `type: feature_planning` for planning and `type: feature` for implementation slices. Append `docs/larv/local-learnings.md` if anything useful was learned.
+12. Call `routing_menu "$dir"` so the user chooses venue and review cadence (`auto`, `manual-slice`, `manual-adr`, or `manual-phase`) before implementation.
 
 ## Hard gates
 
@@ -138,4 +155,4 @@ bash scripts/state.sh update "$dir" '.project.last_updated_at = "'"$(date -u +%Y
 
 - You do not run code from the plan yourself; phase subagents do.
 - You do not bypass gates; soft gates and the Phase 8 routing menu are mandatory.
-- You do not commit non-`docs/`/`adr/` paths; `safe_commit_docs` enforces this.
+- You do not commit non-`docs/`/`adr/` paths except generated AI entry points; `safe_commit_docs` enforces this.

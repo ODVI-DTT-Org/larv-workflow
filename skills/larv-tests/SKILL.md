@@ -3,6 +3,10 @@ name: larv-tests
 description: Phase 4 - Pest, Playwright, package-specific test matrix, and acceptance criteria for Laravel apps.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-tests
 
 Define the test strategy and make every selected Laravel package testable. Use the bundled references:

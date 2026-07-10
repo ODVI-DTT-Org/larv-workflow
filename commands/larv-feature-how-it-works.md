@@ -3,6 +3,10 @@ name: larv-feature-how-it-works
 description: Add a How It Works or Guide page feature to the current Laravel app using the bundled reference examples.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 Argument: optional route or focus, for example `route=/guide`, `route=/how-it-works`, `onboarding`, `admin`, or `customer flow`.
 
 Invoke the `larv-feature-how-it-works` skill.
@@ -27,3 +31,11 @@ Invoke the `larv-feature-how-it-works` skill.
 - `docs/larv/features/how-it-works/role-flow-inventory.md`
 - `docs/larv/features/how-it-works/implementation-report.md`
 - `docs/user-manual/how-it-works.md` when `docs/user-manual/` exists.
+
+## Optional style controls for narrative output
+
+This command participates in the Caveman allowlist.
+
+- Use `/larv-caveman full`, `/larv-caveman lite`, or `/larv-caveman ultra` to persist session style.
+- Use `/larv-caveman off` or `/larv-caveman normal` to clear/reset to normal.
+- For a one-command override, apply `Caveman full`, `Caveman lite`, or `Caveman ultra`.

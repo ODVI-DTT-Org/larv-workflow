@@ -3,6 +3,10 @@ name: larv-feature-feedback
 description: Add an in-app feedback feature to the current Laravel app using bundled feedback references and Resend email delivery.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 Argument: optional focus such as `widget`, `admin`, `screenshots`, or `resend`.
 
 Invoke the `larv-feature-feedback` skill.
@@ -31,3 +35,11 @@ Invoke the `larv-feature-feedback` skill.
 - `docs/larv/features/feedback/design.md`
 - `docs/larv/features/feedback/implementation-report.md`
 - `docs/user-manual/feedback.md` when `docs/user-manual/` exists.
+
+## Optional style controls for planning output
+
+This command participates in the Caveman allowlist.
+
+- Use `/larv-caveman full`, `/larv-caveman lite`, or `/larv-caveman ultra` to persist session style.
+- Use `/larv-caveman off` or `/larv-caveman normal` to clear/reset to normal.
+- For a one-command override, use user preference like `Caveman full`, `Caveman lite`, or `Caveman ultra`.

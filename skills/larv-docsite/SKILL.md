@@ -3,6 +3,10 @@ name: larv-docsite
 description: Phase 6.5 - Docsify-served review of the full plan and generated handoff before the Phase 8 routing menu. Verifier allocates a port from the docsite range; firewall opened; probe-before-announce.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-docsite
 
 Serve `docs/larv/` as a navigable Docsify site so the user can review the full plan in their browser before the implementation gate.

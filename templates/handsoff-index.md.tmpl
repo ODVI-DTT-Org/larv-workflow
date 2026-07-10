@@ -70,6 +70,7 @@ After bootstrap succeeds, the app URL is written to `docs/larv/07-runtime/sandbo
 | | |
 |---|---|
 | VM host | {{vm_host}} |
+| App URL | {{app_url}} |
 | Runtime mode | local on this VM |
 | Mockup port | {{mockup_port}} |
 | Project root | {{project_root}} |
@@ -89,6 +90,7 @@ Smoke-test URL (after each slice): read base URL from `docs/larv/07-runtime/sand
 
 - Do not change schema without consulting the slice handsoff's migration field.
 - Do not skip tests. If a test in DoD does not pass, mark `STATE.yaml.slices.NN.status: failed` and stop.
+- Preserve unrelated user changes in a dirty worktree.
 - Do not mark a slice complete until its testing guide exists at `docs/user-manual/testing/<slice-id>-<slice-slug>.md`.
 - Do not mark a slice complete until `docs/user-manual/seed-data.md` documents the slice's seeded records, credentials, reset command, and demo-data removal notes.
 - After each slice, append to `docs/larv/implementation-tracker.yaml` (snippet in slice handsoff).
@@ -116,11 +118,14 @@ If context is nearly full, stop after the current atomic step and tell the user 
 4. Read `docs/larv/07-runtime/sandbox-url.txt` if it exists. If it is missing, run `docs/Handsoff/bootstrap-sandbox.md` before app code edits; on greenfield projects this also creates the bare Laravel scaffold if `artisan` is missing.
 5. Find the first slice whose STATE status is not completed.
 6. Open the matching `docs/Handsoff/slice-NN-<name>.md` and continue from its next unchecked Definition of Done item.
-7. If every slice is complete, run verification or deployment depending on the user's request.
+7. If every slice is complete and the user asks for a hotfix or follow-up change, use the nearest affected slice, feature, or debug docs as the local contract before editing.
+8. If every slice is complete and the user asks for verification or deployment, run verification or deployment depending on the request.
 
 Do not rely on previous chat context. `DOCS.md`, the docs, tracker, reports, and STATE file are the source of truth.
 
 Runtime note: this handoff assumes the AI is already running on the sandbox VM. Do not SSH to `{{ssh_user}}@{{vm_host}}`; execute the bootstrap, mockup server, doc-site server, and app sandbox commands locally.
+
+Generated files should be updated by regenerating larv handoff outputs, not by hand-editing generated starting-point files or nested `AGENTS.md` contracts.
 
 ## 16. New feature in a fresh session
 
@@ -129,8 +134,11 @@ If the user asks for a new feature after the original implementation:
 1. If larv commands are available, run `/larv:feature <feature-name>`.
 2. If larv commands are not available, read `docs/Handsoff.md`, `docs/larv/STATE.yaml`, `docs/larv/implementation-tracker.yaml`, `adr/`, and `docs/larv/01-domain/`.
 3. Create `docs/larv/features/<feature-slug>/` with the feature brief, domain delta, design delta, test delta, premortem, and implementation slices.
-4. Append feature work to `docs/larv/implementation-tracker.yaml` with `type: feature`.
-5. Refresh the relevant handoff docs before implementation.
+4. Run a **Ponytail YAGNI audit** and save it at `docs/larv/features/<feature-slug>/yagni-audit.md`. The audit must record the need/not-needed decision, removed scope, reused existing screens/config/workflows, rejected packages or abstractions, slice-count rationale, and protected items not simplified away.
+5. Re-run the Ponytail YAGNI audit before handoff generation and update `docs/larv/features/<feature-slug>/yagni-audit.md` so unnecessary scope is removed before implementation starts.
+6. The audit may remove unrequested scope, future-proof abstractions, unnecessary packages, and avoidable extra slices; do not remove security, validation, accessibility, or explicitly requested scope.
+7. Append feature work to `docs/larv/implementation-tracker.yaml` with `type: feature`.
+8. Refresh the relevant handoff docs before implementation.
 
 ## 17. Foreign-AI notes
 
@@ -148,11 +156,11 @@ If you are not Claude Code: ignore any references to "superpowers" or "skills" o
 - Root docs index: `DOCS.md`
 - Implementation reports: `docs/larv/08-implementation/reports/`
 
-## 19. Model switch and starter prompt
+## 19. Model selection starter prompt
 
-When handing this project to another AI tool or a fresh session, first switch that tool to the user's preferred model. If the user did not specify one, use the strongest coding model available in that tool for long-context Laravel implementation.
+When handing this project to another AI tool or a fresh session, use the user's preferred model if one was specified. If not, use the strongest available planning model for planning or ambiguous architecture work, and use a faster execution model for already-planned implementation, tests, formatting, docs, and sandbox operations.
 
-Starter prompt to paste after switching models:
+Starter prompt to paste after model selection:
 
 ```text
 You are continuing a larv-managed Laravel implementation in this same repository. Do not rely on previous chat context. Start by reading DOCS.md, docs/Handsoff.md, docs/larv/STATE.yaml, docs/larv/implementation-tracker.yaml if present, and the latest docs/larv/08-implementation/reports/. If docs/larv/07-runtime/sandbox-url.txt is missing, run docs/Handsoff/bootstrap-sandbox.md before app code edits. Find the first incomplete slice in STATE, open the matching docs/Handsoff/slice-NN-<name>.md, execute its instructions, run required Laravel/frontend commands yourself, restart/probe the sandbox when needed, and report the public URL plus the testing guide path. Do not SSH; this session is already inside the VM.

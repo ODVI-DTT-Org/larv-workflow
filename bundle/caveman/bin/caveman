@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+VERSION="1.0.0"
+
+usage() {
+    cat <<'EOF'
+Usage: caveman [--version] [full|lite|ultra]
+
+Local larv Caveman formatter. It keeps technical terms intact while applying
+short, direct wording for planning/status output. With no stdin, it exits after
+validating the requested mode.
+EOF
+}
+
+mode="${1:-full}"
+case "$mode" in
+    --version|-v|version)
+        printf "larv-caveman %s\n" "$VERSION"
+        exit 0
+        ;;
+    --help|-h|help)
+        usage
+        exit 0
+        ;;
+    full|lite|ultra)
+        ;;
+    *)
+        printf "caveman: unsupported mode: %s\n" "$mode" >&2
+        usage >&2
+        exit 64
+        ;;
+esac
+
+if [ -t 0 ]; then
+    exit 0
+fi
+
+case "$mode" in
+    lite)
+        sed -E \
+            -e 's/\bimplementation\b/build/g' \
+            -e 's/\bapproximately\b/about/g' \
+            -e 's/\butilize\b/use/g' \
+            -e 's/\badditional\b/extra/g'
+        ;;
+    ultra)
+        sed -E \
+            -e 's/\bimplementation\b/build/g' \
+            -e 's/\bapproximately\b/about/g' \
+            -e 's/\butilize\b/use/g' \
+            -e 's/\badditional\b/extra/g' \
+            -e 's/\btherefore\b/so/g' \
+            -e 's/\bhowever\b/but/g' \
+            -e 's/[[:space:]]+/ /g'
+        ;;
+    full)
+        cat
+        ;;
+esac

@@ -3,6 +3,10 @@ name: larv:redesign-attio-finance
 description: Redesign the current Laravel frontend using the Attio Finance HTML Effectiveness CRM templates.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 Argument: optional focus such as `<page>`, `<role>`, or `<workflow>`. If omitted, redesign the whole frontend UI.
 
 Invoke the `larv-redesign-attio-finance` skill.

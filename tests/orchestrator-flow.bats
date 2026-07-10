@@ -102,16 +102,22 @@ teardown() { [ -d "$REPO" ] && rm -rf "$REPO"; }
     # Starting-point files all reference Handsoff.md
     grep -q "Handsoff.md" CLAUDE.md
     grep -q "DOCS.md" CLAUDE.md
-    grep -q "docs/larv/08-implementation/reports/" CLAUDE.md
-    grep -q "docs/larv/03-design/visual-implementation-contract.md" CLAUDE.md
-    grep -q "docs/larv/08-implementation/screenshots/" CLAUDE.md
+    grep -q "docs/Handsoff/slice-NN-<name>.md" CLAUDE.md
+    grep -q "docs/larv/09-verification/" CLAUDE.md
     grep -q "bootstrap-sandbox.md" CLAUDE.md
-    grep -q "production-deploy.md" CLAUDE.md
-    grep -q "package-guide.md" CLAUDE.md
+    grep -q "docs/larv/10-deploy/" CLAUDE.md
+    grep -q "Preserve unrelated user changes" CLAUDE.md
     grep -q "Handsoff.md" AGENTS.md
     grep -q "Handsoff.md" GEMINI.md
     grep -q "Handsoff.md" .cursor/rules/larv.mdc
     grep -q "Handsoff.md" .codex/AGENTS.md
+
+    for f in docs/Handsoff.md; do
+        grep -q "Ponytail YAGNI audit" "$f" || { echo "missing Ponytail audit in $f"; return 1; }
+        grep -q "docs/larv/features/<feature-slug>/yagni-audit.md" "$f" || { echo "missing audit path in $f"; return 1; }
+        grep -q "before handoff generation" "$f" || { echo "missing pre-handoff refresh in $f"; return 1; }
+        grep -q "do not remove security, validation, accessibility, or explicitly requested scope" "$f" || { echo "missing protected scope rule in $f"; return 1; }
+    done
 }
 
 @test "integration: routing menu sets STATE.yaml.execution.mode" {

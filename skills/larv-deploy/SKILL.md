@@ -3,6 +3,10 @@ name: larv-deploy
 description: Phase 10 - production deployment guidance and verification. Defaults to Laravel Cloud hosting and Namecheap DNS; deploy instructions are also generated into docs/Handsoff/production-deploy.md for external AI handoff.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-deploy
 
 Prepare and guide production deployment. If implementation was handed off to another AI, that AI should follow `docs/Handsoff/production-deploy.md`; this skill mirrors the same contract for Claude Code execution.
@@ -31,7 +35,8 @@ Tradeoffs: Other hosts or registrars need a custom deployment runbook.
 5. Should Laravel Cloud create/attach the production database?
 6. Which mail provider and sender address should production use?
 7. Are queue workers, scheduler, Horizon, Reverb, or storage disks needed?
-8. Which automation choice should we use: guide-only, Laravel Cloud CLI automation, Laravel Cloud API automation, or mixed?
+8. Push to Laravel Cloud app (required): provide your Laravel Cloud API token or run `cloud auth`.
+   Credentials are pushed automatically — manual pasting is not supported.
 9. Should DNS stay guide-only, or should we use Namecheap API automation?
 ```
 
@@ -49,21 +54,21 @@ Record answers in `docs/larv/10-deploy/production-answers.md`.
 
 ## Laravel Cloud automation mode
 
-Default is `guide-only` unless the user explicitly requests automation and confirms the Laravel Cloud CLI/API credentials are available.
+**Pushing credentials and triggering a deploy on Laravel Cloud is required.** Manual credential pasting is not supported. The default mode is `Laravel Cloud CLI automation`; use `Laravel Cloud API automation` when CLI is unavailable.
 
 Supported automation choices:
 
-- `guide-only`: no automated production changes; walk the user through `docs/Handsoff/production-deploy.md`.
-- `Laravel Cloud CLI automation`: user authenticates locally with `cloud auth` or `cloud auth:token --add`; then print and run approved `cloud` commands.
-- `Laravel Cloud API automation`: user exports `LARAVEL_CLOUD_API_TOKEN`; use API calls with `Authorization: Bearer $LARAVEL_CLOUD_API_TOKEN`.
+- `Laravel Cloud CLI automation` **(default)**: user authenticates with `cloud auth` or `cloud auth:token --add`; AI prints and runs approved `cloud` commands.
+- `Laravel Cloud API automation`: user exports `LARAVEL_CLOUD_API_TOKEN`; AI uses HTTPS API calls with `Authorization: Bearer $LARAVEL_CLOUD_API_TOKEN`.
 - `mixed`: automate Laravel Cloud deploy but keep DNS guide-only.
 
-If automation mode is requested:
+`guide-only` is **not a valid choice** for the Laravel Cloud deploy step. If credentials are genuinely unavailable, stop and ask the user to provide them before continuing — do not fall back to manual instructions.
 
-1. Check whether a Laravel Cloud CLI is installed or whether the user has provided an approved API workflow.
+Before running any deploy commands:
+
+1. Verify Laravel Cloud CLI or API token is available (see requirements below).
 2. Print every production-affecting command before running it.
 3. Never read or write raw secrets into git-tracked files.
-4. Fall back to `guide-only` if CLI/API capabilities are missing or unclear.
 
 Required Laravel Cloud CLI checks:
 
@@ -117,12 +122,12 @@ NAMECHEAP_CLIENT_IP
 
 ## Completion gate
 
-Do not return `status: complete` until the production URL has been probe-confirmed or the user explicitly chooses `guide-only`.
+Do not return `status: complete` until the production URL has been probe-confirmed AND credentials were pushed via CLI or API automation. A `guide-only` manual paste is not a valid completion state.
 
 ## Subagent return contract
 
 ```yaml
-status: complete | guide-only | failed
+status: complete | failed
 production_url: "https://<domain>" | null
 files_written:
   - docs/larv/10-deploy/production-answers.md

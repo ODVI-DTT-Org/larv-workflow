@@ -52,6 +52,15 @@ teardown() {
     [ "$status" -eq 0 ]
 }
 
+@test "git_dirty_outside_docs returns 1 for stale nested AGENTS files" {
+    mkdir -p "$REPO/app" "$REPO/resources" "$REPO/tests"
+    echo "app dox" > "$REPO/app/AGENTS.md"
+    echo "resources dox" > "$REPO/resources/AGENTS.md"
+    echo "tests dox" > "$REPO/tests/AGENTS.md"
+    run bash -c "cd $REPO && source $PROJECT_ROOT/scripts/lib/git_safe.sh && git_dirty_outside_docs"
+    [ "$status" -eq 1 ]
+}
+
 @test "safe_commit_docs commits docs adr and generated entry points to default branch" {
     mkdir -p "$REPO/docs/larv"
     echo "doc" > "$REPO/docs/larv/note.md"

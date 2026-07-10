@@ -3,6 +3,10 @@ name: larv-security
 description: Repository security guard for Laravel and larv workflows before adopting, installing, running, implementing, or trusting app code and packages.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-security
 
 Use this as the larv workflow's reusable repository guard. It wraps `scripts/security-scan.sh` and enforces a static-first policy before any Laravel app bootstrap, Composer install/update, npm install/build, package adoption, or implementation slice.

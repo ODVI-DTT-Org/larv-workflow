@@ -3,6 +3,10 @@ name: larv:learn
 description: Aggregate Plugin Improvement Notes from handoffs and propose plugin edits via PR. Modes - --quick, --full, --since=DATE, --dry-run.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 Argument flags:
 - `--quick` — last 5 slices, `[plugin]` notes only, only if patterns clear
 - `--full` — all `[plugin]` notes since last `--full` invocation

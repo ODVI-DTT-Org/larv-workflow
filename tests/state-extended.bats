@@ -56,3 +56,23 @@ teardown() { teardown_tmp_project "$TMP"; }
     run yq -r '.execution.allocations[0].value' "$TMP/docs/larv/STATE.yaml"
     [ "$output" = "9001" ]
 }
+
+@test "caveman style helpers persist and clear session mode" {
+    bash scripts/state.sh init "$TMP" my-app greenfield
+    bash scripts/state.sh set-caveman-style "$TMP" full
+    run yq -r '.execution.caveman_style' "$TMP/docs/larv/STATE.yaml"
+    [ "$output" = "full" ]
+    bash scripts/state.sh set-caveman-style "$TMP" off
+    run bash scripts/state.sh get-caveman-style "$TMP"
+    [ "$output" = "normal" ]
+    bash scripts/state.sh clear-caveman-style "$TMP"
+    run bash scripts/state.sh get-caveman-style "$TMP"
+    [ "$output" = "normal" ]
+}
+
+@test "state caveman helper normalizes off/normal aliases" {
+    bash scripts/state.sh init "$TMP" my-app greenfield
+    bash scripts/state.sh set-caveman-style "$TMP" normal
+    run bash scripts/state.sh get-caveman-style "$TMP"
+    [ "$output" = "normal" ]
+}

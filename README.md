@@ -31,6 +31,8 @@ Use `larv` when you want to:
 - **Self-contained handoff**: implementation reads `docs/Handsoff.md` and `docs/Handsoff/slice-NN-*.md`, not hidden chat context.
 - **Sandbox-first verification**: generated apps are expected to run in a browser-visible sandbox before production guidance.
 - **Security baseline**: static checks run before dependency installation, app bootstrap, and implementation slices.
+- **Safe token optimizer gate**: optional Headroom/LeanCTX use must pass `scripts/token-optimizer.sh` version, hash, install-path, telemetry, proxy, shell-hook, and config-mutation checks; otherwise larv continues without an optimizer.
+- **Strict Caveman output**: allowlisted larv planning flows default to Caveman `full`; missing dependencies are reported as `full-unavailable` instead of silently falling back to normal style.
 - **YAGNI-first implementation**: Ponytail's decision ladder is embedded in the implementation phase — every slice uses only what the spec requires, reaching for Laravel's framework and installed packages before writing new code.
 
 ## Ponytail Integration
@@ -100,10 +102,37 @@ Restart Codex after adding the marketplace or symlink. Typing prompts such as `/
 
 - PHP, Composer, and common Laravel PHP extensions.
 - Node.js/npm when the generated Laravel frontend requires asset builds.
+- Strict Caveman output styling is controlled separately via `/larv-caveman`.
 - PostgreSQL for the default sandbox bootstrap.
 - `curl`, `rsync`, `ss`, `flock`, and `setsid`.
 - `yq` for YAML state operations.
 - `bats` for this plugin's test suite.
+
+larv includes a bundled Caveman-compatible binary at `bundle/caveman/bin/caveman`, so strict `full` works without a global install. For an external reviewed binary, point `LARV_CAVEMAN_BIN` at it.
+
+Legacy npm package install guidance is intentionally not used by default because the original `@larv/caveman` package is not available in the public npm registry.
+
+For external Caveman support:
+
+```bash
+export LARV_CAVEMAN_BIN="/path/to/reviewed/caveman"
+```
+
+Known compatibility: upgrading/downgrading this dependency can alter exact phrasing and emphasis.
+
+Optional override examples:
+
+```bash
+export LARV_CAVEMAN_BIN="path/to/caveman"
+export LARV_CAVEMAN_VERSION="1.0.0"
+export LARV_CAVEMAN_ALLOWLIST="full,debug,feature"
+export LARV_CAVEMAN_WARN_ON_VERSION_MISMATCH="0"
+export LARV_CAVEMAN_ALLOWLIST_FILE="scripts/caveman-allowlist.txt"
+```
+
+`LARV_CAVEMAN_WARN_ON_VERSION_MISMATCH=0` suppresses version-mismatch warnings when you intentionally pin a fork/version.
+
+`LARV_CAVEMAN_STRICT=0` is reserved for deterministic compatibility tests that need the old normal fallback. Normal larv workflow should leave strict mode enabled.
 
 The default public sandbox host is the placeholder `sandbox.example.com`. Override it for your environment:
 
@@ -156,6 +185,50 @@ Adoption is read-only on application code. It inspects the app and creates `docs
 
 `status` summarizes `docs/larv/STATE.yaml`. `resume` continues from unresolved errors, pending gates, budget caps, or the next phase.
 
+`/larv-caveman` manages strict Caveman output styling for planning commands. The default is `full`.
+
+`/larv-caveman` supports:
+
+- `Caveman full`
+- `Caveman lite`
+- `Caveman ultra`
+- `off` / `normal` / `clear` return to strict `full`
+
+Allowed commands that read this setting:
+
+- `larv:brainstorm`, `larv:debug`, `larv:feature`, `larv:full`
+- `larv-feature-feedback`, `larv-feature-how-it-works`, `larv-feature-onboarding-helper`
+
+Example one-shot usage:
+
+```text
+larv:feature Improve onboarding flow with Caveman lite
+```
+
+For quick status:
+
+```bash
+bash scripts/caveman.sh status "$PWD"
+```
+
+If the dependency is missing in strict mode, status reports `full-unavailable`. Install or point `LARV_CAVEMAN_BIN` at the pinned binary instead of assuming normal output was used.
+
+To measure Headroom token optimization on a file:
+
+```bash
+bash scripts/token-optimizer.sh measure "$PWD" path/to/file
+```
+
+For stdin:
+
+```bash
+some-command | bash scripts/token-optimizer.sh measure "$PWD" -
+```
+
+Measurement reports `tokens_before`, `tokens_after`, `tokens_saved`, `savings_percent`, `compression_ratio`, `target_met`, and `exact_replay`.
+
+The measurement path first tries gated Headroom direct compression. If Headroom protects code or does not meet the 50% savings target, larv applies a local `larv-context-pack` outline for planning, status, and progress reporting. `exact_replay=false` means the optimized artifact is not byte-exact; re-read the original file before editing exact code.
+
 ## Commands
 
 ### Project Lifecycle
@@ -167,6 +240,7 @@ Adoption is read-only on application code. It inspects the app and creates `docs
 | `/larv:brainstorm` | Run exploratory Phase 0 discussion only, without initializing a full build |
 | `/larv:feature <name>` | Add a feature to a managed project through design, planning, handoff, docs, and implementation gates |
 | `/larv:debug <issue>` | Fix a bug through root-cause analysis, regression test planning, handoff, and gated implementation |
+| `/larv-caveman` | Inspect or set Caveman style for planning commands |
 | `/larv:learn` | Aggregate project learnings and plugin improvement notes |
 | `/larv:status` | Print the current `docs/larv/STATE.yaml` summary |
 | `/larv:resume` | Continue from the last saved larv checkpoint |
@@ -245,6 +319,7 @@ The main workflow skills live in `skills/`:
 | `larv-feature-onboarding-helper` | Onboarding/helper feature |
 | `larv-hyperframes` | Promo video planning/execution workflow for larv-managed apps |
 | `larv-provision` | Legacy reference for sandbox provisioning invariants |
+| `larv-full-test` | Full production feature sweep — collects all bugs first, then fixes them in one pass |
 
 Codex wrappers live in `codex-skills/` and map user-visible `/larv:*` style prompts to the relevant command or main workflow skill.
 

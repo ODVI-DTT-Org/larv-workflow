@@ -3,6 +3,10 @@ name: security
 description: Use when the user types /larv:security or asks to scan an existing repository, Laravel app, package, dependency, or tool before installing, running, adopting, or using it.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv:security
 
 Run a static, non-executing repository guard before trusting a repo, package, or tool. This skill is for "scan before use" checks, not incident response or full malware reverse engineering.

@@ -3,6 +3,10 @@ name: larv-discuss
 description: Phase 0 - Laravel-specific brainstorming, grounded in the DDD interview output. Starts with the user's design-direction preference, then asks about admin panel, auth, async, realtime, observability, performance, payments, multi-tenancy, search, MCPs, and dev tooling.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-discuss
 
 Run product brainstorming with Laravel ecosystem grounding. Reads the DDD interview output (Phase 0a) and uses it to ground every recommendation. The first user-facing question must capture how the user wants design handled later in Phase 3, so design is not introduced too late.

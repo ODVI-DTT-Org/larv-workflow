@@ -3,6 +3,10 @@ name: larv:sandbox
 description: Show current project sandbox URLs, probe readiness, seeded credentials, and browser testing instructions.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 Run: `bash scripts/sandbox.sh "$PWD" info` from the larv plugin root.
 
 The command reads the current project's `docs/larv/STATE.yaml`, runtime URL files, seed guide, and user testing guides, then prints:

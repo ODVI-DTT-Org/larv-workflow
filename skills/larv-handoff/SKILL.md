@@ -3,6 +3,10 @@ name: larv-handoff
 description: Generate the universal Handsoff.md index, sandbox bootstrap handoff, production/env/ops guides, per-slice handsoffs, and AI starting-point files. Mandatory before the routing menu.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-handoff
 
 Generate the documents that every execution venue (same-session, subagents, foreign AI) reads to implement the slice plan. These are the only artifacts the implementation phase consumes. Also generate `docs/user-manual/` for user-facing install, testing, seed data, reset, and deployment guides.
@@ -47,7 +51,7 @@ handsoff_render_runtime_guides "."
 #    For each slice id + name in the slice plan:
 #      handsoff_render_slice "." "$slice_id" "$slice_slug"
 
-# 6. Render the AI starting-point files
+# 6. Render concise AI starting-point routing files
 handsoff_render_starting_points "."
 
 # 7. Commit (auto-commit policy)
@@ -58,7 +62,7 @@ safe_commit_docs "[larv] handsoff documents generated for $(yq -r .project.slug 
 
 - You do not invoke other skills.
 - You do not write content directly to handsoff files; you call library functions.
-- You do not modify files outside `docs/`, `adr/`, and the AI starting-point paths.
+- You do not modify files outside `docs/`, `adr/`, and generated AI starting-point paths.
 - You do not start the app sandbox while generating handoff. You write `docs/Handsoff/bootstrap-sandbox.md`; the implementation venue runs it before the first slice.
 
 ## Required outputs

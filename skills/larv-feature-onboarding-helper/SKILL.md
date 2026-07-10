@@ -3,6 +3,10 @@ name: larv-feature-onboarding-helper
 description: Use when the user types /larv-feature-onboarding-helper or asks to add onboarding, first-login setup, guided tours, role walkthroughs, or user-flow helper UX to a Laravel app.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-feature-onboarding-helper
 
 Add a production onboarding helper to the current Laravel app. The helper must capture the full user flow surface, not just display a welcome message.

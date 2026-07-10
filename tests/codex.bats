@@ -52,7 +52,7 @@ load helpers
 }
 
 @test "Codex skill namespace exposes larv slash command equivalents" {
-    for skill in full status resume adopt brainstorm feature debug learn sandbox sandbox-start sandbox-stop sandbox-reset presentation redesign-attio-finance redesign-attio-venture feature-how-it-works feature-feedback feature-onboarding-helper; do
+    for skill in full status resume adopt brainstorm feature debug learn sandbox sandbox-start sandbox-stop sandbox-reset presentation redesign-attio-finance redesign-attio-venture feature-how-it-works feature-feedback feature-onboarding-helper larv-caveman; do
         [ -f "codex-skills/${skill}/SKILL.md" ] || { echo "missing codex-skills/${skill}/SKILL.md"; return 1; }
     done
     run grep -F "/larv:full" codex-skills/full/SKILL.md
@@ -77,4 +77,12 @@ load helpers
     [ "$status" -eq 0 ]
     run grep -F "/larv-feature-onboarding-helper" codex-skills/feature-onboarding-helper/SKILL.md
     [ "$status" -eq 0 ]
+    run grep -F "/larv-caveman" codex-skills/larv-caveman/SKILL.md
+    [ "$status" -eq 0 ]
+}
+
+@test "Codex larv feature entry point documents wrapper YAGNI audit" {
+    grep -q "Ponytail YAGNI audit" codex-skills/feature/SKILL.md
+    grep -q "docs/larv/features/<feature-slug>/yagni-audit.md" codex-skills/feature/SKILL.md
+    grep -q "before handoff generation" codex-skills/feature/SKILL.md
 }

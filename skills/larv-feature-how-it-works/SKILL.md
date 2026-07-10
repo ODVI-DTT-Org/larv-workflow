@@ -3,6 +3,10 @@ name: larv-feature-how-it-works
 description: Use when the user types /larv-feature-how-it-works or asks to add a How It Works, Guide, walkthrough, product tour, or user workflow page to a Laravel app.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-feature-how-it-works
 
 Add a production How It Works or Guide feature page to the current Laravel app. This skill is for an in-app route such as `/guide` or `/how-it-works`, not a docs-only artifact.

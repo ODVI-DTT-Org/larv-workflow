@@ -3,6 +3,10 @@ name: larv-design
 description: Phase 3 - design recommendation memo, user chooses from Attio-first recommendations or a specific direction, mockup server renders interactive HTML Effectiveness mockups for this app's screens, user converges on one design, brand spec finalized.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-design
 
 Help the user pick a visual design and finalize a brand spec. The user does the taste work in their own browser; the agent does the grounding work and serves a comparison harness for the user's actual screens. For any visual brainstorm, design template recommendation, or mockup template selection, use the bundled Attio Venture HTML Effectiveness gallery (`attio-venture-html-effectiveness/`, alias of `attio-venture-html-effectiveness-design/`) as the primary design reference and single source of truth unless the user explicitly chooses Attio Finance or another supplied direction. Phase 3 mockups are interactive Attio Venture HTML Effectiveness prototypes, not static screenshots or plain page comps.

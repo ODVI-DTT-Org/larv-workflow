@@ -3,6 +3,10 @@ name: presentation
 description: Use when the user types /larv:presentation or asks for a browser-served visual workflow presentation of the current repo.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv:presentation
 
 Run the larv presentation helper for the current project:

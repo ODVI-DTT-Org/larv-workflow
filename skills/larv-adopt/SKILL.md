@@ -3,6 +3,10 @@ name: larv-adopt
 description: Adoption controller for /larv:adopt. Read-only on user code. Detects existing Laravel packages and produces docs/larv/ retroactively.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-adopt
 
 Bring an existing Laravel app under larv management without changing application code.

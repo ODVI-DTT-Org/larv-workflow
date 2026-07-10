@@ -3,6 +3,10 @@ name: larv-verify
 description: Phase 9 - final verification across Pint, Pest, Larastan, asset build, migrations, and sandbox smoke before production deploy guidance.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-verify
 
 Run the final verification pass after implementation and before production deployment. Use the bundled `bundle/masterplan/skills/masterplan-verification/SKILL.md` as the verification discipline reference, but execute the concrete Laravel checks below.

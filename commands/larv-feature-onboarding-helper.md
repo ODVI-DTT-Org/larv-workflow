@@ -3,6 +3,10 @@ name: larv-feature-onboarding-helper
 description: Add an onboarding helper feature that captures all user flows in the current Laravel app.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 Argument: optional focus such as `first-login`, `role-tour`, `checklist`, `admin`, or `all flows`.
 
 Invoke the `larv-feature-onboarding-helper` skill.
@@ -32,3 +36,11 @@ Invoke the `larv-feature-onboarding-helper` skill.
 - `docs/larv/features/onboarding-helper/design.md`
 - `docs/larv/features/onboarding-helper/implementation-report.md`
 - `docs/user-manual/onboarding-helper.md` when `docs/user-manual/` exists.
+
+## Optional style controls for narrative output
+
+This command participates in the Caveman allowlist.
+
+- Use `/larv-caveman full`, `/larv-caveman lite`, or `/larv-caveman ultra` to persist session style.
+- Use `/larv-caveman off` or `/larv-caveman normal` to clear/reset to normal.
+- For a one-command override, apply `Caveman full`, `Caveman lite`, or `Caveman ultra`.

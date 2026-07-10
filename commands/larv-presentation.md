@@ -3,6 +3,10 @@ name: larv:presentation
 description: Generate and serve a visual role workflow presentation for the current repo.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 Run: `bash scripts/presentation.sh "$PWD" start "$ARGUMENTS"` from the larv plugin root. If the platform does not expose `$ARGUMENTS`, pass the words after `/larv:presentation` as the final argument string.
 
 The command reads the whole current repository, including `docs/larv/`, `docs/user-manual/`, routes, models, views, Filament resources, tests, and README/DOCS files. It generates an HTML Effectiveness-style visual workflow presentation plus three graph artifacts:

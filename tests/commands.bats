@@ -6,11 +6,11 @@ COMMANDS=(
     larv-full larv-adopt larv-feature larv-debug
     larv-brainstorm larv-learn larv-status larv-resume
     larv-sandbox larv-sandbox-start larv-sandbox-stop larv-sandbox-reset
-    larv-presentation larv-redesign-attio-finance larv-redesign-attio-venture larv-feature-how-it-works
+    larv-caveman larv-presentation larv-redesign-attio-finance larv-redesign-attio-venture larv-feature-how-it-works
     larv-feature-feedback larv-feature-onboarding-helper larv-security
 )
 
-@test "all 19 command files exist" {
+@test "all 20 command files exist" {
     for cmd in "${COMMANDS[@]}"; do
         [ -f "commands/${cmd}.md" ] || { echo "missing commands/${cmd}.md"; return 1; }
     done
@@ -80,6 +80,11 @@ COMMANDS=(
     [ "$status" -eq 0 ]
 }
 
+@test "larv-caveman command invokes scripts/caveman.sh" {
+    run grep -F "scripts/caveman.sh" commands/larv-caveman.md
+    [ "$status" -eq 0 ]
+}
+
 @test "larv-resume command invokes resume.sh" {
     run grep -F "scripts/resume.sh" commands/larv-resume.md
     [ "$status" -eq 0 ]
@@ -128,6 +133,9 @@ yaml.safe_load(parts[1])
 @test "larv-feature command describes mini-flow with gates" {
     grep -q "Laravel Superpowers brainstorming" commands/larv-feature.md
     grep -q "Laravel Superpowers writing plan" commands/larv-feature.md
+    grep -q "Ponytail YAGNI audit" commands/larv-feature.md
+    grep -q "docs/larv/features/<feature-slug>/yagni-audit.md" commands/larv-feature.md
+    grep -q "before handoff generation" commands/larv-feature.md
     grep -q "docs/larv/features/<feature-slug>/design.md" commands/larv-feature.md
     grep -q "docs/superpowers/specs" commands/larv-feature.md
     grep -q "Per-slice handsoff" commands/larv-feature.md

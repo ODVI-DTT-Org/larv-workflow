@@ -3,6 +3,10 @@ name: larv:sandbox-start
 description: Start or restart the current project's app sandbox, docs server, and mockup server, then verify public URLs.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 Before running anything, ask the user which public VM ports they want for:
 
 - app sandbox (`8000-8999`)

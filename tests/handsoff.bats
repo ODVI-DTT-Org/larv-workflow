@@ -28,17 +28,36 @@ teardown() { teardown_tmp_project "$TMP"; }
     [ "$status" -eq 0 ]
     [ -f "$TMP/docs/Handsoff.md" ]
     grep -q "Handsoff — my-app" "$TMP/docs/Handsoff.md"
-    grep -q "sandbox.example.com" "$TMP/docs/Handsoff.md"
+    grep -q "No sandbox URL recorded yet" "$TMP/docs/Handsoff.md"
     grep -q "docs/larv/03-design/visual-implementation-contract.md" "$TMP/docs/Handsoff.md"
     grep -q "docs/larv/03-design/mockups/" "$TMP/docs/Handsoff.md"
-    grep -q "Model switch and starter prompt" "$TMP/docs/Handsoff.md"
-    grep -q "switch that tool to the user's preferred model" "$TMP/docs/Handsoff.md"
+    grep -q "Model selection starter prompt" "$TMP/docs/Handsoff.md"
+    grep -q "use the user's preferred model" "$TMP/docs/Handsoff.md"
     grep -q "You are continuing a larv-managed Laravel implementation" "$TMP/docs/Handsoff.md"
+    grep -q "Ponytail YAGNI audit" "$TMP/docs/Handsoff.md"
+    grep -q "docs/larv/features/<feature-slug>/yagni-audit.md" "$TMP/docs/Handsoff.md"
+    grep -q "before handoff generation" "$TMP/docs/Handsoff.md"
+    grep -q "do not remove security, validation, accessibility, or explicitly requested scope" "$TMP/docs/Handsoff.md"
 }
 
 @test "handsoff_render_index inlines C4 content (does not link only)" {
     bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_index '$TMP'"
     grep -q "C4 Context" "$TMP/docs/Handsoff.md"
+}
+
+@test "missing source docs render explicit absence notices instead of TBD" {
+    rm -f "$TMP/docs/larv/01-domain/domain-model.md" \
+        "$TMP/docs/larv/02-architecture/c4-context.md" \
+        "$TMP/docs/larv/03-design/data-model.md" \
+        "$TMP/docs/larv/03-design/api-surface.md" \
+        "$TMP/docs/larv/04-test-strategy/strategy.md"
+
+    bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_index '$TMP'"
+
+    grep -q "No standalone source exists yet." "$TMP/docs/Handsoff.md"
+    grep -q "Use feature docs, tracker, implementation reports, and source code as the recovery source." "$TMP/docs/Handsoff.md"
+    grep -q "Do not invent missing product or architecture details." "$TMP/docs/Handsoff.md"
+    ! grep -q "TBD" "$TMP/docs/Handsoff.md"
 }
 
 @test "handsoff_render_slice writes docs/Handsoff/slice-01-auth.md" {
@@ -122,11 +141,85 @@ teardown() { teardown_tmp_project "$TMP"; }
     [ -f "$TMP/.codex/AGENTS.md" ]
 }
 
+@test "handsoff_render_starting_points derives sandbox host from runtime URL before placeholder" {
+    mkdir -p "$TMP/docs/larv/07-runtime"
+    printf "http://46.250.229.188:25000/admin/snowflake\n" > "$TMP/docs/larv/07-runtime/sandbox-url.txt"
+
+    bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_starting_points '$TMP'"
+
+    grep -q "VM host | 46.250.229.188" "$TMP/AGENTS.md"
+    grep -q "App URL | http://46.250.229.188:25000" "$TMP/AGENTS.md"
+    grep -q "Do not SSH to \`46.250.229.188\`" "$TMP/.cursor/rules/larv.mdc"
+    ! grep -q "sandbox.example.com" "$TMP/AGENTS.md"
+    ! grep -q "sandbox.example.com" "$TMP/.cursor/rules/larv.mdc"
+}
+
+@test "handoff index and root AGENTS agree with sandbox runtime host" {
+    mkdir -p "$TMP/docs/larv/07-runtime"
+    printf "http://46.250.229.188:25000/admin/snowflake\n" > "$TMP/docs/larv/07-runtime/sandbox-url.txt"
+
+    bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_index '$TMP' && handsoff_render_starting_points '$TMP'"
+
+    grep -q "VM host | 46.250.229.188" "$TMP/docs/Handsoff.md"
+    grep -q "App URL | http://46.250.229.188:25000" "$TMP/docs/Handsoff.md"
+    grep -q "VM host | 46.250.229.188" "$TMP/AGENTS.md"
+    grep -q "App URL | http://46.250.229.188:25000" "$TMP/AGENTS.md"
+    ! grep -q "sandbox.example.com" "$TMP/docs/Handsoff.md"
+    ! grep -q "sandbox.example.com" "$TMP/AGENTS.md"
+}
+
+@test "handsoff_render_starting_points derives sandbox host from STATE when runtime URL is absent" {
+    yq -i '.sandbox.app_url = "http://198.51.100.24:25000/"' "$TMP/docs/larv/STATE.yaml"
+
+    bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_starting_points '$TMP'"
+
+    grep -q "VM host | 198.51.100.24" "$TMP/AGENTS.md"
+    grep -q "App URL | http://198.51.100.24:25000" "$TMP/AGENTS.md"
+    ! grep -q "sandbox.example.com" "$TMP/AGENTS.md"
+}
+
+@test "handsoff_render_starting_points derives sandbox host from env when runtime and STATE URLs are absent" {
+    yq -i 'del(.sandbox.app_url)' "$TMP/docs/larv/STATE.yaml"
+    printf "APP_URL=http://203.0.113.77:25000\n" > "$TMP/.env"
+
+    bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_starting_points '$TMP'"
+
+    grep -q "VM host | 203.0.113.77" "$TMP/AGENTS.md"
+    grep -q "App URL | http://203.0.113.77:25000" "$TMP/AGENTS.md"
+    ! grep -q "sandbox.example.com" "$TMP/AGENTS.md"
+}
+
+@test "handsoff_render_starting_points does not create nested AGENTS files" {
+    mkdir -p "$TMP/app" "$TMP/resources" "$TMP/tests"
+    bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_starting_points '$TMP'"
+    [ ! -e "$TMP/app/AGENTS.md" ]
+    [ ! -e "$TMP/resources/AGENTS.md" ]
+    [ ! -e "$TMP/tests/AGENTS.md" ]
+    [ ! -e "$TMP/docs/larv/AGENTS.md" ]
+    [ ! -e "$TMP/docs/Handsoff/AGENTS.md" ]
+}
+
 @test "starting-point files all reference docs/Handsoff.md" {
     bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_starting_points '$TMP'"
     for f in "$TMP/CLAUDE.md" "$TMP/AGENTS.md" "$TMP/GEMINI.md" \
              "$TMP/.cursor/rules/larv.mdc" "$TMP/.codex/AGENTS.md"; do
         grep -q "Handsoff.md" "$f" || { echo "missing reference in $f"; return 1; }
+    done
+}
+
+@test "generated handoff and starting-point files include Ponytail audit contract" {
+    bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_index '$TMP' && handsoff_render_starting_points '$TMP'"
+    for f in "$TMP/docs/Handsoff.md"; do
+        grep -q "Ponytail YAGNI audit" "$f" || { echo "missing Ponytail audit in $f"; return 1; }
+        grep -q "docs/larv/features/<feature-slug>/yagni-audit.md" "$f" || { echo "missing audit path in $f"; return 1; }
+        grep -q "before handoff generation" "$f" || { echo "missing pre-handoff refresh in $f"; return 1; }
+        grep -q "need/not-needed decision" "$f" || { echo "missing need decision in $f"; return 1; }
+        grep -q "removed scope" "$f" || { echo "missing removed scope in $f"; return 1; }
+        grep -q "reused existing screens/config/workflows" "$f" || { echo "missing reuse record in $f"; return 1; }
+        grep -q "rejected packages or abstractions" "$f" || { echo "missing rejected packages in $f"; return 1; }
+        grep -q "slice-count rationale" "$f" || { echo "missing slice-count rationale in $f"; return 1; }
+        grep -q "protected items not simplified away" "$f" || { echo "missing protected items in $f"; return 1; }
+        grep -q "do not remove security, validation, accessibility, or explicitly requested scope" "$f" || { echo "missing protected scope rule in $f"; return 1; }
     done
 }
 
@@ -217,6 +310,46 @@ EOF
     grep -q "bootstrap-sandbox.md" "$TMP/.codex/AGENTS.md"
 }
 
+@test "starting-point files include DOX-inspired read and freshness contract" {
+    bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_starting_points '$TMP'"
+    for f in "$TMP/CLAUDE.md" "$TMP/AGENTS.md" "$TMP/GEMINI.md" \
+             "$TMP/.cursor/rules/larv.mdc" "$TMP/.codex/AGENTS.md"; do
+        grep -Eq "Read before editing|Start Here" "$f" || { echo "missing read-before-editing section in $f"; return 1; }
+        grep -Eq "Nearest contract wins|Nearest Contract Wins" "$f" || { echo "missing nearest-contract precedence in $f"; return 1; }
+        grep -qi "freshness\|Only update local contracts" "$f" || { echo "missing doc freshness guidance in $f"; return 1; }
+        grep -q "docs/Handsoff/slice-NN-<name>.md" "$f" || { echo "missing slice handoff route in $f"; return 1; }
+        grep -q "docs/larv/features/<feature-slug>/" "$f" || { echo "missing feature route in $f"; return 1; }
+        grep -q "docs/larv/09-verification/" "$f" || { echo "missing verification route in $f"; return 1; }
+        grep -q "docs/larv/10-deploy/" "$f" || { echo "missing deploy route in $f"; return 1; }
+        grep -q "Do not update docs for formatting-only" "$f" || { echo "missing no-op freshness rule in $f"; return 1; }
+        grep -q "refactor-only" "$f" || { echo "missing refactor-only freshness rule in $f"; return 1; }
+        grep -q "test-only" "$f" || { echo "missing test-only freshness rule in $f"; return 1; }
+    done
+}
+
+@test "starting-point files remain concise routing contracts" {
+    bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_starting_points '$TMP'"
+    for f in "$TMP/CLAUDE.md" "$TMP/AGENTS.md" "$TMP/GEMINI.md" \
+             "$TMP/.cursor/rules/larv.mdc" "$TMP/.codex/AGENTS.md"; do
+        [ "$(wc -l < "$f")" -le 85 ] || { echo "too long: $f"; return 1; }
+        grep -q "Preserve unrelated user changes" "$f" || { echo "missing dirty-worktree safety: $f"; return 1; }
+        grep -qi "regenerat" "$f" || { echo "missing regeneration guidance: $f"; return 1; }
+    done
+}
+
+@test "starting-point files use tool-neutral model guidance and hotfix routing" {
+    bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_starting_points '$TMP'"
+    for f in "$TMP/CLAUDE.md" "$TMP/AGENTS.md" "$TMP/GEMINI.md" \
+             "$TMP/.cursor/rules/larv.mdc" "$TMP/.codex/AGENTS.md"; do
+        grep -q "If all slices are complete and the user asks for a hotfix" "$f" || { echo "missing hotfix routing guidance in $f"; return 1; }
+        grep -q "nearest affected slice" "$f" || { echo "missing nearest affected slice guidance in $f"; return 1; }
+        grep -qi "regenerat" "$f" || { echo "missing regeneration guidance in $f"; return 1; }
+        ! grep -q "Opus" "$f" || { echo "model-specific Opus leaked into $f"; return 1; }
+        ! grep -q "Sonnet" "$f" || { echo "model-specific Sonnet leaked into $f"; return 1; }
+        ! grep -q "Haiku" "$f" || { echo "model-specific Haiku leaked into $f"; return 1; }
+    done
+}
+
 @test "handsoff_render_starting_points writes validated non-empty bodies" {
     bash -c "source $PROJECT_ROOT/scripts/lib/handsoff.sh && handsoff_render_starting_points '$TMP'"
     for f in "$TMP/CLAUDE.md" "$TMP/AGENTS.md" "$TMP/GEMINI.md" \
@@ -224,7 +357,7 @@ EOF
         [ "$(wc -c < "$f")" -gt 500 ] || { echo "too small: $f"; return 1; }
         grep -q "docs/Handsoff.md" "$f" || { echo "missing handoff reference: $f"; return 1; }
         grep -q "bootstrap-sandbox.md" "$f" || { echo "missing bootstrap reference: $f"; return 1; }
-        grep -q "Model switch starter prompt" "$f" || { echo "missing model switch prompt: $f"; return 1; }
+        grep -Eq "Fresh Session Prompt|Starter prompt" "$f" || { echo "missing fresh session prompt: $f"; return 1; }
         grep -q "You are continuing a larv-managed Laravel implementation" "$f" || { echo "missing starter prompt: $f"; return 1; }
     done
 }

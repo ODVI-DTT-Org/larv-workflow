@@ -7,7 +7,7 @@ load helpers
 }
 
 @test "README.md mentions all public commands" {
-    for cmd in /larv:full /larv:adopt /larv:feature /larv:debug /larv:brainstorm /larv:learn /larv:status /larv:resume /larv:sandbox /larv:sandbox-start /larv:sandbox-stop /larv:sandbox-reset /larv:presentation /larv:security /larv:redesign-attio-finance /larv:redesign-attio-venture /larv-feature-how-it-works /larv-feature-feedback /larv-feature-onboarding-helper; do
+    for cmd in /larv:full /larv:adopt /larv:feature /larv:debug /larv:brainstorm /larv:learn /larv-caveman /larv:status /larv:resume /larv:sandbox /larv:sandbox-start /larv:sandbox-stop /larv:sandbox-reset /larv:presentation /larv:security /larv:redesign-attio-finance /larv:redesign-attio-venture /larv-feature-how-it-works /larv-feature-feedback /larv-feature-onboarding-helper; do
         run grep -F "$cmd" README.md
         [ "$status" -eq 0 ]
     done

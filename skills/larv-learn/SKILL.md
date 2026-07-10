@@ -3,6 +3,10 @@ name: larv-learn
 description: Phase 11 - aggregate implementation reports, local learnings, and plugin improvement notes into LEARNINGS.md proposals. Supports --quick, --full, --since, and --dry-run.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-learn
 
 Aggregate project lessons and plugin improvement signals after implementation, verification, or deployment.

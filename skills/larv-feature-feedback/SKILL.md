@@ -3,6 +3,10 @@ name: larv-feature-feedback
 description: Use when the user types /larv-feature-feedback or asks to add in-app feedback, bug report, idea report, screenshot feedback, or developer feedback to a Laravel app.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 # larv-feature-feedback
 
 Add a production in-app feedback feature to the current Laravel app. The feature must let authenticated users submit feedback from inside the app and let an admin/developer triage reports.

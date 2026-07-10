@@ -8,7 +8,7 @@ SKILLS=(
     larv-implement larv-verify larv-deploy larv-learn larv-handoff
     larv-adopt larv-docsite larv-presentation larv-redesign-attio-finance larv-redesign-attio-venture
     larv-feature-how-it-works larv-feature-feedback larv-feature-onboarding-helper
-    larv-security
+    larv-security larv-headroom
 )
 
 @test "all 24 skill files exist" {
@@ -147,6 +147,9 @@ yaml.safe_load(parts[1])
     ! grep -q "STUB — sub-project A scaffolding only" skills/larv-handoff/SKILL.md
     grep -q "handsoff_render_index" skills/larv-handoff/SKILL.md
     grep -q "handsoff_render_starting_points" skills/larv-handoff/SKILL.md
+    grep -q "concise AI starting-point routing files" skills/larv-handoff/SKILL.md
+    ! grep -q "docs/larv/AGENTS.md" skills/larv-handoff/SKILL.md
+    ! grep -q "app/AGENTS.md" skills/larv-handoff/SKILL.md
 }
 
 @test "larv-provision SKILL.md is no longer a stub" {
@@ -188,6 +191,7 @@ yaml.safe_load(parts[1])
     ! grep -q "hard_gate" skills/larv-orchestrator/SKILL.md
     grep -q "routing_menu" skills/larv-orchestrator/SKILL.md
     grep -q "Phase 8 routing menu" skills/larv-orchestrator/SKILL.md
+    grep -q "generated AI entry points" skills/larv-orchestrator/SKILL.md
 }
 
 @test "larv-orchestrator handles all three execution modes" {
@@ -197,6 +201,20 @@ yaml.safe_load(parts[1])
     grep -q "Laravel Superpowers brainstorming" skills/larv-orchestrator/SKILL.md
     grep -q "docs/larv/features/<feature-slug>/design.md" skills/larv-orchestrator/SKILL.md
     grep -q "docs/superpowers/plans" skills/larv-orchestrator/SKILL.md
+}
+
+@test "larv feature wrapper requires Ponytail YAGNI audit before handoff" {
+    grep -q "Ponytail YAGNI audit" skills/larv-orchestrator/SKILL.md
+    grep -q "docs/larv/features/<feature-slug>/yagni-audit.md" skills/larv-orchestrator/SKILL.md
+    grep -q "remove unrequested feature scope" skills/larv-orchestrator/SKILL.md
+    grep -q "one small slice instead of several" skills/larv-orchestrator/SKILL.md
+    grep -q "before handoff generation" skills/larv-orchestrator/SKILL.md
+    grep -q "need/not-needed decision" skills/larv-orchestrator/SKILL.md
+    grep -q "reused existing screens/config/workflows" skills/larv-orchestrator/SKILL.md
+    grep -q "rejected packages or abstractions" skills/larv-orchestrator/SKILL.md
+    grep -q "slice-count rationale" skills/larv-orchestrator/SKILL.md
+    grep -q "protected items not simplified away" skills/larv-orchestrator/SKILL.md
+    grep -q "not remove security, validation, accessibility, or explicitly requested scope" skills/larv-orchestrator/SKILL.md
 }
 
 @test "larv-domain-interview SKILL.md exists with valid frontmatter" {

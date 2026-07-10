@@ -58,9 +58,24 @@ main() {
     completed="$(yq -r '[.slices.status[] | select(.state == "completed")] | length' "$sp")"
     in_progress="$(yq -r '[.slices.status[] | select(.state == "in_progress")] | length' "$sp")"
     pending="$(yq -r '[.slices.status[] | select(.state == "pending")] | length' "$sp")"
+    local caveman_style stored_style
+    stored_style="$(bash "$PLUGIN_ROOT/scripts/state.sh" get-caveman-style "$dir" 2>/dev/null || true)"
+    [ -n "$stored_style" ] || stored_style="normal"
+    caveman_style="$(LARV_CAVEMAN_ALLOW_UNSCOPED_RESOLVE=1 bash "$PLUGIN_ROOT/scripts/caveman.sh" resolve "$dir" "$stored_style" 2>/dev/null || true)"
+    [ -n "$caveman_style" ] || caveman_style="full-unavailable"
 
     echo "Project: $name ($slug, $mode, started $started)"
+    echo "Caveman style: $caveman_style"
     echo "Plugin: larv $plug_ver"
+    local optimizer_selected optimizer_status optimizer_reason
+    optimizer_selected="$(yq -r '.token_optimizer.selected // "none"' "$sp")"
+    optimizer_status="$(yq -r '.token_optimizer.status // "fallback"' "$sp")"
+    optimizer_reason="$(yq -r '.token_optimizer.fallback_reason // .token_optimizer.reason // ""' "$sp")"
+    if [ "$optimizer_selected" = "none" ] || [ "$optimizer_status" != "safe" ]; then
+        echo "Token optimizer: none (fallback${optimizer_reason:+ - $optimizer_reason})"
+    else
+        echo "Token optimizer: $optimizer_selected (safe)"
+    fi
     echo
     echo "Phase $cur - $(phase_name "$cur")"
     echo "Last completed: $last"

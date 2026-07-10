@@ -30,6 +30,68 @@ handsoff_collect_tokens() {
     db_name="$(yq -r '.execution.allocations[] | select(.kind == "db-name") | .value' "$sp" 2>/dev/null | head -1)"
     project_root="$(yq -r '.execution.allocations[] | select(.kind == "project-root") | .value' "$sp" 2>/dev/null | head -1)"
 
+    __handsoff_env_value() {
+        local key="$1"
+        local env_file="$dir/.env"
+        [ -f "$env_file" ] || return 0
+        awk -F= -v key="$key" '
+            $1 == key {
+                value = substr($0, length(key) + 2)
+                gsub(/^"|"$/, "", value)
+                gsub(/^'\''|'\''$/, "", value)
+                print value
+                exit
+            }
+        ' "$env_file"
+    }
+
+    __handsoff_base_url() {
+        local url="$1"
+        [ -n "$url" ] || return 0
+        url="${url%%[[:space:]]*}"
+        url="${url%%#*}"
+        case "$url" in
+            http://*|https://*) ;;
+            *) return 0 ;;
+        esac
+        printf "%s\n" "$url" | sed -E 's#^(https?://[^/]+).*$#\1#; s#/$##'
+    }
+
+    __handsoff_url_host() {
+        local url="$1"
+        [ -n "$url" ] || return 0
+        printf "%s\n" "$url" | sed -E 's#^https?://([^/:]+).*$#\1#'
+    }
+
+    __handsoff_url_port() {
+        local url="$1"
+        [ -n "$url" ] || return 0
+        printf "%s\n" "$url" | sed -nE 's#^https?://[^/:]+:([0-9]+).*$#\1#p'
+    }
+
+    local runtime_url state_app_url env_app_url selected_app_url selected_host selected_port
+    runtime_url="$(__handsoff_base_url "$(head -n 1 "$dir/docs/larv/07-runtime/sandbox-url.txt" 2>/dev/null || true)")"
+    state_app_url="$(__handsoff_base_url "$(yq -r '.sandbox.app_url // ""' "$sp" 2>/dev/null || true)")"
+    env_app_url="$(__handsoff_base_url "$(__handsoff_env_value APP_URL)")"
+
+    if [ -n "$runtime_url" ]; then
+        selected_app_url="$runtime_url"
+    elif [ -n "$state_app_url" ]; then
+        selected_app_url="$state_app_url"
+    elif [ -n "$env_app_url" ]; then
+        selected_app_url="$env_app_url"
+    elif [ -n "${LARV_VM_HOST:-}" ] && [ -n "$app_port" ]; then
+        selected_app_url="http://${LARV_VM_HOST}:${app_port}"
+    elif [ -n "$app_port" ]; then
+        selected_app_url="http://sandbox.example.com:${app_port}"
+    else
+        selected_app_url="No sandbox URL recorded yet. Run docs/Handsoff/bootstrap-sandbox.md before app code edits."
+    fi
+
+    selected_host="$(__handsoff_url_host "$selected_app_url")"
+    selected_port="$(__handsoff_url_port "$selected_app_url")"
+    app_port="${selected_port:-${app_port:-not allocated}}"
+
     __handsoff_token() {
         local key="$1"
         local value="$2"
@@ -46,30 +108,39 @@ handsoff_collect_tokens() {
         fi
     }
 
+    __handsoff_absence_notice() {
+        cat <<'EOF'
+No standalone source exists yet.
+Use feature docs, tracker, implementation reports, and source code as the recovery source.
+Do not invent missing product or architecture details.
+EOF
+    }
+
     __handsoff_token project_name "$(yq -r '.project.name' "$sp")"
     __handsoff_token project_slug "$slug"
     __handsoff_token plugin_version "$plugin_version"
     __handsoff_token generated_at "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
     __handsoff_token git_sha "$git_sha"
     __handsoff_token git_default_branch "$git_default_branch"
-    __handsoff_token vm_host "${LARV_VM_HOST:-sandbox.example.com}"
+    __handsoff_token vm_host "${selected_host:-${LARV_VM_HOST:-sandbox.example.com}}"
+    __handsoff_token app_url "$selected_app_url"
     __handsoff_token ssh_user "${LARV_VM_HOST_SSH_USER:-larv-user}"
-    __handsoff_token app_port "${app_port:-TBD}"
-    __handsoff_token mockup_port "${mockup_port:-TBD}"
-    __handsoff_token db_name "${db_name:-TBD}"
-    __handsoff_token db_user "${db_name:-TBD}"
+    __handsoff_token app_port "${app_port:-not allocated}"
+    __handsoff_token mockup_port "${mockup_port:-not allocated}"
+    __handsoff_token db_name "${db_name:-not allocated}"
+    __handsoff_token db_user "${db_name:-not allocated}"
     __handsoff_token project_root "${project_root:-$(cd "$dir" && pwd -P)}"
     __handsoff_token redis_prefix "larv:$slug:"
     __handsoff_token ssh_key_path "~/.ssh/larv_${slug}_ed25519"
     __handsoff_token mission_paragraph "See docs/larv/00-discuss/product-brief.md"
     __handsoff_token adr_aggregator_inlined "$(__handsoff_file_or_default "$dir/docs/larv/decisions.md" "_(no ADRs yet)_")"
-    __handsoff_token ddd_model_inlined_or_flat_model "$(__handsoff_file_or_default "$dir/docs/larv/01-domain/domain-model.md" "_(domain model TBD)_")"
-    __handsoff_token c4_diagrams_inlined "$(__handsoff_file_or_default "$dir/docs/larv/02-architecture/c4-context.md" "_(C4 TBD)_")"
-    __handsoff_token data_model_inlined "$(__handsoff_file_or_default "$dir/docs/larv/03-design/data-model.md" "_(data model TBD)_")"
-    __handsoff_token api_surface_inlined "$(__handsoff_file_or_default "$dir/docs/larv/03-design/api-surface.md" "_(API surface TBD)_")"
-    __handsoff_token test_strategy_inlined "$(__handsoff_file_or_default "$dir/docs/larv/04-test-strategy/strategy.md" "_(test strategy TBD)_")"
-    __handsoff_token slice_plan_inlined "$(__handsoff_file_or_default "$dir/docs/larv/06-implementation/elephant-carpaccio.md" "_(slice plan TBD)_")"
-    __handsoff_token design_pick_slug "$(test -f "$dir/docs/larv/03-design/design-decision.md" && grep -m1 -oE 'pick: [A-Za-z0-9_-]+' "$dir/docs/larv/03-design/design-decision.md" | head -1 | sed 's/pick: //' || echo "TBD")"
+    __handsoff_token ddd_model_inlined_or_flat_model "$(__handsoff_file_or_default "$dir/docs/larv/01-domain/domain-model.md" "$(__handsoff_absence_notice)")"
+    __handsoff_token c4_diagrams_inlined "$(__handsoff_file_or_default "$dir/docs/larv/02-architecture/c4-context.md" "$(__handsoff_absence_notice)")"
+    __handsoff_token data_model_inlined "$(__handsoff_file_or_default "$dir/docs/larv/03-design/data-model.md" "$(__handsoff_absence_notice)")"
+    __handsoff_token api_surface_inlined "$(__handsoff_file_or_default "$dir/docs/larv/03-design/api-surface.md" "$(__handsoff_absence_notice)")"
+    __handsoff_token test_strategy_inlined "$(__handsoff_file_or_default "$dir/docs/larv/04-test-strategy/strategy.md" "$(__handsoff_absence_notice)")"
+    __handsoff_token slice_plan_inlined "$(__handsoff_file_or_default "$dir/docs/larv/06-implementation/elephant-carpaccio.md" "$(__handsoff_absence_notice)")"
+    __handsoff_token design_pick_slug "$(test -f "$dir/docs/larv/03-design/design-decision.md" && grep -m1 -oE 'pick: [A-Za-z0-9_-]+' "$dir/docs/larv/03-design/design-decision.md" | head -1 | sed 's/pick: //' || echo "No design pick recorded yet.")"
     __handsoff_token smoke_path "$(yq -r '.sandbox.smoke_path // "health"' "$sp" 2>/dev/null || echo "health")"
 }
 
@@ -207,8 +278,8 @@ ui_screens_list=- (see slice plan)
 depends_on_list=[]
 parallel_flag=false
 test_filter=$slice_id
-est_tokens=TBD
-est_minutes=TBD
+est_tokens=not estimated
+est_minutes=not estimated
 implementation_bash=# (insert exact bash from slice plan)
 tracker_id_padding=0001
 your_tool_id=<your tool>
@@ -287,7 +358,6 @@ handsoff_render_starting_points() {
             return 1
         fi
     done
-
     mkdir -p "$dir/.codex" "$dir/.cursor/rules"
     mv "$tmpdir/CLAUDE.md" "$dir/CLAUDE.md"
     mv "$tmpdir/AGENTS.md" "$dir/AGENTS.md"

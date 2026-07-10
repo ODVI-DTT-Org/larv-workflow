@@ -98,6 +98,12 @@ main() {
     security_status="$(awk -F': ' '/^- Status:/ {print $2}' "$security_report" | tail -n 1)"
     [ -n "$security_status" ] || security_status="unknown"
 
+    echo "Token optimizer gate:"
+    local optimizer_json optimizer_output
+    optimizer_json="$(bash "$PLUGIN_ROOT/scripts/token-optimizer.sh" json "$dir")"
+    optimizer_output="$(bash "$PLUGIN_ROOT/scripts/token-optimizer.sh" status "$dir")"
+    printf "%s\n" "$optimizer_output" | sed 's/^/  /'
+
     bash "$PLUGIN_ROOT/scripts/state.sh" init "$dir" "$name" "$mode"
 
     local bm bs bd
@@ -114,6 +120,8 @@ main() {
         ".budget.estimated_total = {\"tokens\": $DEFAULT_BUDGET_TOKENS, \"minutes\": $DEFAULT_BUDGET_MINUTES, \"cost_usd\": $DEFAULT_BUDGET_COST}"
     bash "$PLUGIN_ROOT/scripts/state.sh" update "$dir" \
         ".security = {\"baseline\": {\"status\": \"$security_status\", \"report\": \"docs/larv/security/pre-flight-security.md\", \"checked_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}, \"policy\": {\"pre_implementation_gate\": true, \"per_slice_gate\": true, \"allow_bypass_env\": \"LARV_SECURITY_ALLOW_FAIL\"}}"
+    bash "$PLUGIN_ROOT/scripts/state.sh" update "$dir" \
+        ".token_optimizer = $optimizer_json"
 
     cat >"$dir/docs/larv/pre-flight.md" <<EOF
 # Pre-flight report
@@ -134,6 +142,9 @@ $vm_runtime
 
 Security check:
 $security_output
+
+Token optimizer gate:
+$optimizer_output
 EOF
 
     echo "Project: $name"

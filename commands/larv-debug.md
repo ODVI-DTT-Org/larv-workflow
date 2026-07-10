@@ -3,6 +3,10 @@ name: larv:debug
 description: Fix a bug in a managed Laravel app. Mini-flow with full discipline parity — gates, handsoff, tracker, AI starting-points refresh.
 ---
 
+## larv Headroom Combo
+
+Before context-heavy work, run `bash <larv-plugin-root>/scripts/headroom-combo.sh status "$PWD"` to activate Ponytail + gated Headroom + Caveman. If Headroom falls back, continue normally.
+
 Argument: `<issue>` — one-line description of the bug.
 
 Invoke the `larv-orchestrator` skill in debug mode with the provided issue text.
@@ -24,6 +28,15 @@ Invoke the `larv-orchestrator` skill in debug mode with the provided issue text.
 8. **Implementation hard gate**: even debug fixes go through the routing menu.
 
 `STATE.yaml.debugs` array gains an entry: `{ issue, slug, started_at, slice_id, status }`.
+
+## Optional style controls for narrative and planning output
+
+This command participates in the Caveman allowlist.
+
+- Use `/larv-caveman full`, `/larv-caveman lite`, or `/larv-caveman ultra` to persist session style.
+- Use `/larv-caveman off` or `/larv-caveman normal` to clear/reset to normal.
+- For one-command overrides, apply `Caveman full`, `Caveman lite`, or `Caveman ultra`.
+- If no one-shot override is present, use the persisted `/larv-caveman` value.
 
 ## What changes vs `/larv:feature`
 
