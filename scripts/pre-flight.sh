@@ -83,7 +83,11 @@ main() {
     echo "  context7 stub"
     echo "Design tools check:"
     local design_output
-    design_output="$(bash "$PLUGIN_ROOT/scripts/design-setup.sh" check "$dir" 2>&1 | sed '1d' || true)"
+    if [ "${LARV_PREFLIGHT_SKIP_DESIGN_CHECK:-0}" = "1" ]; then
+        design_output="  skipped (LARV_PREFLIGHT_SKIP_DESIGN_CHECK=1)"
+    else
+        design_output="$(bash "$PLUGIN_ROOT/scripts/design-setup.sh" check "$dir" 2>&1 | sed '1d' || true)"
+    fi
     printf "%s\n" "${design_output:-  info: design-setup check produced no lines}"
     echo "VM runtime check:"
     local vm_runtime

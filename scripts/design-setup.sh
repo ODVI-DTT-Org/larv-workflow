@@ -8,7 +8,7 @@ PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 . "$PLUGIN_ROOT/scripts/lib/higgsfield.sh"
 
 HF_VERSION="1.1.26"
-HF_SHA256="5d666fae70c99b7388690191a649d1487962250ed50820e079edfd1ffac7bf5b"
+HF_SHA256="${LARV_HIGGSFIELD_SHA256:-5d666fae70c99b7388690191a649d1487962250ed50820e079edfd1ffac7bf5b}"
 HF_ARCHIVE_URL="${LARV_HIGGSFIELD_ARCHIVE_URL:-https://github.com/higgsfield-ai/cli/releases/download/v${HF_VERSION}/hf_${HF_VERSION}_linux_amd64.tar.gz}"
 HF_DEST="$HOME/.local/share/larv/higgsfield"
 CAP="${LARV_HIGGSFIELD_CREDIT_CAP:-10}"
@@ -29,10 +29,10 @@ cmd_check() {
     local hard=0 fallback=0 launcher host acct tool
     echo "Design tools check:"
     if launcher="$(design_impeccable_launcher)"; then
-        if "$launcher" engine-probe >/dev/null 2>&1; then
+        if sh "$launcher" engine-probe >/dev/null 2>&1; then
             echo "  ok: impeccable engine ($launcher)"
         else
-            echo "  missing: impeccable engine (run: $launcher engine-probe)"; hard=1
+            echo "  missing: impeccable engine (run: sh $launcher engine-probe)"; hard=1
         fi
     else
         echo "  missing: impeccable skill (run /larv:design-setup)"; hard=1
@@ -88,8 +88,13 @@ install_higgsfield() {
         mv "$tmp/hf" "$HF_DEST/bin/higgsfield"
         cp "$PLUGIN_ROOT/templates/higgsfield-wrapper.sh" "$HF_DEST/higgsfield"
         chmod 700 "$HF_DEST/bin/higgsfield" "$HF_DEST/higgsfield"
-    )
+    ) || true
     rm -rf "$tmp"
+    if [ ! -x "$HF_DEST/bin/higgsfield" ]; then
+        echo "ERROR: Higgsfield install incomplete" >&2
+        rm -rf "$HF_DEST"
+        return 1
+    fi
     mkdir -p "$HOME/.local/bin"
     ln -sfn "$HF_DEST/higgsfield" "$HOME/.local/bin/higgsfield"
     echo "  ok: higgsfield $HF_VERSION installed at $HF_DEST"
@@ -112,7 +117,7 @@ install_impeccable() {
         cp -a "$src" "$target"
         echo "  ok: impeccable skill installed at $target"
     done
-    "$HOME/.claude/skills/impeccable/scripts/impeccable" engine-probe >/dev/null \
+    sh "$HOME/.claude/skills/impeccable/scripts/impeccable" engine-probe >/dev/null \
         && echo "  ok: impeccable engine ready" \
         || { echo "ERROR: impeccable engine-probe failed (needs network once)" >&2; return 1; }
 }

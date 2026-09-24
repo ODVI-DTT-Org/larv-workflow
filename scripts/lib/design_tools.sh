@@ -17,7 +17,7 @@ design_higgsfield_bin() {
 
 design_impeccable_launcher() {
     if [ -n "${LARV_IMPECCABLE_SKILL_DIR:-}" ]; then
-        [ -x "$LARV_IMPECCABLE_SKILL_DIR/scripts/impeccable" ] \
+        [ -f "$LARV_IMPECCABLE_SKILL_DIR/scripts/impeccable" ] \
             && { echo "$LARV_IMPECCABLE_SKILL_DIR/scripts/impeccable"; return 0; }
         return 1
     fi
@@ -25,7 +25,7 @@ design_impeccable_launcher() {
     for c in "$DESIGN_TOOLS_PLUGIN_ROOT/bundle/impeccable" \
              "$HOME/.claude/skills/impeccable" \
              "$HOME/.agents/skills/impeccable"; do
-        [ -x "$c/scripts/impeccable" ] && { echo "$c/scripts/impeccable"; return 0; }
+        [ -f "$c/scripts/impeccable" ] && { echo "$c/scripts/impeccable"; return 0; }
     done
     return 1
 }

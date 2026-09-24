@@ -2,7 +2,7 @@
 
 load helpers
 
-setup() { TMP="$(setup_tmp_project)"; }
+setup() { TMP="$(setup_tmp_project)"; export LARV_PREFLIGHT_SKIP_DESIGN_CHECK=1; }
 teardown() { teardown_tmp_project "$TMP"; }
 
 @test "pre-flight initializes STATE.yaml when called for a new project" {
@@ -138,6 +138,15 @@ EOF
 }
 
 @test "pre-flight report includes the design tools check" {
-    grep -q 'design-setup.sh" check' scripts/pre-flight.sh
-    grep -q '^Design tools check:$' scripts/pre-flight.sh
+    local stub_dir fake_home
+    stub_dir="$(mktemp -d)"; export STUB_DIR="$stub_dir"
+    fake_home="$(mktemp -d)"; export HOME="$fake_home"
+    export LARV_HIGGSFIELD_BIN="$PROJECT_ROOT/tests/fixtures/higgsfield-stub.sh"
+    export LARV_IMPECCABLE_SKILL_DIR="$PROJECT_ROOT/tests/fixtures/impeccable-launcher-stub"
+    export LARV_VM_HOST=203.0.113.10
+    export LARV_PREFLIGHT_SKIP_DESIGN_CHECK=0
+    bash scripts/pre-flight.sh "$TMP" my-app greenfield
+    grep -q "Design tools check:" "$TMP/docs/larv/pre-flight.md"
+    grep -q "ok: higgsfield" "$TMP/docs/larv/pre-flight.md"
+    rm -rf "$stub_dir" "$fake_home"
 }

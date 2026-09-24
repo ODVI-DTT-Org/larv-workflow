@@ -80,6 +80,19 @@ teardown() {
     [ ! -e "$HOME/.local/share/larv/higgsfield" ]
 }
 
+@test "install fails cleanly when the archive has no hf binary, even if checksum matches" {
+    export LARV_HIGGSFIELD_BIN=""
+    printf 'not-a-cli' >"$STUB_DIR/decoy"
+    tar -czf "$STUB_DIR/no-hf.tgz" -C "$STUB_DIR" decoy
+    local sha
+    sha="$(sha256sum "$STUB_DIR/no-hf.tgz" | awk '{print $1}')"
+    LARV_DESIGN_SETUP_UNAME="Linux x86_64" LARV_HIGGSFIELD_ARCHIVE_URL="file://$STUB_DIR/no-hf.tgz" \
+        LARV_HIGGSFIELD_SHA256="$sha" run bash scripts/design-setup.sh install
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"Higgsfield install incomplete"* ]]
+    [ ! -e "$HOME/.local/share/larv/higgsfield" ]
+}
+
 @test "install is a no-op report when already installed and never signs in" {
     mkdir -p "$HOME/.local/share/larv/higgsfield"
     cp tests/fixtures/higgsfield-stub.sh "$HOME/.local/share/larv/higgsfield/higgsfield"
