@@ -68,3 +68,12 @@ BUNDLES=(masterplan superpowers-laravel domain-driven-design)
     [ "$status" -eq 0 ]
     echo "$output" | grep -qi "verified"
 }
+
+@test "impeccable skill is vendored at 4.3.1 with an executable launcher" {
+    [ "$(yq -r '.["impeccable-skill"]' bundle/VERSIONS.yaml)" = "4.3.1" ]
+    [ "$(yq -r '.["higgsfield-cli"]' bundle/VERSIONS.yaml)" = "1.1.26" ]
+    grep -q "version: 4.3.1" bundle/impeccable/SKILL.md
+    [ -x bundle/impeccable/scripts/impeccable ]
+    [ "$(tr -d '[:space:]' < bundle/impeccable/scripts/VERSION)" = "0.1.5" ]
+    grep -q "83c2c735777c68e30ea536ab9cc97f7843456945" bundle/impeccable/UPSTREAM.md
+}

@@ -84,6 +84,8 @@ verify_bundle() {
         "$PLUGIN_ROOT/bundle/superpowers-laravel/commands"
         "$PLUGIN_ROOT/bundle/superpowers-laravel/skills"
         "$PLUGIN_ROOT/bundle/domain-driven-design/skills/domain-driven-design/SKILL.md"
+        "$PLUGIN_ROOT/bundle/impeccable/SKILL.md"
+        "$PLUGIN_ROOT/bundle/impeccable/scripts/impeccable"
     )
 
     local p
