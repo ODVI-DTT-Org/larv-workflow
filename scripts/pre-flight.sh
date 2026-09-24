@@ -81,6 +81,10 @@ main() {
     done
     echo "MCP check:"
     echo "  context7 stub"
+    echo "Design tools check:"
+    local design_output
+    design_output="$(bash "$PLUGIN_ROOT/scripts/design-setup.sh" check "$dir" 2>&1 | sed '1d' || true)"
+    printf "%s\n" "${design_output:-  info: design-setup check produced no lines}"
     echo "VM runtime check:"
     local vm_runtime
     vm_runtime="$(vm_runtime_check)"
@@ -136,6 +140,9 @@ Bundle versions:
 
 Estimated budget: ~$DEFAULT_BUDGET_MINUTES min, ~\$$DEFAULT_BUDGET_COST
 Cap policy: pause_at_120pct
+
+Design tools check:
+$design_output
 
 VM runtime check:
 $vm_runtime

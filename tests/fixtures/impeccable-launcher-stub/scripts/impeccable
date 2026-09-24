@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Test double for the Impeccable skill launcher. STUB_SEED_FAIL=1 simulates API outage.
+printf '%s\n' "$*" >>"${STUB_DIR:-/tmp}/impeccable.log"
+case "$1" in
+    engine-probe) echo "impeccable-engine 0.1.5" ;;
+    concept-seed)
+        [ -f PRODUCT.md ] || { echo "NO_PRODUCT_MD"; exit 1; }
+        [ "${STUB_SEED_FAIL:-0}" = "1" ] && { echo "seed api unreachable" >&2; exit 1; }
+        echo "SURFACE CONCEPT SEED (key: stubkey1; mode: unscoped)"
+        echo "DEALT INDICES: 5, 2, 1 (index 5 leads)"
+        ;;
+    *) echo "stub: unhandled $*" >&2; exit 2 ;;
+esac

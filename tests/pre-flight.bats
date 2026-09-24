@@ -136,3 +136,8 @@ EOF
     run bash scripts/pre-flight.sh "$TMP" my-app greenfield
     [ "$status" -ne 0 ]
 }
+
+@test "pre-flight report includes the design tools check" {
+    grep -q 'design-setup.sh" check' scripts/pre-flight.sh
+    grep -q '^Design tools check:$' scripts/pre-flight.sh
+}
