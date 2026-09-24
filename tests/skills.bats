@@ -9,9 +9,10 @@ SKILLS=(
     larv-adopt larv-docsite larv-presentation larv-redesign-attio-finance larv-redesign-attio-venture
     larv-feature-how-it-works larv-feature-feedback larv-feature-onboarding-helper
     larv-security larv-headroom
+    larv-redesign-impeccable-higgsfield
 )
 
-@test "all 24 skill files exist" {
+@test "all 25 skill files exist" {
     for skill in "${SKILLS[@]}"; do
         [ -f "skills/${skill}/SKILL.md" ] || { echo "missing skills/${skill}/SKILL.md"; return 1; }
     done
@@ -518,4 +519,17 @@ yaml.safe_load(parts[1])
     grep -q "Namecheap API" skills/larv-deploy/SKILL.md
     grep -q "NAMECHEAP_CLIENT_IP" skills/larv-deploy/SKILL.md
     grep -q "automation choice" skills/larv-deploy/SKILL.md
+}
+
+@test "impeccable-higgsfield redesign skill enforces cost, privacy and full-screen rules" {
+    f=skills/larv-redesign-impeccable-higgsfield/SKILL.md
+    grep -q "/larv:redesign-impeccable-higgsfield" "$f"
+    grep -q "production app redesign" "$f"
+    grep -q "screen-inventory.md" "$f"
+    grep -q "visual-parity.md" "$f"
+    grep -q "FICTIONAL-DATA-CONFIRMED" "$f"
+    grep -q "LARV_DESIGN_CONFIRMED_SPEND" "$f"
+    grep -q "every screen" "$f"
+    grep -q "Never run \`higgsfield auth token\`" "$f"
+    grep -q "Do not ask the user to run" "$f"
 }

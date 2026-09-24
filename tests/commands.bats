@@ -8,9 +8,10 @@ COMMANDS=(
     larv-sandbox larv-sandbox-start larv-sandbox-stop larv-sandbox-reset
     larv-caveman larv-presentation larv-redesign-attio-finance larv-redesign-attio-venture larv-feature-how-it-works
     larv-feature-feedback larv-feature-onboarding-helper larv-security
+    larv-redesign-impeccable-higgsfield larv-design-setup
 )
 
-@test "all 20 command files exist" {
+@test "all 22 command files exist" {
     for cmd in "${COMMANDS[@]}"; do
         [ -f "commands/${cmd}.md" ] || { echo "missing commands/${cmd}.md"; return 1; }
     done
@@ -59,6 +60,16 @@ COMMANDS=(
     grep -q "sandbox restart/probe" commands/larv-redesign-attio-venture.md
     grep -q "visual-parity.md" commands/larv-redesign-attio-finance.md
     grep -q "visual-parity.md" commands/larv-redesign-attio-venture.md
+}
+
+@test "impeccable-higgsfield redesign command wires setup, board and implementation" {
+    f=commands/larv-redesign-impeccable-higgsfield.md
+    grep -q "name: larv:redesign-impeccable-higgsfield" "$f"
+    grep -q "design-setup.sh check" "$f"
+    grep -q "design-directions.sh" "$f"
+    grep -q "Preserve all backend behavior" "$f"
+    grep -q "visual-parity.md" "$f"
+    grep -q "board-url.txt" "$f"
 }
 
 @test "every command file has frontmatter" {

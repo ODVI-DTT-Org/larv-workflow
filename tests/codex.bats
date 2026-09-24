@@ -52,7 +52,7 @@ load helpers
 }
 
 @test "Codex skill namespace exposes larv slash command equivalents" {
-    for skill in full status resume adopt brainstorm feature debug learn sandbox sandbox-start sandbox-stop sandbox-reset presentation redesign-attio-finance redesign-attio-venture feature-how-it-works feature-feedback feature-onboarding-helper larv-caveman; do
+    for skill in full status resume adopt brainstorm feature debug learn sandbox sandbox-start sandbox-stop sandbox-reset presentation redesign-attio-finance redesign-attio-venture feature-how-it-works feature-feedback feature-onboarding-helper larv-caveman redesign-impeccable-higgsfield design-setup; do
         [ -f "codex-skills/${skill}/SKILL.md" ] || { echo "missing codex-skills/${skill}/SKILL.md"; return 1; }
     done
     run grep -F "/larv:full" codex-skills/full/SKILL.md
@@ -85,4 +85,10 @@ load helpers
     grep -q "Ponytail YAGNI audit" codex-skills/feature/SKILL.md
     grep -q "docs/larv/features/<feature-slug>/yagni-audit.md" codex-skills/feature/SKILL.md
     grep -q "before handoff generation" codex-skills/feature/SKILL.md
+}
+
+@test "Codex redesign-impeccable-higgsfield entry point points at the command and skill" {
+    run grep -F "/larv:redesign-impeccable-higgsfield" codex-skills/redesign-impeccable-higgsfield/SKILL.md
+    [ "$status" -eq 0 ]
+    grep -q "skills/larv-redesign-impeccable-higgsfield/SKILL.md" codex-skills/redesign-impeccable-higgsfield/SKILL.md
 }
