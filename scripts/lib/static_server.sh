@@ -148,8 +148,12 @@ static_server_open_firewall() {
     [ -n "$port" ] || { echo "ERROR: port required" >&2; return 1; }
     if [ "${LARV_RUNTIME_MODE:-local}" = "local" ]; then
         if command -v ufw >/dev/null; then
+            local ufw_status
             sudo ufw allow "$port/tcp" >/dev/null
-            sudo ufw status | grep -q "$port/tcp"
+            ufw_status="$(sudo ufw status)"
+            # An inactive ufw filters nothing, so there is no rule to confirm.
+            grep -q '^Status: inactive' <<<"$ufw_status" && return 0
+            grep -q "$port/tcp" <<<"$ufw_status"
         fi
         return
     fi

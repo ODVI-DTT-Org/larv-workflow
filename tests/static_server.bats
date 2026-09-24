@@ -112,3 +112,21 @@ EOF
     [ "$status" -eq 0 ]
     [ "$(cat "$LARV_TEST_UFW_RULE_FILE")" = "9000/tcp" ]
 }
+
+@test "static_server_open_firewall succeeds when local ufw is installed but inactive" {
+    cat > "$BIN/ufw" <<'EOF'
+#!/usr/bin/env bash
+case "$1" in
+    allow) exit 0 ;;
+    status) echo "Status: inactive"; exit 0 ;;
+    *) exit 1 ;;
+esac
+EOF
+    cat > "$BIN/sudo" <<'EOF'
+#!/usr/bin/env bash
+exec "$@"
+EOF
+    chmod +x "$BIN/ufw" "$BIN/sudo"
+    PATH="$BIN:$PATH" run bash -c "source $PROJECT_ROOT/scripts/lib/vm.sh && source $PROJECT_ROOT/scripts/lib/static_server.sh && static_server_open_firewall ignored 9000"
+    [ "$status" -eq 0 ]
+}
