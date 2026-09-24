@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>
+:root{--bg:#f6f6f4;--surface:#fff;--ink:#1d1f1e;--muted:#5d6360;--line:#e2e4e1;--accent:#1f5f46}
+@media (prefers-color-scheme:dark){:root{--bg:#141615;--surface:#1c1f1d;--ink:#eceeed;--muted:#a3aaa6;--line:#2c302e;--accent:#6fc19b}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1280px;margin:0 auto;padding:32px 16px 64px}
+h1{font-size:28px;margin:0 0 4px}.q{color:var(--muted);margin:0 0 8px}
+.note{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:16px 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px;margin-top:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.card img{width:100%;display:block;border-bottom:1px solid var(--line);background:var(--bg)}
+.card .body{padding:16px;display:flex;flex-direction:column;gap:8px}
+.kicker{font-size:12px;letter-spacing:.08em;color:var(--accent);font-weight:600}
+.card h2{font-size:20px;margin:0}.muted{color:var(--muted)}
+.chips{display:flex;gap:6px}.chip{width:28px;height:28px;border-radius:6px;border:1px solid var(--line)}
+.pick{font-family:ui-monospace,monospace;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 10px;align-self:flex-start}
+.wireframe{aspect-ratio:3/2;display:grid;grid-template-columns:22% 1fr;gap:8px;padding:14px;border-bottom:1px solid var(--line)}
+.wireframe.phone{aspect-ratio:9/16;max-height:520px;grid-template-columns:1fr}
+.wireframe span{border-radius:6px}
+.declined{margin-top:28px}.declined li{margin:6px 0}
+footer{margin-top:32px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<main>
+<h1>{{TITLE}}</h1>
+<p class="q">{{QUESTION}}</p>
+{{NOTE}}
+<section class="cards">
+{{CARDS}}
+</section>
+{{DECLINED}}
+<footer>Sample data only. These are direction comps, not working screens. Reply in chat with <code>pick: &lt;id&gt;</code>.</footer>
+</main>
+</body>
+</html>

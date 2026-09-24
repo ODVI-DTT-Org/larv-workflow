@@ -136,6 +136,116 @@ EOF
     echo "pick: $id ($label)"
 }
 
+step_board() {
+    local dir="$1" out="$2"
+    [ -f "$out/options.json" ] || { echo "ERROR: $out/options.json missing" >&2; return 1; }
+    mkdir -p "$out/board/comps"
+    local id
+    for id in $(comp_ids "$out"); do
+        [ -f "$out/comps/$id.png" ] && cp "$out/comps/$id.png" "$out/board/comps/$id.png"
+    done
+    python3 - "$out" "$PLUGIN_ROOT/templates/design-board.html.tmpl" <<'PY'
+import html, json, sys
+from pathlib import Path
+out = Path(sys.argv[1]); tmpl = Path(sys.argv[2]).read_text(encoding="utf-8")
+data = json.loads((out / "options.json").read_text(encoding="utf-8"))
+opts = list(data.get("options") or [])
+canon = data.get("canonCard")
+if isinstance(canon, dict):
+    canon = dict(canon, id=canon.get("id") or "canon", kicker=canon.get("kicker") or "CATEGORY STANDARD")
+    opts.append(canon)
+seen = set()
+for o in opts:
+    oid = o.get("id")
+    if not oid:
+        sys.exit("ERROR: option without id")
+    if oid in seen:
+        sys.exit(f"ERROR: duplicate option id: {oid}")
+    seen.add(oid)
+    for field in ("label", "thesis", "palette", "viewport", "risk"):
+        if not o.get(field):
+            sys.exit(f"ERROR: option {oid} missing {field}")
+e = lambda s: html.escape(str(s), quote=True)
+fallback = (out / "fallback").read_text().strip() if (out / "fallback").exists() else ""
+reasons = set()
+cards, declined = [], []
+for o in opts:
+    oid = o["id"]
+    chips = "".join(f'<span class="chip" style="background:{e(c)}" title="{e(c)}"></span>' for c in o["palette"][:6])
+    if o.get("verdict") == "declined":
+        kept = f' Kept: {e(o["kept"])}' if o.get("kept") else ""
+        declined.append(f'<li><strong>{e(o["label"])}</strong> <span class="muted">— {e(o.get("case") or o["risk"])}.{kept}</span></li>')
+        continue
+    png = out / "board" / "comps" / f"{oid}.png"
+    if png.exists():
+        visual = f'<img src="comps/{e(oid)}.png" alt="{e(o["label"])} comp (sample data)" loading="lazy">'
+    else:
+        fb = out / "comps" / f"{oid}.fallback"
+        reasons.add(fb.read_text().strip() if fb.exists() else "no-comp")
+        pal = o["palette"] + ["#dddddd"] * 3
+        phone = " phone" if o.get("surface") == "phone" else ""
+        visual = (f'<div class="wireframe{phone}" aria-label="{e(o["label"])} wireframe" style="background:{e(pal[0])}">'
+                  f'<span style="background:{e(pal[1])}"></span><span style="background:{e(pal[2])};opacity:.35"></span></div>')
+    kicker = f'<div class="kicker">{e(o["kicker"])}</div>' if o.get("kicker") else ""
+    cards.append(f'''<article class="card" id="{e(oid)}">{visual}<div class="body">{kicker}
+<h2>{e(o["label"])}</h2><p>{e(o["thesis"])}</p><div class="chips">{chips}</div>
+<p class="muted"><strong>First screen:</strong> {e(o["viewport"])}</p>
+<p class="muted"><strong>Risk:</strong> {e(o["risk"])}</p>
+<code class="pick">pick: {e(oid)}</code></div></article>''')
+notes = []
+if fallback == "seed-unavailable":
+    notes.append("Impeccable's direction service was unreachable; these directions were written from PRODUCT.md.")
+if reasons & {"higgsfield-unavailable", "generation-failed"}:
+    notes.append("Higgsfield was unavailable for some cards, so they show zero-credit wireframes.")
+note = f'<p class="note">{" ".join(e(n) for n in notes)}</p>' if notes else ""
+dec = f'<section class="declined"><h3>Considered and declined</h3><ul>{"".join(declined)}</ul></section>' if declined else ""
+page = (tmpl.replace("{{TITLE}}", e(data.get("title") or "Design directions"))
+            .replace("{{QUESTION}}", e(data.get("question") or "Choose one direction."))
+            .replace("{{NOTE}}", note).replace("{{CARDS}}", "\n".join(cards)).replace("{{DECLINED}}", dec))
+(out / "board" / "index.html").write_text(page, encoding="utf-8")
+print(f"board: {len(cards)} cards, {len(declined)} declined -> {out / 'board' / 'index.html'}")
+PY
+}
+
+step_serve() {
+    local dir="$1" out="$2" requested="${3:-auto}" host slug port session url
+    [ -f "$out/board/index.html" ] || { echo "ERROR: run board first" >&2; return 1; }
+    host="$(design_public_host)" || { echo "ERROR: no public host (set LARV_VM_HOST); refusing to announce a local URL" >&2; return 1; }
+    export LARV_VM_HOST="$host"
+    . "$PLUGIN_ROOT/scripts/lib/vm.sh"
+    . "$PLUGIN_ROOT/scripts/lib/verifier.sh"
+    . "$PLUGIN_ROOT/scripts/lib/static_server.sh"
+    . "$PLUGIN_ROOT/scripts/lib/probe.sh"
+    slug="$(design_slug "$dir")"
+    if [ "$requested" = "auto" ] || [ -z "$requested" ]; then
+        port="$(allocate_port mockup "$slug")"
+    else
+        case "$requested" in *[!0-9]*) echo "ERROR: port must be numeric or auto" >&2; return 1 ;; esac
+        [ "$requested" -ge 9000 ] && [ "$requested" -le 9499 ] || { echo "ERROR: port must be in 9000-9499" >&2; return 1; }
+        verify_allocation "$requested" mockup "$slug" || { echo "ERROR: port $requested is taken" >&2; return 1; }
+        port="$requested"
+    fi
+    session="larv-design-board-$slug"
+    if [ "${LARV_DESIGN_SKIP_PROBE:-0}" != "1" ]; then
+        static_server_check_remote_deps "" || { release_port_reservation mockup "$port" "$slug" || true; echo "ERROR: php/curl/ss/setsid missing" >&2; return 1; }
+        static_server_open_firewall "" "$port" || { release_port_reservation mockup "$port" "$slug" || true; return 1; }
+    fi
+    static_server_start "" "$port" "$out/board" "$session" || { release_port_reservation mockup "$port" "$slug" || true; return 1; }
+    url="$(static_server_url "$port")/"
+    if [ "${LARV_DESIGN_SKIP_PROBE:-0}" != "1" ]; then
+        probe_url_inside "" "$port" static || { echo "ERROR: inside probe failed" >&2; return 1; }
+        probe_with_retries "$url" static || { echo "ERROR: external probe failed for $url" >&2; return 1; }
+    fi
+    release_port_reservation mockup "$port" "$slug" || true
+    if [ -f "$dir/docs/larv/STATE.yaml" ]; then
+        bash "$PLUGIN_ROOT/scripts/state.sh" record-allocation "$dir" mockup-port "$port"
+    else
+        printf 'slug: %s\nboard_port: %s\nboard_session: %s\n' "$slug" "$port" "$session" >"$out/../run.yaml"
+    fi
+    printf '%s\n' "$url" >"$out/board-url.txt"
+    echo "Design board ready at $url"
+}
+
 main() {
     local step="${1:-help}"
     case "$step" in
@@ -151,6 +261,8 @@ main() {
         seed) step_seed "$dir" "$out" ;;
         cost) step_cost "$dir" "$out" ;;
         comps) step_comps "$dir" "$out" ;;
+        board) step_board "$dir" "$out" ;;
+        serve) step_serve "$dir" "$out" "$@" ;;
         pick) step_pick "$dir" "$out" "$@" ;;
         *) usage >&2; exit 64 ;;
     esac

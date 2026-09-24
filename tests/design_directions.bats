@@ -161,3 +161,78 @@ EOF
     [ "$status" -ne 0 ]
     [[ "$output" == *"unknown option id: nope"* ]]
 }
+
+@test "board renders every card with comps, sample-data labels and no external URLs" {
+    write_options
+    bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    run bash scripts/design-directions.sh board "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    html="$OUT/board/index.html"
+    for label in "Service counter" "Dispatch register" "Pocket queue" "Control panel"; do grep -q "$label" "$html"; done
+    grep -q 'src="comps/assigned.png"' "$html"
+    [ -s "$OUT/board/comps/assigned.png" ]
+    grep -q "Sample data" "$html"
+    grep -q "pick: assigned" "$html"
+    grep -q "Clear group labels" "$html"
+    ! grep -Eq '(src|href)="https?://' "$html"
+}
+
+@test "board renders a wireframe when a comp is missing and names the reason" {
+    write_options
+    STUB_SIGNED_OUT=1 bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    run bash scripts/design-directions.sh board "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    grep -q 'class="wireframe"' "$OUT/board/index.html"
+    grep -q "Higgsfield was unavailable" "$OUT/board/index.html"
+}
+
+@test "board escapes HTML in agent-authored text" {
+    write_options
+    jq '.options[0].thesis = "<script>alert(1)</script> & more"' "$OUT/options.json" >"$OUT/o.json" && mv "$OUT/o.json" "$OUT/options.json"
+    run bash scripts/design-directions.sh board "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    ! grep -q "<script>alert" "$OUT/board/index.html"
+    grep -q "&lt;script&gt;" "$OUT/board/index.html"
+}
+
+@test "board refuses a card missing required fields" {
+    write_options
+    jq 'del(.options[1].thesis)' "$OUT/options.json" >"$OUT/o.json" && mv "$OUT/o.json" "$OUT/options.json"
+    run bash scripts/design-directions.sh board "$TMP" "$OUT"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"option model-pick missing thesis"* ]]
+}
+
+@test "board refuses duplicate ids" {
+    write_options
+    jq '.options[1].id = "assigned"' "$OUT/options.json" >"$OUT/o.json" && mv "$OUT/o.json" "$OUT/options.json"
+    run bash scripts/design-directions.sh board "$TMP" "$OUT"
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"duplicate option id: assigned"* ]]
+}
+
+@test "serve without STATE uses the basename slug, public host and run.yaml" {
+    write_options
+    bash scripts/design-directions.sh board "$TMP" "$OUT"
+    export LARV_VM_HOST=203.0.113.10 LARV_DESIGN_SKIP_PROBE=1
+    export LARV_PORT_RESERVATION_DIR="$STUB_DIR/ports" LARV_SANDBOX_PROCESS_DIR="$STUB_DIR/procs"
+    run bash scripts/design-directions.sh serve "$TMP" "$OUT" auto
+    [ "$status" -eq 0 ]
+    url="$(cat "$OUT/board-url.txt")"
+    [[ "$url" =~ ^http://203\.0\.113\.10:9[0-4][0-9][0-9]/$ ]]
+    port="${url##*:}"; port="${port%/}"
+    grep -q "board_port: $port" "$OUT/../run.yaml"
+    curl -fsS "http://127.0.0.1:$port/" | grep -q "Dispatch register"
+    source scripts/lib/vm.sh; source scripts/lib/static_server.sh
+    static_server_stop "" "$(yq -r '.board_session' "$OUT/../run.yaml")"
+}
+
+@test "serve refuses to announce a placeholder host" {
+    write_options
+    bash scripts/design-directions.sh board "$TMP" "$OUT"
+    mkdir -p "$STUB_DIR/bin"; printf '#!/bin/sh\necho ""\n' >"$STUB_DIR/bin/hostname"; chmod +x "$STUB_DIR/bin/hostname"
+    PATH="$STUB_DIR/bin:$PATH" LARV_VM_HOST=sandbox.example.com run bash scripts/design-directions.sh serve "$TMP" "$OUT" auto
+    [ "$status" -eq 1 ]
+    [[ "$output" == *"no public host"* ]]
+    [ ! -f "$OUT/board-url.txt" ]
+}
