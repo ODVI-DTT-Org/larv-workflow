@@ -69,6 +69,10 @@ larv-design (mode impeccable-higgsfield)┼─► scripts/design-setup.sh check 
   - Never runs `higgsfield auth login` itself. Prints the one user step: `! ~/.local/share/larv/higgsfield/higgsfield auth login` (no `--port`; headless callback steps copied from `loi/prs/docs/higgsfield-setup.md`). Never runs `auth token`.
 - `pre-flight.sh` calls `design-setup.sh check` and reports only (like the existing Impeccable status line).
 
+### Unit 1b — scripts/lib/higgsfield.sh (Higgsfield)
+
+The only code that talks to Higgsfield. `hf_account_json`/`hf_credits` (balance, never tokens), `hf_cost <prompt> <aspect>` (price check, no spend), `hf_generate_comp <prompt> <aspect> <out.png> [ref.png]` (`generate create nano_banana_pro --resolution 2k --wait --json`, downloads `result_url`). Used by `design-setup.sh check` and by the `cost` and `comps` steps. Higgsfield's role in the round: it renders the comp image on every dealt direction card — the images the user chooses between on the sandbox board — and the chosen comp is the visual target for implementation parity.
+
 ### Unit 2 — `scripts/design-directions.sh`
 
 Each step is a subcommand so the skill can pause for the user between steps. Output directory `OUT`:
