@@ -20,14 +20,20 @@ hf_account_json() {
 }
 
 hf_credits() {
-    hf_account_json | jq -r '.credits'
+    local json value
+    json="$(hf_account_json)" || return 1
+    value="$(printf '%s' "$json" | jq -r '.credits')" || return 1
+    [[ "$value" =~ ^[0-9]+$ ]] || return 1
+    printf '%s\n' "$value"
 }
 
 hf_cost() {
-    local prompt_file="$1" aspect="$2"
-    __hf generate cost "$HF_MODEL" --prompt "$(cat "$prompt_file")" \
-        --aspect_ratio "$aspect" --resolution "$HF_RESOLUTION" --json \
-        | jq -r '.credits'
+    local prompt_file="$1" aspect="$2" json value
+    json="$(__hf generate cost "$HF_MODEL" --prompt "$(cat "$prompt_file")" \
+        --aspect_ratio "$aspect" --resolution "$HF_RESOLUTION" --json 2>/dev/null)" || return 1
+    value="$(printf '%s' "$json" | jq -r '.credits')" || return 1
+    [[ "$value" =~ ^[0-9]+$ ]] || return 1
+    printf '%s\n' "$value"
 }
 
 hf_generate_comp() {

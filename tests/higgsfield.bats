@@ -60,3 +60,16 @@ teardown() {
     hf_cost "$TMP/prompt.txt" 3:2 >/dev/null
     ! grep -q "auth token" "$STUB_DIR/hf.log"
 }
+
+@test "hf_credits returns non-zero when signed out" {
+    STUB_SIGNED_OUT=1 run hf_credits
+    [ "$status" -ne 0 ]
+    [ -z "$output" ]
+}
+
+@test "hf_cost returns non-zero when CLI is missing" {
+    export LARV_HIGGSFIELD_BIN="/nonexistent/higgsfield"
+    run hf_cost "$TMP/prompt.txt" 3:2
+    [ "$status" -ne 0 ]
+    [ -z "$output" ]
+}
