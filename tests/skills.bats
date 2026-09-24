@@ -557,3 +557,15 @@ yaml.safe_load(parts[1])
     grep -q "LARV_DESIGN_PORT_KIND=mockup-port" "$d"
     grep -q -- "--from <key> --reroll <n>" "$r"
 }
+
+@test "redesign skill scopes against existing interfaces, slices first and supports --only" {
+    r=skills/larv-redesign-impeccable-higgsfield/SKILL.md
+    grep -q "scope.md" "$r"
+    grep -q "new opt-in interface" "$r"
+    grep -q "first slice" "$r"
+    grep -q "roll out" "$r"
+    grep -q -- "--only" "$r"
+    grep -q "Do not roll out beyond the first slice without the user's yes." "$r"
+    d=skills/larv-design/SKILL.md
+    grep -q -- "--only" "$d"
+}

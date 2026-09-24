@@ -81,4 +81,6 @@ load helpers
     grep -q "nano_banana_pro" README.md
     grep -q "LARV_HIGGSFIELD_CREDIT_CAP" README.md
     grep -q "FICTIONAL-DATA-CONFIRMED" README.md
+    grep -q -- "--only" README.md
+    grep -q "first slice" README.md
 }

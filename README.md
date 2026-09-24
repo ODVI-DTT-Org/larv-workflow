@@ -376,8 +376,8 @@ The redesign commands use these galleries as concrete implementation references,
 
 1. Impeccable (vendored skill 4.3.1) deals three grounded directions from `PRODUCT.md`.
 2. Higgsfield renders one comp per direction with `nano_banana_pro` at 2k (about 2 credits each). Declined directions get no comp.
-3. `scripts/design-directions.sh` renders the options board and serves it on a public 9000-9499 port (probe before announce). You pick with `pick: <id>` (a dealt direction or the category-standard `canon` card); `design-directions.sh stop` shuts the board down.
-4. The pick becomes `DESIGN.md`; the redesign command then rebuilds every screen, Phase 3 builds one clickable prototype.
+3. `scripts/design-directions.sh` renders the options board and serves it on a public 9000-9499 port (probe before announce). You pick with `pick: <id>` (a dealt direction or the category-standard `canon` card); `design-directions.sh stop` shuts the board down. `cost` and `comps` take `--only <id>[,<id>...]` to comp only the lead card when the user's cap is below the round total, leaving the other cards as zero-credit wireframes.
+4. The pick becomes `DESIGN.md`; `/larv:redesign-impeccable-higgsfield` builds a first slice (the shell plus the primary role's core screens), verifies it, and asks before rolling out to every screen family. Phase 3 builds one clickable prototype of the pick.
 
 | Setting | Default |
 |---|---|

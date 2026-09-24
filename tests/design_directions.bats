@@ -309,6 +309,78 @@ priced() {
     grep -q "generate create" "$STUB_DIR/hf.log"
 }
 
+@test "cost --only prices one card and records only" {
+    write_options
+    run bash scripts/design-directions.sh cost "$TMP" "$OUT" --only assigned
+    [ "$status" -eq 0 ]
+    [ "$(jq -r '.total' "$OUT/cost.json")" = "2" ]
+    [ "$(jq -r '.per_comp | keys | join(",")' "$OUT/cost.json")" = "assigned" ]
+    [ "$(jq -c '.only' "$OUT/cost.json")" = '["assigned"]' ]
+}
+
+@test "cost --only rejects an unknown or declined id" {
+    write_options
+    run bash scripts/design-directions.sh cost "$TMP" "$OUT" --only nope
+    [ "$status" -eq 64 ]
+    [[ "$output" == *"--only: unknown or declined option id: nope"* ]]
+    run bash scripts/design-directions.sh cost "$TMP" "$OUT" --only cassette
+    [ "$status" -eq 64 ]
+    [[ "$output" == *"--only: unknown or declined option id: cassette"* ]]
+}
+
+@test "cost without --only has no only key (unchanged behaviour)" {
+    write_options
+    run bash scripts/design-directions.sh cost "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    [ "$(jq -r 'has("only")' "$OUT/cost.json")" = "false" ]
+}
+
+@test "comps uses cost.json's only selection and wireframes the rest" {
+    write_options
+    bash scripts/design-directions.sh cost "$TMP" "$OUT" --only assigned >/dev/null
+    run bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    [ -s "$OUT/comps/assigned.png" ]
+    [ "$(grep -c "generate create" "$STUB_DIR/hf.log")" = "1" ]
+    [ ! -e "$OUT/comps/model-pick.png" ]
+    [ "$(cat "$OUT/comps/model-pick.fallback")" = "not-selected" ]
+    [ "$(cat "$OUT/comps/phone-card.fallback")" = "not-selected" ]
+    [[ "$output" == *"comps: model-pick -> wireframe card (not-selected)"* ]]
+}
+
+@test "comps --only must match cost.json's only" {
+    write_options
+    bash scripts/design-directions.sh cost "$TMP" "$OUT" --only assigned >/dev/null
+    run bash scripts/design-directions.sh comps "$TMP" "$OUT" --only model-pick
+    [ "$status" -eq 4 ]
+    [[ "$output" == *"comps: --only does not match cost.json (rerun cost)"* ]]
+    ! grep -q "generate create" "$STUB_DIR/hf.log"
+}
+
+@test "comps --only matching cost.json's only succeeds" {
+    write_options
+    bash scripts/design-directions.sh cost "$TMP" "$OUT" --only assigned >/dev/null
+    run bash scripts/design-directions.sh comps "$TMP" "$OUT" --only assigned
+    [ "$status" -eq 0 ]
+    [ -s "$OUT/comps/assigned.png" ]
+}
+
+@test "board shows the credit-limit note when a card is not-selected" {
+    write_options
+    bash scripts/design-directions.sh cost "$TMP" "$OUT" --only assigned >/dev/null
+    bash scripts/design-directions.sh comps "$TMP" "$OUT" >/dev/null
+    run bash scripts/design-directions.sh board "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    grep -q "Some cards are shown as wireframes to keep this round within its credit limit." "$OUT/board/index.html"
+}
+
+@test "cost and comps behave unchanged without --only" {
+    priced
+    run bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    for id in assigned model-pick phone-card; do [ -s "$OUT/comps/$id.png" ]; done
+}
+
 @test "cost and comps reject a non-numeric cap" {
     write_options
     LARV_HIGGSFIELD_CREDIT_CAP="10 credits" run bash scripts/design-directions.sh cost "$TMP" "$OUT"

@@ -1,7 +1,7 @@
 {
   "name": "larv",
   "description": "AI-driven Laravel app development plugin orchestrating masterplan, superpowers-laravel, and domain-driven-design into an end-to-end workflow.",
-  "version": "0.4.31",
+  "version": "0.4.32",
   "author": {
     "name": "larv-workflow",
     "url": "https://github.com/larv-workflow/larv"

@@ -21,10 +21,16 @@ Steps (run in order; the agent authors options.json and prompts/<id>.txt after s
   seed     Run Impeccable concept-seed into seed.txt (fallback marker on failure)
            Re-roll: seed <dir> <out> --from <seed-key> --reroll <n>
   cost     Price every comp card that needs a new comp; writes cost.json.
+           cost <dir> <out> [--only <id>[,<id>...]] comps only the listed cards
+           (e.g. comp only the lead card when the user's cap is below the round
+           total); each id must be a non-declined card, else exit 64.
            Exit 4 when over LARV_HIGGSFIELD_CREDIT_CAP; zero-credit fallback when
            Higgsfield is missing or signed out
   comps    Generate one Higgsfield comp per priced card (exit 4 without a matching,
-           within-cap cost.json; per-card wireframe fallback otherwise)
+           within-cap cost.json; per-card wireframe fallback otherwise).
+           comps <dir> <out> [--only <id>[,<id>...]] must equal cost.json's
+           selection (exit 4 otherwise); cards outside the selection are left
+           as not-selected wireframes.
   board    Render board/index.html from options.json and comps
   serve    Serve the board on a public 9000-9499 port (probe before announce).
            STATE.yaml records the port as LARV_DESIGN_PORT_KIND (default design-board-port)
@@ -96,14 +102,39 @@ step_seed() {
     fi
 }
 
+# parse_only <ids-newline-list> <--only value>: prints the sorted, deduped
+# selection on success; exits 64 on an unknown or declined id.
+parse_only() {
+    local ids="$1" only="$2" oid selected=()
+    IFS=',' read -ra only_ids <<<"$only"
+    for oid in "${only_ids[@]}"; do
+        grep -qx -- "$oid" <<<"$ids" || { echo "ERROR: --only: unknown or declined option id: $oid" >&2; return 64; }
+        selected+=("$oid")
+    done
+    printf '%s\n' "${selected[@]}" | LC_ALL=C sort -u
+}
+
 step_cost() {
-    local dir="$1" out="$2" id ids c total=0 per='{}'
+    local dir="$1" out="$2" id ids c total=0 per='{}' only="" only_json="null"
+    shift 2
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --only) only="${2:-}"; shift 2 || { echo "ERROR: --only needs a list of ids" >&2; return 64; } ;;
+            *) echo "ERROR: unknown cost argument: $1" >&2; return 64 ;;
+        esac
+    done
     check_numbers || return 1
     [ -f "$out/options.json" ] || { echo "ERROR: $out/options.json missing" >&2; return 1; }
     ids="$(comp_ids "$out")" || return 1
+    if [ -n "$only" ]; then
+        ids="$(parse_only "$ids" "$only")" || return $?
+        only_json="$(jq -Rn '[inputs]' <<<"$ids")"
+    fi
     rm -f "$out/cost.json"
     if ! design_higgsfield_bin >/dev/null 2>&1 || ! hf_account_json >/dev/null 2>&1; then
-        jq -n --argjson cap "$CAP" '{per_comp: {}, total: 0, cap: $cap, fallback: "higgsfield-unavailable"}' >"$out/cost.json"
+        jq -n --argjson cap "$CAP" --argjson only "$only_json" \
+            '{per_comp: {}, total: 0, cap: $cap, fallback: "higgsfield-unavailable"}
+             + (if $only == null then {} else {only: $only} end)' >"$out/cost.json"
         echo "cost: Higgsfield not installed or signed out; 0 credits, the board uses zero-credit wireframe cards"
         return 0
     fi
@@ -114,8 +145,8 @@ step_cost() {
         per="$(jq -c --arg id "$id" --argjson c "$c" '. + {($id): $c}' <<<"$per")"
         total=$((total + c))
     done
-    jq -n --argjson per "$per" --argjson total "$total" --argjson cap "$CAP" \
-        '{per_comp: $per, total: $total, cap: $cap}' >"$out/cost.json"
+    jq -n --argjson per "$per" --argjson total "$total" --argjson cap "$CAP" --argjson only "$only_json" \
+        '{per_comp: $per, total: $total, cap: $cap} + (if $only == null then {} else {only: $only} end)' >"$out/cost.json"
     echo "cost: $total credits for $(jq 'length' <<<"$per") comps (cap $CAP)"
     if [ "$total" -gt "$CAP" ] && [ "$CONFIRMED" -lt "$total" ]; then
         echo "cost: $total credits exceeds cap $CAP; ask the user, then rerun cost and comps with LARV_DESIGN_CONFIRMED_SPEND=$total"
@@ -124,7 +155,14 @@ step_cost() {
 }
 
 step_comps() {
-    local dir="$1" out="$2" id ids ref="" aspect job reason="" balance="" total=0 need=()
+    local dir="$1" out="$2" id ids ref="" aspect job reason="" balance="" total=0 need=() only="" cost_only=""
+    shift 2
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --only) only="${2:-}"; shift 2 || { echo "ERROR: --only needs a list of ids" >&2; return 64; } ;;
+            *) echo "ERROR: unknown comps argument: $1" >&2; return 64 ;;
+        esac
+    done
     check_numbers || return 1
     [ -f "$out/options.json" ] || { echo "ERROR: $out/options.json missing" >&2; return 1; }
     ids="$(comp_ids "$out")" || return 1
@@ -137,15 +175,41 @@ step_comps() {
         ref="$out/refs/reference.png"
     fi
     [ -f "$out/cost.json" ] || { echo "comps: no $out/cost.json; run cost first (and confirm any spend over the cap)" >&2; return 4; }
+    cost_only="$(jq -r '(.only // []) | sort | join(",")' "$out/cost.json")"
+    if [ -n "$only" ]; then
+        local given
+        given="$(printf '%s\n' "${only//,/$'\n'}" | LC_ALL=C sort -u | paste -sd, -)"
+        if [ "$given" != "$cost_only" ]; then
+            echo "comps: --only does not match cost.json (rerun cost)" >&2
+            return 4
+        fi
+    fi
     for id in $ids; do
         if comp_current "$out" "$id"; then echo "comps: keep $id"; else need+=("$id"); fi
     done
-    [ "${#need[@]}" -eq 0 ] && { echo "comps: nothing to generate"; return 0; }
+    local gen=() skip=()
+    if [ -n "$cost_only" ]; then
+        local sel
+        sel="$(tr ',' '\n' <<<"$cost_only")"
+        for id in "${need[@]}"; do
+            if grep -qx -- "$id" <<<"$sel"; then gen+=("$id"); else skip+=("$id"); fi
+        done
+    else
+        gen=("${need[@]}")
+    fi
+    for id in "${skip[@]}"; do
+        echo "not-selected" >"$out/comps/$id.fallback"
+        echo "comps: $id -> wireframe card (not-selected)"
+    done
+    if [ "${#gen[@]}" -eq 0 ]; then
+        [ "${#skip[@]}" -eq 0 ] && echo "comps: nothing to generate"
+        return 0
+    fi
     reason="$(jq -r '.fallback // ""' "$out/cost.json")"
     if [ -z "$reason" ]; then
         local priced wanted sum
         priced="$(jq -r '.per_comp | keys | join(",")' "$out/cost.json")"
-        wanted="$(printf '%s\n' "${need[@]}" | LC_ALL=C sort | paste -sd, -)"
+        wanted="$(printf '%s\n' "${gen[@]}" | LC_ALL=C sort | paste -sd, -)"
         if [ "$priced" != "$wanted" ]; then
             echo "comps: cost.json prices [$priced] but the cards to generate are [$wanted]; cost.json does not match, rerun cost" >&2
             return 4
@@ -169,7 +233,7 @@ step_comps() {
             echo "comps: balance before: $balance credits (round total $total)"
         fi
     fi
-    for id in "${need[@]}"; do
+    for id in "${gen[@]}"; do
         if [ -n "$reason" ]; then
             echo "$reason" >"$out/comps/$id.fallback"
             echo "comps: $id -> wireframe card ($reason)"
@@ -294,6 +358,8 @@ if reasons & {"higgsfield-unavailable", "generation-failed"}:
     notes.append("Higgsfield was unavailable for some cards, so they show zero-credit wireframes.")
 if "low-credits" in reasons:
     notes.append("Higgsfield credits ran low for this round, so some cards show zero-credit wireframes.")
+if "not-selected" in reasons:
+    notes.append("Some cards are shown as wireframes to keep this round within its credit limit.")
 note = f'<p class="note">{" ".join(e(n) for n in notes)}</p>' if notes else ""
 dec = f'<section class="declined"><h3>Considered and declined</h3><ul>{"".join(declined)}</ul></section>' if declined else ""
 page = (tmpl.replace("{{TITLE}}", e(data.get("title") or "Design directions"))
@@ -401,8 +467,8 @@ main() {
     case "$step" in
         context) step_context "$dir" "$out" ;;
         seed) step_seed "$dir" "$out" "$@" ;;
-        cost) step_cost "$dir" "$out" ;;
-        comps) step_comps "$dir" "$out" ;;
+        cost) step_cost "$dir" "$out" "$@" ;;
+        comps) step_comps "$dir" "$out" "$@" ;;
         board) step_board "$dir" "$out" ;;
         serve) step_serve "$dir" "$out" "$@" ;;
         pick) step_pick "$dir" "$out" "$@" ;;
