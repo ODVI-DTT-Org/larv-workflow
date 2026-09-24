@@ -109,6 +109,14 @@ EOF
     grep -q "impeccable:product-schema" "$TMP/PRODUCT.md"
 }
 
+@test "context with LARV_IMPECCABLE_PRODUCT_ONLY writes PRODUCT.md but not DESIGN.md" {
+    seed_larv_docs
+    LARV_IMPECCABLE_PRODUCT_ONLY=1 run bash scripts/impeccable.sh context "$TMP"
+    [ "$status" -eq 0 ]
+    [ -f "$TMP/PRODUCT.md" ]
+    [ ! -f "$TMP/DESIGN.md" ]
+}
+
 @test "detect skips when there is no UI surface" {
     write_stub_impeccable 2
     run env LARV_IMPECCABLE_BIN="$BIN_DIR/impeccable" bash scripts/impeccable.sh detect "$TMP"

@@ -93,12 +93,13 @@ cmd_context() {
         FORCE=1
     fi
 
-    python3 - "$dir" "$FORCE" "$PLUGIN_ROOT" <<'PY'
+    python3 - "$dir" "$FORCE" "$PLUGIN_ROOT" "${LARV_IMPECCABLE_PRODUCT_ONLY:-0}" <<'PY'
 import json, os, re, sys
 from pathlib import Path
 
 project = Path(sys.argv[1])
 force = sys.argv[2] == "1"
+product_only = len(sys.argv) > 4 and sys.argv[4] == "1"
 
 def read(rel):
     p = project / rel
@@ -342,7 +343,9 @@ if force or not product_path.exists():
 else:
     print(f"context: keep existing {product_path}")
 
-if force or not design_path.exists():
+if product_only:
+    print("context: product-only, DESIGN.md left for the direction pick")
+elif force or not design_path.exists():
     design_path.write_text(design, encoding="utf-8")
     wrote.append("DESIGN.md")
 else:
