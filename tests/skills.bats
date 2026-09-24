@@ -533,3 +533,14 @@ yaml.safe_load(parts[1])
     grep -q "Never run \`higgsfield auth token\`" "$f"
     grep -q "Do not ask the user to run" "$f"
 }
+
+@test "Phase 0 and Phase 3 support the impeccable-higgsfield design mode" {
+    grep -q "mode: impeccable-higgsfield" skills/larv-discuss/SKILL.md
+    f=skills/larv-design/SKILL.md
+    grep -q "mode: impeccable-higgsfield" "$f"
+    grep -q "design-directions.sh" "$f"
+    grep -q "design-setup.sh check" "$f"
+    grep -q "docs/larv/03-design/directions/" "$f"
+    grep -q "only when the design mode is not \`impeccable-higgsfield\`" "$f"
+    grep -q "one interactive HTML prototype of the picked comp" "$f"
+}

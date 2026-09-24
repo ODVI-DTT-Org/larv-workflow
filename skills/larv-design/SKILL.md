@@ -20,6 +20,21 @@ Help the user pick a visual design and finalize a brand spec. The user does the 
 
 ## Step sequence
 
+### Mode: impeccable-higgsfield
+
+If `docs/larv/00-discuss/design-preferences.md` records `mode: impeccable-higgsfield`, replace steps 2–8 with the directions round, using `OUT=docs/larv/03-design/directions/` and `D=<larv-plugin-root>/scripts/design-directions.sh`:
+
+1. `bash <larv-plugin-root>/scripts/design-setup.sh check "$PWD"`: exit 1 stops the phase with `status: failed`; exit 3 continues with zero-credit wireframe cards (say why).
+2. `bash $D context "$PWD" $OUT` (writes PRODUCT.md only; DESIGN.md waits for the pick).
+3. `bash $D seed "$PWD" $OUT`; author `$OUT/options.json` and `$OUT/prompts/<id>.txt` exactly as in `skills/larv-redesign-impeccable-higgsfield/SKILL.md` steps 4–5. Add the Attio workspace baseline (`templates/attio-crm-workspace.html`) as the `canonCard`.
+4. `bash $D cost "$PWD" $OUT` (exit 4: ask the user, rerun with `LARV_DESIGN_CONFIRMED_SPEND`).
+5. Ask for the mockup port as in step 5 below, then `bash $D board "$PWD" $OUT`, `bash $D serve "$PWD" $OUT <port|auto>`, `bash $D comps "$PWD" $OUT`, `bash $D board "$PWD" $OUT`. Print `$OUT/board-url.txt`.
+6. User picks (`pick: <id>`); `bash $D pick "$PWD" $OUT <id>`. Copy `$OUT/decision.md` to `docs/larv/03-design/design-decision.md` with the user's rationale.
+7. Build one interactive HTML prototype of the picked comp under `docs/larv/03-design/mockups/<pick-slug>/` (`index.html` harness, `interaction-map.md`, working navigation and primary actions, app logo and favicon) and serve it with step 7's mockup-server block on the same port (stop the board session first: `static_server_stop "" larv-design-board-<slug>`). Only one prototype is built: the picked comp's.
+8. Continue with step 9. Write `DESIGN.md` from the picked comp and brand spec; do not regenerate it with `impeccable.sh context`.
+
+In this mode the picked comp and its single prototype are the visual source of truth, and DESIGN.md is written from them. Any rule elsewhere in this skill that makes Attio mockups the visual source of truth, derives DESIGN.md from the brand spec with `impeccable.sh context`, or forbids replacing Attio mockups with an Impeccable world roll applies only when the design mode is not `impeccable-higgsfield`.
+
 ### 1. Frame the design ask
 
 Read inputs above, including the Phase 0 design preference. Write a one-paragraph design brief and confirm with the user. If `docs/larv/00-discuss/design-preferences.md` says `mode: agent-recommendations`, start from that saved preference instead of asking whether recommendations are wanted again. If it says `mode: user-specified`, restate the saved style/template/brand direction and ask only if it is ambiguous. If it says `mode: decide-later` or the file is missing, ask the normal design preference question in Step 2.
@@ -224,6 +239,7 @@ The mockup server is not optional. Do not proceed to brand finalization, `design
 - `docs/larv/03-design/mockup-url.txt` exists and contains the external URL.
 - `runtime_gate_require_phase_url . design "$LARV_VM_HOST"` succeeded.
 - The URL was printed to the user.
+- In mode `impeccable-higgsfield`: `docs/larv/03-design/directions/board-url.txt` was probe-confirmed and shown, `directions/decision.md` exists, the picked comp sidecar has `approved: true` (unless the pick was a wireframe card), and the single prototype of the picked comp satisfies every mockup bullet above.
 
 If any item fails or cannot be performed, stop immediately and return:
 
@@ -297,6 +313,10 @@ files_written:
   - docs/larv/03-design/brand-spec.md
   - docs/larv/03-design/ui-design.md
   - docs/larv/03-design/visual-implementation-contract.md
+  - docs/larv/03-design/directions/options.json      # mode impeccable-higgsfield
+  - docs/larv/03-design/directions/comps/<id>.png    # mode impeccable-higgsfield
+  - docs/larv/03-design/directions/board-url.txt     # mode impeccable-higgsfield
+  - docs/larv/03-design/directions/decision.md       # mode impeccable-higgsfield
 state_updates:
   execution.allocations: [..., { kind: mockup-port, value: "<port>" }]
 plugin_improvement_notes: (none)

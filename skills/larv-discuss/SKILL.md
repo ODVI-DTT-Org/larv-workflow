@@ -30,13 +30,16 @@ Ask this as Q1 in Phase 0, before admin panel, auth, tenancy, or any package cho
 > "Before we choose Laravel packages, how do you want the design phase handled?
 > (a) Recommend a visual direction from my PRD/domain answers - default starts with Attio, then adds Attio Venture/Attio Finance if relevant
 > (b) I already have a specific style/template/brand direction
-> (c) Decide later in Phase 3"
+> (c) Decide later in Phase 3
+> (d) Impeccable directions with Higgsfield comps — I propose three grounded directions, render one comp each (~2 credits per comp), and show them on a sandbox URL for you to pick."
 
 If the user chooses (a), record `mode: agent-recommendations`, `default_starting_point: templates/attio-crm-workspace.html`, and note any domain-fit hints for Attio Venture or Attio Finance.
 
 If the user chooses (b), ask one short follow-up for the style/template/brand reference and record `mode: user-specified`, `raw_direction`, and any paths/URLs/named brands they gave. Do not fetch external sources in Phase 0.
 
 If the user chooses (c), record `mode: decide-later`.
+
+If the user chooses (d), record `mode: impeccable-higgsfield` and `credit_cap: 10` (or the number the user gives).
 
 Write `docs/larv/00-discuss/design-preferences.md` with:
 
