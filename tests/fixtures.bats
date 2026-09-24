@@ -14,6 +14,7 @@ load helpers
     [ "$status" -eq 0 ]
     [ -f "$tmp/docs/larv/STATE.yaml" ]
     [ -f "$tmp/docs/larv/pre-flight.md" ]
+    grep -q "skipped (LARV_PREFLIGHT_SKIP_DESIGN_CHECK=1)" "$tmp/docs/larv/pre-flight.md"
 
     run bash scripts/status.sh "$tmp"
     [ "$status" -eq 0 ]
