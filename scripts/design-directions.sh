@@ -207,6 +207,16 @@ print(f"board: {len(cards)} cards, {len(declined)} declined -> {out / 'board' / 
 PY
 }
 
+# step_serve_cleanup <session> <port> <slug>
+# Stops any server the current serve attempt started and releases its port
+# reservation. Safe to call even when the server never started (static_server_stop
+# / release_port_reservation are no-ops when there is nothing to clean up).
+step_serve_cleanup() {
+    local session="$1" port="$2" slug="$3"
+    static_server_stop "" "$session" || true
+    release_port_reservation mockup "$port" "$slug" || true
+}
+
 step_serve() {
     local dir="$1" out="$2" requested="${3:-auto}" host slug port session url
     [ -f "$out/board/index.html" ] || { echo "ERROR: run board first" >&2; return 1; }
@@ -226,15 +236,23 @@ step_serve() {
         port="$requested"
     fi
     session="larv-design-board-$slug"
-    if [ "${LARV_DESIGN_SKIP_PROBE:-0}" != "1" ]; then
-        static_server_check_remote_deps "" || { release_port_reservation mockup "$port" "$slug" || true; echo "ERROR: php/curl/ss/setsid missing" >&2; return 1; }
-        static_server_open_firewall "" "$port" || { release_port_reservation mockup "$port" "$slug" || true; return 1; }
+    if [ "${LARV_DESIGN_SKIP_PROBE:-0}" != "1" ] && [ "${LARV_DESIGN_SKIP_FIREWALL:-0}" != "1" ]; then
+        static_server_check_remote_deps "" || { step_serve_cleanup "$session" "$port" "$slug"; echo "ERROR: php/curl/ss/setsid missing" >&2; return 1; }
+        static_server_open_firewall "" "$port" || { step_serve_cleanup "$session" "$port" "$slug"; return 1; }
     fi
-    static_server_start "" "$port" "$out/board" "$session" || { release_port_reservation mockup "$port" "$slug" || true; return 1; }
+    static_server_start "" "$port" "$out/board" "$session" || { step_serve_cleanup "$session" "$port" "$slug"; return 1; }
     url="$(static_server_url "$port")/"
     if [ "${LARV_DESIGN_SKIP_PROBE:-0}" != "1" ]; then
-        probe_url_inside "" "$port" static || { echo "ERROR: inside probe failed" >&2; return 1; }
-        probe_with_retries "$url" static || { echo "ERROR: external probe failed for $url" >&2; return 1; }
+        if [ "${LARV_DESIGN_FORCE_PROBE_FAIL:-0}" = "1" ]; then
+            # Test-only hook: forces the probe-before-announce path to fail
+            # without needing a real unroutable network round trip, so the
+            # cleanup-on-probe-failure test stays fast and network-free.
+            step_serve_cleanup "$session" "$port" "$slug"
+            echo "ERROR: inside probe failed (forced for test)" >&2
+            return 1
+        fi
+        probe_url_inside "" "$port" static || { step_serve_cleanup "$session" "$port" "$slug"; echo "ERROR: inside probe failed" >&2; return 1; }
+        probe_with_retries "$url" static || { step_serve_cleanup "$session" "$port" "$slug"; echo "ERROR: external probe failed for $url" >&2; return 1; }
     fi
     release_port_reservation mockup "$port" "$slug" || true
     if [ -f "$dir/docs/larv/STATE.yaml" ]; then

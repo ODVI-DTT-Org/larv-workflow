@@ -236,3 +236,23 @@ EOF
     [[ "$output" == *"no public host"* ]]
     [ ! -f "$OUT/board-url.txt" ]
 }
+
+@test "serve stops the server and releases the port when probe-before-announce fails" {
+    write_options
+    bash scripts/design-directions.sh board "$TMP" "$OUT"
+    export LARV_VM_HOST=203.0.113.10 LARV_DESIGN_SKIP_FIREWALL=1 LARV_DESIGN_FORCE_PROBE_FAIL=1
+    export LARV_PORT_RESERVATION_DIR="$STUB_DIR/ports" LARV_SANDBOX_PROCESS_DIR="$STUB_DIR/procs"
+    run bash scripts/design-directions.sh serve "$TMP" "$OUT" auto
+    [ "$status" -eq 1 ]
+    [ ! -f "$OUT/board-url.txt" ]
+    source scripts/lib/design_tools.sh
+    slug="$(design_slug "$TMP")"
+    session="larv-design-board-$slug"
+    log="$STUB_DIR/procs/$session.log"
+    [ -f "$log" ]
+    port="$(grep -oE ':[0-9]{4}\)? ' "$log" | head -1 | grep -oE '[0-9]{4}')"
+    [ -n "$port" ]
+    [ ! -f "$STUB_DIR/procs/$session.pid" ]
+    ! curl -fsS --max-time 1 "http://127.0.0.1:$port/" >/dev/null 2>&1
+    [ ! -f "$STUB_DIR/ports/mockup/$port" ]
+}
