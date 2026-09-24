@@ -376,7 +376,7 @@ The redesign commands use these galleries as concrete implementation references,
 
 1. Impeccable (vendored skill 4.3.1) deals three grounded directions from `PRODUCT.md`.
 2. Higgsfield renders one comp per direction with `nano_banana_pro` at 2k (about 2 credits each). Declined directions get no comp.
-3. `scripts/design-directions.sh` renders the options board and serves it on a public 9000-9499 port (probe before announce). You pick with `pick: <id>`.
+3. `scripts/design-directions.sh` renders the options board and serves it on a public 9000-9499 port (probe before announce). You pick with `pick: <id>` (a dealt direction or the category-standard `canon` card); `design-directions.sh stop` shuts the board down.
 4. The pick becomes `DESIGN.md`; the redesign command then rebuilds every screen, Phase 3 builds one clickable prototype.
 
 | Setting | Default |
@@ -385,7 +385,7 @@ The redesign commands use these galleries as concrete implementation references,
 | `LARV_HIGGSFIELD_MODEL` | `nano_banana_pro` |
 | `LARV_VM_HOST` | public host for board URLs; falls back to `hostname -I` |
 
-Setup: `/larv:design-setup` runs `scripts/design-setup.sh check|install`. It installs the SHA-256-pinned Higgsfield CLI 1.1.26 into `~/.local/share/larv/higgsfield/` and the Impeccable skill into `~/.claude/skills` and `~/.agents/skills`. Signing in is the one user step (`! ~/.local/share/larv/higgsfield/higgsfield auth login`); larv never runs `auth token`. When Higgsfield is unavailable the board uses zero-credit wireframe cards.
+Setup: `/larv:design-setup` runs `scripts/design-setup.sh check|install`. It installs the SHA-256-pinned Higgsfield CLI 1.1.26 into `~/.local/share/larv/higgsfield/` and the Impeccable skill into `~/.claude/skills` and `~/.agents/skills`. Signing in is the one user step (`! ~/.local/share/larv/higgsfield/higgsfield auth login`); larv never runs `auth token`. Comps are generated only after `cost` has priced the round within the cap (or the user confirmed the spend). When Higgsfield is not installed, signed out, or the balance does not cover the round, the board uses zero-credit wireframe cards.
 
 Privacy: only screenshots of seeded or fictional data may be sent to Higgsfield as reference images, and `directions/refs/FICTIONAL-DATA-CONFIRMED` must exist before one is used.
 

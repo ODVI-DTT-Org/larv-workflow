@@ -544,3 +544,16 @@ yaml.safe_load(parts[1])
     grep -q "only when the design mode is not \`impeccable-higgsfield\`" "$f"
     grep -q "one interactive HTML prototype of the picked comp" "$f"
 }
+
+@test "impeccable-higgsfield skills pass the cap, stop via the script and keep the board port separate" {
+    r=skills/larv-redesign-impeccable-higgsfield/SKILL.md
+    d=skills/larv-design/SKILL.md
+    ! grep -q "static_server_stop" "$r"
+    ! grep -q "static_server_stop" "$d"
+    grep -q 'bash \$D stop "\$PWD" \$OUT' "$r"
+    grep -q 'bash \$D stop "\$PWD" \$OUT' "$d"
+    grep -q "LARV_HIGGSFIELD_CREDIT_CAP=" "$r"
+    grep -q "LARV_HIGGSFIELD_CREDIT_CAP=<credit_cap from design-preferences.md>" "$d"
+    grep -q "LARV_DESIGN_PORT_KIND=mockup-port" "$d"
+    grep -q -- "--from <key> --reroll <n>" "$r"
+}

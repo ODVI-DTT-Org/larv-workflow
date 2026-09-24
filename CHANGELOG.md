@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `/larv:design-setup` and `scripts/design-setup.sh` (pinned Higgsfield CLI 1.1.26, readiness check in pre-flight).
 - Vendor Impeccable skill 4.3.1 in `bundle/impeccable/`.
 - `impeccable.sh context` honors `LARV_IMPECCABLE_PRODUCT_ONLY=1`.
+- `design-directions.sh`: `comps` spends only against a matching, within-cap `cost.json`; changed prompts are re-priced and regenerated; `seed --from <key> --reroll <n>`; `pick canon`; `stop` step; board port recorded as `design-board-port` (Phase 3 uses `mockup-port`).
 
 - Adds `/larv:full-test`, a production end-to-end feature sweep that requires login credentials and optional DB-revert consent, tours every feature collecting bugs without fixing, then fixes all bugs in one severity-ordered pass after the full sweep is complete.
 
