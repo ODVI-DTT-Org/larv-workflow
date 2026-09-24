@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Impeccable directions + Higgsfield comps design round.
-# Steps: context seed cost comps board serve pick (see usage).
+# Steps: context seed cost comps board serve pick stop (see usage).
 set -euo pipefail
 
 PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -8,30 +8,52 @@ PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 . "$PLUGIN_ROOT/scripts/lib/higgsfield.sh"
 
 CAP="${LARV_HIGGSFIELD_CREDIT_CAP:-10}"
+CONFIRMED="${LARV_DESIGN_CONFIRMED_SPEND:-0}"
+# Option ids become file names and URL paths: lowercase slug only.
+ID_RE='\A[a-z0-9][a-z0-9-]*\z'
 
 usage() {
     cat <<'EOF'
-Usage: design-directions.sh <step> <project-dir> <out-dir> [arg]
+Usage: design-directions.sh <step> <project-dir> <out-dir> [args]
 
 Steps (run in order; the agent authors options.json and prompts/<id>.txt after seed):
   context  Ensure PRODUCT.md (exit 2 NEEDS_PRODUCT_MD when the agent must author it)
   seed     Run Impeccable concept-seed into seed.txt (fallback marker on failure)
-  cost     Price every comp card with Higgsfield; exit 4 when over LARV_HIGGSFIELD_CREDIT_CAP
-  comps    Generate one Higgsfield comp per comp card (per-card wireframe fallback)
+           Re-roll: seed <dir> <out> --from <seed-key> --reroll <n>
+  cost     Price every comp card that needs a new comp; writes cost.json.
+           Exit 4 when over LARV_HIGGSFIELD_CREDIT_CAP; zero-credit fallback when
+           Higgsfield is missing or signed out
+  comps    Generate one Higgsfield comp per priced card (exit 4 without a matching,
+           within-cap cost.json; per-card wireframe fallback otherwise)
   board    Render board/index.html from options.json and comps
-  serve    Serve the board on a public 9000-9499 port (probe before announce)
-  pick     Approve the chosen card: pick <dir> <out> <id>
+  serve    Serve the board on a public 9000-9499 port (probe before announce).
+           STATE.yaml records the port as LARV_DESIGN_PORT_KIND (default design-board-port)
+  pick     Approve the chosen card: pick <dir> <out> <id> (dealt card or canon)
+  stop     Stop the board server and release its port reservation
 EOF
 }
 
+check_numbers() {
+    [[ "$CAP" =~ ^[0-9]+$ ]] || { echo "ERROR: LARV_HIGGSFIELD_CREDIT_CAP must be a whole number (got '$CAP')" >&2; return 1; }
+    [[ "$CONFIRMED" =~ ^[0-9]+$ ]] || { echo "ERROR: LARV_DESIGN_CONFIRMED_SPEND must be a whole number (got '$CONFIRMED')" >&2; return 1; }
+}
+
+# comp_ids <out>: ids of non-declined cards; fails on an unsafe id.
 comp_ids() {
-    jq -r '.options[] | select((.verdict // "") != "declined") | .id' "$1/options.json"
+    jq -r --arg re "$ID_RE" '.options[] | select((.verdict // "") != "declined") | .id
+        | if (type == "string") and test($re) then . else error("invalid option id: \(.)") end' "$1/options.json"
 }
 
 aspect_for() {
     local surface
     surface="$(jq -r --arg id "$2" '.options[] | select(.id == $id) | .surface // "desktop"' "$1/options.json")"
     [ "$surface" = "phone" ] && echo "9:16" || echo "3:2"
+}
+
+# comp_current <out> <id>: the comp exists and was generated from the current prompt.
+comp_current() {
+    [ -s "$1/comps/$2.png" ] && [ -f "$1/comps/$2.json" ] && [ -f "$1/prompts/$2.txt" ] \
+        && jq -e --rawfile p "$1/prompts/$2.txt" '.prompt == $p' "$1/comps/$2.json" >/dev/null 2>&1
 }
 
 step_context() {
@@ -49,10 +71,24 @@ step_context() {
 }
 
 step_seed() {
-    local dir="$1" out="$2" launcher
+    local dir="$1" out="$2" launcher from="" reroll=""
+    shift 2
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            --from) from="${2:-}"; shift 2 || { echo "ERROR: --from needs a seed key" >&2; return 64; } ;;
+            --reroll) reroll="${2:-}"; shift 2 || { echo "ERROR: --reroll needs a number" >&2; return 64; } ;;
+            *) echo "ERROR: unknown seed argument: $1" >&2; return 64 ;;
+        esac
+    done
+    local extra=()
+    if [ -n "$from" ] || [ -n "$reroll" ]; then
+        [[ "$from" =~ ^[A-Za-z0-9_-]+$ ]] || { echo "ERROR: re-roll needs --from <seed-key> (the key: line in seed.txt)" >&2; return 64; }
+        [[ "$reroll" =~ ^[1-9][0-9]*$ ]] || { echo "ERROR: re-roll needs --reroll <n> (1, 2, ...)" >&2; return 64; }
+        extra=(--from "$from" --reroll "$reroll")
+    fi
     mkdir -p "$out"; rm -f "$out/fallback"
     launcher="$(design_impeccable_launcher)" || { echo "seed-unavailable" >"$out/fallback"; echo "seed: no impeccable launcher; fallback"; return 0; }
-    if (cd "$dir" && sh "$launcher" concept-seed --candidate-count 7) >"$out/seed.txt" 2>&1; then
+    if (cd "$dir" && sh "$launcher" concept-seed --candidate-count 7 ${extra[@]+"${extra[@]}"}) >"$out/seed.txt" 2>&1; then
         echo "seed: wrote $out/seed.txt"
     else
         echo "seed-unavailable" >"$out/fallback"
@@ -61,10 +97,18 @@ step_seed() {
 }
 
 step_cost() {
-    local dir="$1" out="$2" id c total=0 per='{}'
+    local dir="$1" out="$2" id ids c total=0 per='{}'
+    check_numbers || return 1
     [ -f "$out/options.json" ] || { echo "ERROR: $out/options.json missing" >&2; return 1; }
-    for id in $(comp_ids "$out"); do
-        [ -f "$out/comps/$id.png" ] && continue
+    ids="$(comp_ids "$out")" || return 1
+    rm -f "$out/cost.json"
+    if ! design_higgsfield_bin >/dev/null 2>&1 || ! hf_account_json >/dev/null 2>&1; then
+        jq -n --argjson cap "$CAP" '{per_comp: {}, total: 0, cap: $cap, fallback: "higgsfield-unavailable"}' >"$out/cost.json"
+        echo "cost: Higgsfield not installed or signed out; 0 credits, the board uses zero-credit wireframe cards"
+        return 0
+    fi
+    for id in $ids; do
+        comp_current "$out" "$id" && continue
         [ -f "$out/prompts/$id.txt" ] || { echo "ERROR: missing prompt $out/prompts/$id.txt" >&2; return 1; }
         c="$(hf_cost "$out/prompts/$id.txt" "$(aspect_for "$out" "$id")")" || { echo "ERROR: hf_cost failed for $id (Higgsfield CLI unavailable or errored)" >&2; return 1; }
         per="$(jq -c --arg id "$id" --argjson c "$c" '. + {($id): $c}' <<<"$per")"
@@ -73,15 +117,17 @@ step_cost() {
     jq -n --argjson per "$per" --argjson total "$total" --argjson cap "$CAP" \
         '{per_comp: $per, total: $total, cap: $cap}' >"$out/cost.json"
     echo "cost: $total credits for $(jq 'length' <<<"$per") comps (cap $CAP)"
-    if [ "$total" -gt "$CAP" ] && [ "${LARV_DESIGN_CONFIRMED_SPEND:-0}" -lt "$total" ]; then
-        echo "cost: $total credits exceeds cap $CAP; ask the user, then rerun with LARV_DESIGN_CONFIRMED_SPEND=$total"
+    if [ "$total" -gt "$CAP" ] && [ "$CONFIRMED" -lt "$total" ]; then
+        echo "cost: $total credits exceeds cap $CAP; ask the user, then rerun cost and comps with LARV_DESIGN_CONFIRMED_SPEND=$total"
         return 4
     fi
 }
 
 step_comps() {
-    local dir="$1" out="$2" id ref="" aspect job
+    local dir="$1" out="$2" id ids ref="" aspect job reason="" balance="" total=0 need=()
+    check_numbers || return 1
     [ -f "$out/options.json" ] || { echo "ERROR: $out/options.json missing" >&2; return 1; }
+    ids="$(comp_ids "$out")" || return 1
     mkdir -p "$out/comps"
     if [ -f "$out/refs/reference.png" ]; then
         if [ ! -f "$out/refs/FICTIONAL-DATA-CONFIRMED" ]; then
@@ -90,12 +136,44 @@ step_comps() {
         fi
         ref="$out/refs/reference.png"
     fi
-    local signed_in=1
-    hf_account_json >/dev/null 2>&1 || signed_in=0
-    for id in $(comp_ids "$out"); do
-        if [ -f "$out/comps/$id.png" ]; then echo "comps: keep $id"; continue; fi
-        if [ "$signed_in" -eq 0 ]; then
-            echo "higgsfield-unavailable" >"$out/comps/$id.fallback"; continue
+    [ -f "$out/cost.json" ] || { echo "comps: no $out/cost.json; run cost first (and confirm any spend over the cap)" >&2; return 4; }
+    for id in $ids; do
+        if comp_current "$out" "$id"; then echo "comps: keep $id"; else need+=("$id"); fi
+    done
+    [ "${#need[@]}" -eq 0 ] && { echo "comps: nothing to generate"; return 0; }
+    reason="$(jq -r '.fallback // ""' "$out/cost.json")"
+    if [ -z "$reason" ]; then
+        local priced wanted sum
+        priced="$(jq -r '.per_comp | keys | join(",")' "$out/cost.json")"
+        wanted="$(printf '%s\n' "${need[@]}" | LC_ALL=C sort | paste -sd, -)"
+        if [ "$priced" != "$wanted" ]; then
+            echo "comps: cost.json prices [$priced] but the cards to generate are [$wanted]; cost.json does not match, rerun cost" >&2
+            return 4
+        fi
+        total="$(jq -r '.total' "$out/cost.json")"
+        sum="$(jq -r '[.per_comp[]] | add // 0' "$out/cost.json")"
+        if ! [[ "$total" =~ ^[0-9]+$ ]] || [ "$total" != "$sum" ]; then
+            echo "comps: cost.json total does not match its per-comp prices; rerun cost" >&2
+            return 4
+        fi
+        if [ "$total" -gt "$CAP" ] && [ "$CONFIRMED" -lt "$total" ]; then
+            echo "comps: $total credits exceeds cap $CAP; ask the user, then rerun with LARV_DESIGN_CONFIRMED_SPEND=$total" >&2
+            return 4
+        fi
+        if ! hf_account_json >/dev/null 2>&1 || ! balance="$(hf_credits)"; then
+            reason="higgsfield-unavailable"
+        elif [ "$balance" -lt "$total" ]; then
+            reason="low-credits"
+            echo "comps: balance $balance credits is below the round total $total"
+        else
+            echo "comps: balance before: $balance credits (round total $total)"
+        fi
+    fi
+    for id in "${need[@]}"; do
+        if [ -n "$reason" ]; then
+            echo "$reason" >"$out/comps/$id.fallback"
+            echo "comps: $id -> wireframe card ($reason)"
+            continue
         fi
         aspect="$(aspect_for "$out" "$id")"
         if job="$(hf_generate_comp "$out/prompts/$id.txt" "$aspect" "$out/comps/$id.png" ${ref:+"$ref"})"; then
@@ -103,27 +181,40 @@ step_comps() {
             jq -n --rawfile prompt "$out/prompts/$id.txt" --arg model "$HF_MODEL" \
                 --arg aspect "$aspect" --arg res "$HF_RESOLUTION" --arg job "$job" \
                 --arg date "$(date +%F)" --arg ref "$ref" \
+                --argjson credits "$(jq --arg id "$id" '.per_comp[$id]' "$out/cost.json")" \
                 '{prompt: $prompt, tool: "Higgsfield CLI", model: $model, aspect_ratio: $aspect,
-                  resolution: $res, job_id: $job, generated_on: $date, reference: $ref,
-                  approved: false, sample_data: true}' >"$out/comps/$id.json"
+                  resolution: $res, credits: $credits, job_id: $job, generated_on: $date,
+                  reference: $ref, approved: false, sample_data: true}' >"$out/comps/$id.json"
             echo "comps: $id done"
         else
             echo "generation-failed" >"$out/comps/$id.fallback"
             echo "comps: $id failed; wireframe card will be shown"
         fi
     done
-    [ "$signed_in" -eq 0 ] && echo "comps: Higgsfield unavailable; board uses zero-credit wireframe cards"
+    case "$reason" in
+        "") balance="$(hf_credits 2>/dev/null)" && echo "comps: balance after: $balance credits" ;;
+        low-credits) echo "comps: not enough Higgsfield credits; board uses zero-credit wireframe cards" ;;
+        *) echo "comps: Higgsfield unavailable; board uses zero-credit wireframe cards" ;;
+    esac
     return 0
 }
 
 step_pick() {
-    local dir="$1" out="$2" id="${3:-}" label
-    label="$(jq -r --arg id "$id" '.options[] | select(.id == $id) | .label' "$out/options.json")"
-    [ -n "$id" ] && [ -n "$label" ] || { echo "ERROR: unknown option id: $id" >&2; return 1; }
-    if [ -f "$out/comps/$id.json" ]; then
+    local dir="$1" out="$2" id="${3:-}" row label verdict
+    [ -n "$id" ] || { echo "ERROR: pick needs an option id" >&2; return 1; }
+    row="$(jq -c --arg id "$id" '[.options[]?, (.canonCard | objects
+            | . + {id: (if (.id // "") == "" then "canon" else .id end)})]
+        | map(select(.id == $id)) | first // empty' "$out/options.json")"
+    [ -n "$row" ] || { echo "ERROR: unknown option id: $id" >&2; return 1; }
+    verdict="$(jq -r '.verdict // ""' <<<"$row")"
+    [ "$verdict" != "declined" ] || { echo "ERROR: option $id was declined; pick a dealt card or the canon card" >&2; return 1; }
+    label="$(jq -r '.label // ""' <<<"$row")"
+    local comp="none (wireframe card)"
+    if comp_current "$out" "$id"; then
         local tmp="$out/comps/$id.json.tmp"
         jq --arg d "$(date +%F)" '.approved = true | .approved_on = $d' "$out/comps/$id.json" >"$tmp"
         mv "$tmp" "$out/comps/$id.json"
+        comp="comps/$id.png"
     fi
     cat >"$out/decision.md" <<EOF
 # Design direction decision
@@ -131,7 +222,7 @@ step_pick() {
 pick: $id
 label: $label
 date: $(date +%F)
-comp: $( [ -f "$out/comps/$id.png" ] && echo "comps/$id.png" || echo "none (wireframe card)" )
+comp: $comp
 EOF
     echo "pick: $id ($label)"
 }
@@ -139,13 +230,15 @@ EOF
 step_board() {
     local dir="$1" out="$2"
     [ -f "$out/options.json" ] || { echo "ERROR: $out/options.json missing" >&2; return 1; }
-    mkdir -p "$out/board/comps"
-    local id
-    for id in $(comp_ids "$out"); do
-        [ -f "$out/comps/$id.png" ] && cp "$out/comps/$id.png" "$out/board/comps/$id.png"
+    local id ids
+    ids="$(comp_ids "$out")" || return 1
+    # Only board/comps is cleared: board/ is the live server's docroot.
+    rm -rf "$out/board/comps"; mkdir -p "$out/board/comps"
+    for id in $ids; do
+        if comp_current "$out" "$id"; then cp "$out/comps/$id.png" "$out/board/comps/$id.png"; fi
     done
     python3 - "$out" "$PLUGIN_ROOT/templates/design-board.html.tmpl" <<'PY'
-import html, json, sys
+import html, json, re, sys
 from pathlib import Path
 out = Path(sys.argv[1]); tmpl = Path(sys.argv[2]).read_text(encoding="utf-8")
 data = json.loads((out / "options.json").read_text(encoding="utf-8"))
@@ -159,6 +252,8 @@ for o in opts:
     oid = o.get("id")
     if not oid:
         sys.exit("ERROR: option without id")
+    if not isinstance(oid, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]*", oid):
+        sys.exit(f"ERROR: invalid option id: {oid}")
     if oid in seen:
         sys.exit(f"ERROR: duplicate option id: {oid}")
     seen.add(oid)
@@ -197,6 +292,8 @@ if fallback == "seed-unavailable":
     notes.append("Impeccable's direction service was unreachable; these directions were written from PRODUCT.md.")
 if reasons & {"higgsfield-unavailable", "generation-failed"}:
     notes.append("Higgsfield was unavailable for some cards, so they show zero-credit wireframes.")
+if "low-credits" in reasons:
+    notes.append("Higgsfield credits ran low for this round, so some cards show zero-credit wireframes.")
 note = f'<p class="note">{" ".join(e(n) for n in notes)}</p>' if notes else ""
 dec = f'<section class="declined"><h3>Considered and declined</h3><ul>{"".join(declined)}</ul></section>' if declined else ""
 page = (tmpl.replace("{{TITLE}}", e(data.get("title") or "Design directions"))
@@ -220,6 +317,11 @@ step_serve_cleanup() {
 step_serve() {
     local dir="$1" out="$2" requested="${3:-auto}" host slug port session url
     [ -f "$out/board/index.html" ] || { echo "ERROR: run board first" >&2; return 1; }
+    local kind="${LARV_DESIGN_PORT_KIND:-design-board-port}"
+    case "$kind" in
+        design-board-port|mockup-port) ;;
+        *) echo "ERROR: LARV_DESIGN_PORT_KIND must be design-board-port or mockup-port (got '$kind')" >&2; return 1 ;;
+    esac
     host="$(design_public_host)" || { echo "ERROR: no public host (set LARV_VM_HOST); refusing to announce a local URL" >&2; return 1; }
     export LARV_VM_HOST="$host"
     . "$PLUGIN_ROOT/scripts/lib/vm.sh"
@@ -256,12 +358,34 @@ step_serve() {
     fi
     release_port_reservation mockup "$port" "$slug" || true
     if [ -f "$dir/docs/larv/STATE.yaml" ]; then
-        bash "$PLUGIN_ROOT/scripts/state.sh" record-allocation "$dir" mockup-port "$port"
+        bash "$PLUGIN_ROOT/scripts/state.sh" record-allocation "$dir" "$kind" "$port"
     else
         printf 'slug: %s\nboard_port: %s\nboard_session: %s\n' "$slug" "$port" "$session" >"$out/../run.yaml"
     fi
     printf '%s\n' "$url" >"$out/board-url.txt"
     echo "Design board ready at $url"
+}
+
+step_stop() {
+    local dir="$1" out="$2" slug session port="" run kind
+    . "$PLUGIN_ROOT/scripts/lib/vm.sh"
+    . "$PLUGIN_ROOT/scripts/lib/verifier.sh"
+    . "$PLUGIN_ROOT/scripts/lib/static_server.sh"
+    slug="$(design_slug "$dir")"
+    session="larv-design-board-$slug"
+    run="$out/../run.yaml"
+    if [ -f "$run" ]; then
+        slug="$(yq -r '.slug // ""' "$run")"; [ -n "$slug" ] && [ "$slug" != "null" ] || slug="$(design_slug "$dir")"
+        session="$(yq -r '.board_session // ""' "$run")"; [ -n "$session" ] && [ "$session" != "null" ] || session="larv-design-board-$slug"
+        port="$(yq -r '.board_port // ""' "$run")"
+    elif [ -f "$dir/docs/larv/STATE.yaml" ]; then
+        kind="${LARV_DESIGN_PORT_KIND:-design-board-port}"
+        port="$(K="$kind" yq -r '[.execution.allocations[]? | select(.kind == strenv(K))] | .[-1].value // ""' "$dir/docs/larv/STATE.yaml" 2>/dev/null || true)"
+    fi
+    [ "$port" = "null" ] && port=""
+    static_server_stop "" "$session" || true
+    if [[ "$port" =~ ^[0-9]+$ ]]; then release_port_reservation mockup "$port" "$slug" || true; fi
+    echo "stop: stopped $session${port:+ (port $port)}"
 }
 
 main() {
@@ -276,12 +400,13 @@ main() {
     mkdir -p "$out"; out="$(cd "$out" && pwd -P)"
     case "$step" in
         context) step_context "$dir" "$out" ;;
-        seed) step_seed "$dir" "$out" ;;
+        seed) step_seed "$dir" "$out" "$@" ;;
         cost) step_cost "$dir" "$out" ;;
         comps) step_comps "$dir" "$out" ;;
         board) step_board "$dir" "$out" ;;
         serve) step_serve "$dir" "$out" "$@" ;;
         pick) step_pick "$dir" "$out" "$@" ;;
+        stop) step_stop "$dir" "$out" ;;
         *) usage >&2; exit 64 ;;
     esac
 }

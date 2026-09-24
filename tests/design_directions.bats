@@ -9,6 +9,7 @@ setup() {
     export PATH="/usr/local/bin:/usr/bin:/bin"
     export LARV_HIGGSFIELD_BIN="$PROJECT_ROOT/tests/fixtures/higgsfield-stub.sh"
     export LARV_IMPECCABLE_SKILL_DIR="$PROJECT_ROOT/tests/fixtures/impeccable-launcher-stub"
+    export LARV_HIGGSFIELD_ALLOW_FILE_URL=1
     OUT="$TMP/docs/larv/redesigns/t-impeccable-higgsfield/directions"
     mkdir -p "$OUT/prompts"
     printf '# PRS\n\nPouch receiving.\n' >"$TMP/PRODUCT.md"
@@ -29,6 +30,12 @@ write_options() {
 ]}
 EOF
     for id in assigned model-pick phone-card; do printf 'Mockup %s\n' "$id" >"$OUT/prompts/$id.txt"; done
+}
+
+# write_options + a priced round (cost.json), so comps may spend
+priced() {
+    write_options
+    bash scripts/design-directions.sh cost "$TMP" "$OUT" >/dev/null
 }
 
 @test "context keeps an existing PRODUCT.md" {
@@ -66,9 +73,9 @@ EOF
     [ ! -f "$OUT/fallback" ]
 }
 
-@test "cost fails clearly when hf_cost fails" {
+@test "cost fails clearly when hf_cost fails while signed in" {
     write_options
-    LARV_HIGGSFIELD_BIN=/nonexistent run bash scripts/design-directions.sh cost "$TMP" "$OUT"
+    STUB_COST=abc run bash scripts/design-directions.sh cost "$TMP" "$OUT"
     [ "$status" -ne 0 ]
     [[ "$output" == *"hf_cost failed for assigned"* ]]
     [ ! -f "$OUT/cost.json" ]
@@ -93,7 +100,7 @@ EOF
 }
 
 @test "comps writes png and sidecar for each comp card with the right aspect" {
-    write_options
+    priced
     run bash scripts/design-directions.sh comps "$TMP" "$OUT"
     [ "$status" -eq 0 ]
     for id in assigned model-pick phone-card; do
@@ -108,7 +115,7 @@ EOF
 }
 
 @test "comps falls back per card when Higgsfield fails" {
-    write_options
+    priced
     STUB_FAIL_CREATE=1 run bash scripts/design-directions.sh comps "$TMP" "$OUT"
     [ "$status" -eq 0 ]
     [ -f "$OUT/comps/assigned.fallback" ]
@@ -117,6 +124,7 @@ EOF
 
 @test "comps falls back for every card when signed out, without calling create" {
     write_options
+    STUB_SIGNED_OUT=1 bash scripts/design-directions.sh cost "$TMP" "$OUT"
     STUB_SIGNED_OUT=1 run bash scripts/design-directions.sh comps "$TMP" "$OUT"
     [ "$status" -eq 0 ]
     [ -f "$OUT/comps/model-pick.fallback" ]
@@ -124,7 +132,7 @@ EOF
 }
 
 @test "comps skips existing images so a rerun spends nothing" {
-    write_options
+    priced
     bash scripts/design-directions.sh comps "$TMP" "$OUT"
     : >"$STUB_DIR/hf.log"
     run bash scripts/design-directions.sh comps "$TMP" "$OUT"
@@ -133,7 +141,7 @@ EOF
 }
 
 @test "comps refuses reference images without the fictional-data confirmation" {
-    write_options
+    priced
     mkdir -p "$OUT/refs"; printf 'png' >"$OUT/refs/reference.png"
     run bash scripts/design-directions.sh comps "$TMP" "$OUT"
     [ "$status" -eq 5 ]
@@ -145,7 +153,7 @@ EOF
 }
 
 @test "pick approves only the chosen sidecar and writes decision.md" {
-    write_options
+    priced
     bash scripts/design-directions.sh comps "$TMP" "$OUT"
     run bash scripts/design-directions.sh pick "$TMP" "$OUT" model-pick
     [ "$status" -eq 0 ]
@@ -163,7 +171,7 @@ EOF
 }
 
 @test "board renders every card with comps, sample-data labels and no external URLs" {
-    write_options
+    priced
     bash scripts/design-directions.sh comps "$TMP" "$OUT"
     run bash scripts/design-directions.sh board "$TMP" "$OUT"
     [ "$status" -eq 0 ]
@@ -179,6 +187,7 @@ EOF
 
 @test "board renders a wireframe when a comp is missing and names the reason" {
     write_options
+    STUB_SIGNED_OUT=1 bash scripts/design-directions.sh cost "$TMP" "$OUT"
     STUB_SIGNED_OUT=1 bash scripts/design-directions.sh comps "$TMP" "$OUT"
     run bash scripts/design-directions.sh board "$TMP" "$OUT"
     [ "$status" -eq 0 ]
@@ -223,8 +232,11 @@ EOF
     port="${url##*:}"; port="${port%/}"
     grep -q "board_port: $port" "$OUT/../run.yaml"
     curl -fsS "http://127.0.0.1:$port/" | grep -q "Dispatch register"
-    source scripts/lib/vm.sh; source scripts/lib/static_server.sh
-    static_server_stop "" "$(yq -r '.board_session' "$OUT/../run.yaml")"
+    run bash scripts/design-directions.sh stop "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    [[ "$output" == *"stopped larv-design-board-"* ]]
+    [ ! -f "$STUB_DIR/procs/$(yq -r '.board_session' "$OUT/../run.yaml").pid" ]
+    ! curl -fsS --max-time 1 "http://127.0.0.1:$port/" >/dev/null 2>&1
 }
 
 @test "serve refuses to announce a placeholder host" {
@@ -255,4 +267,188 @@ EOF
     [ ! -f "$STUB_DIR/procs/$session.pid" ]
     ! curl -fsS --max-time 1 "http://127.0.0.1:$port/" >/dev/null 2>&1
     [ ! -f "$STUB_DIR/ports/mockup/$port" ]
+}
+
+@test "context delegates to impeccable.sh when only the larv product brief exists" {
+    rm "$TMP/PRODUCT.md"
+    mkdir -p "$TMP/docs/larv/00-discuss"
+    printf '# Product brief\n\nPouch receiving service for a mailroom.\n' >"$TMP/docs/larv/00-discuss/product-brief.md"
+    run bash scripts/design-directions.sh context "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    [ -f "$TMP/PRODUCT.md" ]
+    [ ! -f "$TMP/DESIGN.md" ]
+}
+
+@test "comps refuses to spend without cost.json" {
+    write_options
+    run bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    [ "$status" -eq 4 ]
+    [[ "$output" == *"run cost first"* ]]
+    ! grep -q "generate create" "$STUB_DIR/hf.log"
+}
+
+@test "comps refuses a cost.json that does not cover exactly the cards to generate" {
+    priced
+    printf 'Mockup changed\n' >"$OUT/prompts/assigned.txt"
+    jq '.per_comp |= del(.["model-pick"]) | .total = 4' "$OUT/cost.json" >"$OUT/c.json" && mv "$OUT/c.json" "$OUT/cost.json"
+    : >"$STUB_DIR/hf.log"
+    run bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    [ "$status" -eq 4 ]
+    [[ "$output" == *"does not match"* ]]
+    ! grep -q "generate create" "$STUB_DIR/hf.log"
+}
+
+@test "comps refuses a cost.json over the cap without confirmed spend" {
+    write_options
+    LARV_HIGGSFIELD_CREDIT_CAP=5 LARV_DESIGN_CONFIRMED_SPEND=6 bash scripts/design-directions.sh cost "$TMP" "$OUT"
+    LARV_HIGGSFIELD_CREDIT_CAP=5 run bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    [ "$status" -eq 4 ]
+    ! grep -q "generate create" "$STUB_DIR/hf.log"
+    LARV_HIGGSFIELD_CREDIT_CAP=5 LARV_DESIGN_CONFIRMED_SPEND=6 run bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    grep -q "generate create" "$STUB_DIR/hf.log"
+}
+
+@test "cost and comps reject a non-numeric cap" {
+    write_options
+    LARV_HIGGSFIELD_CREDIT_CAP="10 credits" run bash scripts/design-directions.sh cost "$TMP" "$OUT"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"must be a whole number"* ]]
+    [ ! -f "$OUT/cost.json" ]
+    bash scripts/design-directions.sh cost "$TMP" "$OUT"
+    LARV_DESIGN_CONFIRMED_SPEND=lots run bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    [ "$status" -ne 0 ]
+    ! grep -q "generate create" "$STUB_DIR/hf.log"
+}
+
+@test "cost writes a zero-credit fallback when the Higgsfield binary is missing" {
+    write_options
+    LARV_HIGGSFIELD_BIN=/nonexistent run bash scripts/design-directions.sh cost "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    [ "$(jq -c '.' "$OUT/cost.json")" = '{"per_comp":{},"total":0,"cap":10,"fallback":"higgsfield-unavailable"}' ]
+    LARV_HIGGSFIELD_BIN=/nonexistent run bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    grep -qx "higgsfield-unavailable" "$OUT/comps/assigned.fallback"
+}
+
+@test "cost writes a zero-credit fallback when Higgsfield is signed out" {
+    write_options
+    STUB_SIGNED_OUT=1 run bash scripts/design-directions.sh cost "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    [ "$(jq -r '.fallback' "$OUT/cost.json")" = "higgsfield-unavailable" ]
+    [ "$(jq -r '.total' "$OUT/cost.json")" = "0" ]
+}
+
+@test "comps falls back with low-credits when the balance is below the round total" {
+    priced
+    STUB_CREDITS=5 run bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    grep -qx "low-credits" "$OUT/comps/assigned.fallback"
+    ! grep -q "generate create" "$STUB_DIR/hf.log"
+    bash scripts/design-directions.sh board "$TMP" "$OUT"
+    grep -q "credits ran low" "$OUT/board/index.html"
+    grep -q 'class="wireframe' "$OUT/board/index.html"
+}
+
+@test "comps sidecar records credits and prints the balance before and after" {
+    priced
+    run bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    [ "$(jq -r '.credits' "$OUT/comps/assigned.json")" = "2" ]
+    [[ "$output" == *"balance before: 79 credits"* ]]
+    [[ "$output" == *"balance after: 79 credits"* ]]
+}
+
+@test "a changed prompt is re-priced and regenerated; the board drops stale copies" {
+    priced
+    bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    bash scripts/design-directions.sh board "$TMP" "$OUT"
+    printf 'Mockup assigned, rerolled\n' >"$OUT/prompts/assigned.txt"
+    run bash scripts/design-directions.sh cost "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    [ "$(jq -r '.per_comp | keys | join(",")' "$OUT/cost.json")" = "assigned" ]
+    STUB_FAIL_CREATE=1 run bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    [ -f "$OUT/comps/assigned.fallback" ]
+    bash scripts/design-directions.sh board "$TMP" "$OUT"
+    [ ! -e "$OUT/board/comps/assigned.png" ]
+    ! grep -q 'src="comps/assigned.png"' "$OUT/board/index.html"
+    [ -e "$OUT/board/comps/model-pick.png" ]
+    : >"$STUB_DIR/hf.log"
+    run bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    [ "$(grep -c "generate create" "$STUB_DIR/hf.log")" = "1" ]
+    grep -q "rerolled" "$OUT/comps/assigned.json"
+}
+
+@test "seed passes --from and --reroll through to concept-seed" {
+    run bash scripts/design-directions.sh seed "$TMP" "$OUT" --from stubkey1 --reroll 2
+    [ "$status" -eq 0 ]
+    grep -q -- "concept-seed --candidate-count 7 --from stubkey1 --reroll 2" "$STUB_DIR/impeccable.log"
+    run bash scripts/design-directions.sh seed "$TMP" "$OUT" --reroll x
+    [ "$status" -ne 0 ]
+    run bash scripts/design-directions.sh seed "$TMP" "$OUT" --from stubkey1
+    [ "$status" -ne 0 ]
+}
+
+@test "pick accepts the canon card" {
+    write_options
+    jq '.canonCard = {"label":"Category standard","thesis":"Plain CRM","palette":["#ffffff"],"viewport":"Table","risk":"Familiar"}' "$OUT/options.json" >"$OUT/o.json" && mv "$OUT/o.json" "$OUT/options.json"
+    bash scripts/design-directions.sh board "$TMP" "$OUT"
+    grep -q "pick: canon" "$OUT/board/index.html"
+    run bash scripts/design-directions.sh pick "$TMP" "$OUT" canon
+    [ "$status" -eq 0 ]
+    grep -q "pick: canon" "$OUT/decision.md"
+    grep -q "Category standard" "$OUT/decision.md"
+}
+
+@test "pick rejects a declined option" {
+    write_options
+    run bash scripts/design-directions.sh pick "$TMP" "$OUT" cassette
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"declined"* ]]
+    [ ! -f "$OUT/decision.md" ]
+}
+
+@test "board and comps reject unsafe option ids" {
+    write_options
+    jq '.options[0].id = "../evil"' "$OUT/options.json" >"$OUT/o.json" && mv "$OUT/o.json" "$OUT/options.json"
+    run bash scripts/design-directions.sh board "$TMP" "$OUT"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"invalid option id: ../evil"* ]]
+    run bash scripts/design-directions.sh cost "$TMP" "$OUT"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"invalid option id: ../evil"* ]]
+    run bash scripts/design-directions.sh comps "$TMP" "$OUT"
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"invalid option id: ../evil"* ]]
+    ! grep -q "generate create" "$STUB_DIR/hf.log"
+}
+
+@test "serve records design-board-port by default and honors LARV_DESIGN_PORT_KIND" {
+    write_options
+    bash scripts/state.sh init "$TMP" prs greenfield >/dev/null
+    bash scripts/design-directions.sh board "$TMP" "$OUT"
+    export LARV_VM_HOST=203.0.113.10 LARV_DESIGN_SKIP_PROBE=1
+    export LARV_PORT_RESERVATION_DIR="$STUB_DIR/ports" LARV_SANDBOX_PROCESS_DIR="$STUB_DIR/procs"
+    run bash scripts/design-directions.sh serve "$TMP" "$OUT" auto
+    [ "$status" -eq 0 ]
+    [ "$(yq -r '[.execution.allocations[] | select(.kind == "design-board-port")] | length' "$TMP/docs/larv/STATE.yaml")" = "1" ]
+    [ "$(yq -r '[.execution.allocations[] | select(.kind == "mockup-port")] | length' "$TMP/docs/larv/STATE.yaml")" = "0" ]
+    bash scripts/design-directions.sh stop "$TMP" "$OUT"
+    LARV_DESIGN_PORT_KIND=mockup-port run bash scripts/design-directions.sh serve "$TMP" "$OUT" auto
+    [ "$status" -eq 0 ]
+    [ "$(yq -r '[.execution.allocations[] | select(.kind == "mockup-port")] | length' "$TMP/docs/larv/STATE.yaml")" = "1" ]
+    run bash scripts/design-directions.sh stop "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
+    LARV_DESIGN_PORT_KIND=bogus run bash scripts/design-directions.sh serve "$TMP" "$OUT" auto
+    [ "$status" -ne 0 ]
+    [[ "$output" == *"LARV_DESIGN_PORT_KIND"* ]]
+}
+
+@test "stop is a no-op success when no board is running" {
+    write_options
+    export LARV_SANDBOX_PROCESS_DIR="$STUB_DIR/procs" LARV_PORT_RESERVATION_DIR="$STUB_DIR/ports"
+    run bash scripts/design-directions.sh stop "$TMP" "$OUT"
+    [ "$status" -eq 0 ]
 }
