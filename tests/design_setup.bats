@@ -40,6 +40,13 @@ teardown() {
     [[ "$output" == *"fallback: 4 credits left (cap 10)"* ]]
 }
 
+@test "check exits 3 when the credit balance is not a whole number" {
+    STUB_CREDITS=12.5 run bash scripts/design-setup.sh check "$TMP"
+    [ "$status" -eq 3 ]
+    [[ "$output" == *"fallback"* ]]
+    [[ "$output" != *"ok: higgsfield"* ]]
+}
+
 @test "check exits 3 when Higgsfield is not installed" {
     export LARV_HIGGSFIELD_BIN="$STUB_DIR/none"
     run bash scripts/design-setup.sh check "$TMP"

@@ -48,7 +48,10 @@ hf_generate_comp() {
     [ -n "$url" ] || { echo "ERROR: Higgsfield returned no result_url" >&2; return 1; }
     mkdir -p "$(dirname "$out_png")"
     tmp="$out_png.part"
-    if ! curl -fsSL -o "$tmp" "$url" || [ ! -s "$tmp" ]; then
+    # Only https downloads (redirects included); file:// is a test-only override.
+    local proto="=https"
+    [ "${LARV_HIGGSFIELD_ALLOW_FILE_URL:-0}" = "1" ] && proto="=https,file"
+    if ! curl -fsSL --proto "$proto" --proto-redir "$proto" -o "$tmp" "$url" || [ ! -s "$tmp" ]; then
         rm -f "$tmp"; return 1
     fi
     mv "$tmp" "$out_png"

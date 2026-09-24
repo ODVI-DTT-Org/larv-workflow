@@ -43,10 +43,13 @@ cmd_check() {
         echo "  fallback: higgsfield not signed in; user runs: $LOGIN_HINT"; fallback=1
     else
         local credits email plan
-        credits="$(jq -r '.credits' <<<"$acct")"
         email="$(jq -r '.email' <<<"$acct")"
         plan="$(jq -r '.subscription_plan_type' <<<"$acct")"
-        if [ "$credits" -lt "$CAP" ]; then
+        if ! credits="$(hf_credits)"; then
+            echo "  fallback: could not read a whole-number credit balance on $email"; fallback=1
+        elif ! [[ "$CAP" =~ ^[0-9]+$ ]]; then
+            echo "  fallback: LARV_HIGGSFIELD_CREDIT_CAP must be a whole number (got '$CAP')"; fallback=1
+        elif [ "$credits" -lt "$CAP" ]; then
             echo "  fallback: $credits credits left (cap $CAP) on $email"; fallback=1
         else
             echo "  ok: higgsfield $email ($plan, $credits credits)"

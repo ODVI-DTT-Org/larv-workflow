@@ -8,6 +8,7 @@ setup() {
     export HOME="$STUB_DIR/home"; mkdir -p "$HOME"
     export PATH="/usr/local/bin:/usr/bin:/bin"
     export LARV_HIGGSFIELD_BIN="$PROJECT_ROOT/tests/fixtures/higgsfield-stub.sh"
+    export LARV_HIGGSFIELD_ALLOW_FILE_URL=1
     . scripts/lib/design_tools.sh
     . scripts/lib/higgsfield.sh
     printf 'Desktop mockup of "PRS" — cost $5 `x`\nsecond line\n' >"$TMP/prompt.txt"
@@ -72,4 +73,16 @@ teardown() {
     run hf_cost "$TMP/prompt.txt" 3:2
     [ "$status" -ne 0 ]
     [ -z "$output" ]
+}
+
+@test "hf_generate_comp refuses a file:// result_url unless the test-only override is set" {
+    LARV_HIGGSFIELD_ALLOW_FILE_URL=0 run hf_generate_comp "$TMP/prompt.txt" 3:2 "$TMP/out/c.png"
+    [ "$status" -ne 0 ]
+    [ ! -e "$TMP/out/c.png" ]
+    [ ! -e "$TMP/out/c.png.part" ]
+}
+
+@test "stub generate cost fails when signed out" {
+    STUB_SIGNED_OUT=1 run hf_cost "$TMP/prompt.txt" 3:2
+    [ "$status" -ne 0 ]
 }
