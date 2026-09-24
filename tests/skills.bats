@@ -332,6 +332,20 @@ yaml.safe_load(parts[1])
     grep -q "broken links" skills/larv-design/SKILL.md
 }
 
+@test "larv-design serves a mockup root index and resolves the real public host" {
+    grep -q "mockups/index.html" skills/larv-design/SKILL.md
+    grep -q "design_public_host" skills/larv-design/SKILL.md
+    grep -q "http://sandbox.example.com:\*" skills/larv-design/SKILL.md
+    grep -q 'static_server_stop "\$ssh_target" "larv-mockups-\$slug"' skills/larv-design/SKILL.md
+}
+
+@test "larv-design step 7 mockup-server block is valid bash" {
+    local block
+    block="$(sed -n '/^### 7\. Mockup server/,/^## Mandatory completion gate/p' skills/larv-design/SKILL.md | sed -n '/^```bash$/,/^```$/p' | sed '1d;$d')"
+    [[ "$block" == *probe_url_inside* ]]
+    bash -n <<<"$block"
+}
+
 @test "larv-docsite SKILL.md exists for Phase 6.5" {
     [ -f skills/larv-docsite/SKILL.md ]
     grep -q "^name: larv-docsite" skills/larv-docsite/SKILL.md

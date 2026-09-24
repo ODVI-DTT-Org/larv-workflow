@@ -30,7 +30,7 @@ If `docs/larv/00-discuss/design-preferences.md` records `mode: impeccable-higgsf
 4. `LARV_HIGGSFIELD_CREDIT_CAP=<credit_cap from design-preferences.md> bash $D cost "$PWD" $OUT` (exit 4: ask the user, rerun `cost` and `comps` with `LARV_DESIGN_CONFIRMED_SPEND=<total>`). Higgsfield missing or signed out: `cost` records a zero-credit fallback and exits 0. When the user's cap is below the round total, offer to comp only the lead card with `--only <lead-id>`, and leave the other cards as wireframes.
 5. Ask for the mockup port as in step 5 below, then `bash $D board "$PWD" $OUT`, `LARV_DESIGN_PORT_KIND=mockup-port bash $D serve "$PWD" $OUT <port|auto>`, `LARV_HIGGSFIELD_CREDIT_CAP=<credit_cap from design-preferences.md> bash $D comps "$PWD" $OUT` (plus the same `LARV_DESIGN_CONFIRMED_SPEND` as `cost`), `bash $D board "$PWD" $OUT`. Print `$OUT/board-url.txt` and the credit balance `comps` printed before and after.
 6. User picks (`pick: <id>`); `bash $D pick "$PWD" $OUT <id>`. Copy `$OUT/decision.md` to `docs/larv/03-design/design-decision.md` with the user's rationale.
-7. Build one interactive HTML prototype of the picked comp under `docs/larv/03-design/mockups/<pick-slug>/` (`index.html` harness, `interaction-map.md`, working navigation and primary actions, app logo and favicon) and serve it with step 7's mockup-server block on the same port (stop the board first: `LARV_DESIGN_PORT_KIND=mockup-port bash $D stop "$PWD" $OUT`). Only one prototype is built: the picked comp's.
+7. Build one interactive HTML prototype of the picked comp under `docs/larv/03-design/mockups/<pick-slug>/` (`index.html` harness, `interaction-map.md`, working navigation and primary actions, app logo and favicon), plus the mockup root `docs/larv/03-design/mockups/index.html` linking to that pick set's `index.html` with the app logo and favicon links, and serve it with step 7's mockup-server block on the same port (stop the board first: `LARV_DESIGN_PORT_KIND=mockup-port bash $D stop "$PWD" $OUT`). Only one prototype is built: the picked comp's.
 8. Continue with step 9. Write `DESIGN.md` from the picked comp and brand spec; do not regenerate it with `impeccable.sh context`.
 
 In this mode the picked comp and its single prototype are the visual source of truth, and DESIGN.md is written from them. Any rule elsewhere in this skill that makes Attio mockups the visual source of truth, derives DESIGN.md from the brand spec with `impeccable.sh context`, or forbids replacing Attio mockups with an Impeccable world roll applies only when the design mode is not `impeccable-higgsfield`.
@@ -113,6 +113,10 @@ If the user chooses a number, use it as `requested_mockup_port`. If they choose 
 . scripts/lib/vm.sh
 . scripts/lib/verifier.sh
 . scripts/lib/static_server.sh
+. scripts/lib/design_tools.sh
+
+LARV_VM_HOST="$(design_public_host)" || { echo "ERROR: no public host; set LARV_VM_HOST to this server's public address" >&2; exit 1; }
+export LARV_VM_HOST
 
 slug=$(yq -r .project.slug docs/larv/STATE.yaml)
 requested_mockup_port="${requested_mockup_port:-}"
@@ -154,6 +158,8 @@ The mockups must be high-fidelity, interactive Attio Venture HTML Effectiveness 
 
 Use the Attio Venture HTML Effectiveness templates in `attio-venture-html-effectiveness/` as the concrete structure, interaction, and visual vocabulary source unless the user explicitly selected Attio Finance or another supplied design. Preserve useful density, tables, toolbars, filters, cards, badges, forms, modals, CRM interaction patterns, sidebar/header navigation, tabs, command bars, drawers, empty states, and hover/focus states, but rewrite labels, records, routes, and workflow states for the current app's domain. The Design Choice System variant selected for the mockup must be recorded in `design-decision.md` and reflected in `brand-spec.md`.
 
+In addition to each pick set's own `index.html`, the mockup root `docs/larv/03-design/mockups/index.html` is required. It links to every pick set's `index.html` and carries the app logo and favicon links, so the served root itself resolves instead of 404ing.
+
 Each mockup set must include:
 
 - `index.html` as a clickable navigation harness that links to every screen in the set and names the main workflow paths.
@@ -176,6 +182,10 @@ If the selected direction is Attio Venture or Attio Finance, copy the relevant l
 . scripts/lib/static_server.sh
 . scripts/lib/probe.sh
 . scripts/lib/runtime_gate.sh
+. scripts/lib/design_tools.sh
+
+LARV_VM_HOST="$(design_public_host)" || { echo "ERROR: no public host; set LARV_VM_HOST to this server's public address" >&2; exit 1; }
+export LARV_VM_HOST
 
 slug=$(yq -r .project.slug docs/larv/STATE.yaml)
 mockup_port="$(yq -r '.execution.allocations[] | select(.kind == "mockup-port") | .value' docs/larv/STATE.yaml | tail -1)"
@@ -184,6 +194,7 @@ ssh_target="${LARV_VM_HOST_SSH_USER}@${LARV_VM_HOST}"
 project_root="$(pwd -P)"
 mockups_dir="$project_root/docs/larv/03-design/mockups"
 test -d "$mockups_dir"
+test -f "$mockups_dir/index.html"
 trap 'release_port_reservation mockup "$mockup_port" "$slug" || true' EXIT
 
 if ! verify_allocation "$mockup_port" mockup "$slug"; then
@@ -196,17 +207,19 @@ static_server_start "$ssh_target" "$mockup_port" \
 
 if ! probe_url_inside "$ssh_target" "$mockup_port" static; then
     echo "ERROR: inside-VM probe failed for mockup port" >&2
+    static_server_stop "$ssh_target" "larv-mockups-$slug"
     exit 1
 fi
 mockup_url="$(static_server_url "$mockup_port")/"
 case "$mockup_url" in
-    http://127.0.0.1:*|http://localhost:*)
+    http://127.0.0.1:*|http://localhost:*|http://sandbox.example.com:*)
         echo "ERROR: refusing to announce local-only mockup URL: $mockup_url" >&2
         exit 1
         ;;
 esac
 if ! probe_with_retries "$mockup_url" static; then
     echo "ERROR: external probe failed" >&2
+    static_server_stop "$ssh_target" "larv-mockups-$slug"
     exit 1
 fi
 release_port_reservation mockup "$mockup_port" "$slug" || true
@@ -221,6 +234,7 @@ echo "Mockups ready at $mockup_url"
 The mockup server is not optional. Do not proceed to brand finalization, `design-decision.md`, `brand-spec.md`, `ui-design.md`, auto-commit, or `status: complete` until all of these are true:
 
 - At least one HTML mockup exists under `docs/larv/03-design/mockups/`.
+- `docs/larv/03-design/mockups/index.html` exists at the mockup root, links to every pick set's `index.html`, and carries the app logo and favicon links.
 - The mockups are explicitly based on the Attio Venture HTML Effectiveness reference (`attio-venture-html-effectiveness/`) unless the user chose Attio Finance or another supplied direction, and include `index.html` as a clickable navigation harness.
 - `docs/larv/03-design/mockups/<pick-slug>/interaction-map.md` exists for every pick and lists role/workflow click paths.
 - Every primary navigation item, primary action, tab, filter, modal trigger, and row action in the mockups either links to another mockup HTML file or visibly changes state with JavaScript.
