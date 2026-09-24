@@ -7,7 +7,7 @@ load helpers
 }
 
 @test "README.md mentions all public commands" {
-    for cmd in /larv:full /larv:adopt /larv:feature /larv:debug /larv:brainstorm /larv:learn /larv-caveman /larv:status /larv:resume /larv:sandbox /larv:sandbox-start /larv:sandbox-stop /larv:sandbox-reset /larv:presentation /larv:security /larv:redesign-attio-finance /larv:redesign-attio-venture /larv-feature-how-it-works /larv-feature-feedback /larv-feature-onboarding-helper; do
+    for cmd in /larv:full /larv:adopt /larv:feature /larv:debug /larv:brainstorm /larv:learn /larv-caveman /larv:status /larv:resume /larv:sandbox /larv:sandbox-start /larv:sandbox-stop /larv:sandbox-reset /larv:presentation /larv:security /larv:redesign-attio-finance /larv:redesign-attio-venture /larv-feature-how-it-works /larv-feature-feedback /larv-feature-onboarding-helper /larv:redesign-impeccable-higgsfield /larv:design-setup; do
         run grep -F "$cmd" README.md
         [ "$status" -eq 0 ]
     done
@@ -73,4 +73,12 @@ load helpers
     grep -q "Publishing Checklist" README.md
     grep -q "MIT" README.md
     grep -q "LICENSE" README.md
+}
+
+@test "README documents Impeccable + Higgsfield design directions" {
+    grep -q "## Impeccable + Higgsfield design directions" README.md
+    grep -q "/larv:redesign-impeccable-higgsfield" README.md
+    grep -q "nano_banana_pro" README.md
+    grep -q "LARV_HIGGSFIELD_CREDIT_CAP" README.md
+    grep -q "FICTIONAL-DATA-CONFIRMED" README.md
 }

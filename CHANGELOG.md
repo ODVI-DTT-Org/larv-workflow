@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Add `/larv:redesign-impeccable-higgsfield`: Impeccable directions + Higgsfield comps on a public sandbox board, then a full-screen production redesign.
+- Add Phase 3 design mode `impeccable-higgsfield` (one prototype of the picked comp).
+- Add `/larv:design-setup` and `scripts/design-setup.sh` (pinned Higgsfield CLI 1.1.26, readiness check in pre-flight).
+- Vendor Impeccable skill 4.3.1 in `bundle/impeccable/`.
+- `impeccable.sh context` honors `LARV_IMPECCABLE_PRODUCT_ONLY=1`.
+
 - Adds `/larv:full-test`, a production end-to-end feature sweep that requires login credentials and optional DB-revert consent, tours every feature collecting bugs without fixing, then fixes all bugs in one severity-ordered pass after the full sweep is complete.
 
 - Adds the Attio Finance and Attio Venture HTML Effectiveness galleries as first-class Phase 3 design sources for visual brainstorms, docs preview mockups, and new-app design templates.

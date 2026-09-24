@@ -262,6 +262,8 @@ The measurement path first tries gated Headroom direct compression. If Headroom 
 |---|---|
 | `/larv:redesign-attio-finance` | Redesign the Laravel frontend with the bundled Attio Finance CRM visual system |
 | `/larv:redesign-attio-venture` | Redesign the Laravel frontend with the bundled Attio Venture CRM visual system |
+| `/larv:redesign-impeccable-higgsfield` | Redesign the Laravel frontend using Impeccable directions and Higgsfield comps picked from a public sandbox board |
+| `/larv:design-setup` | Install and verify the pinned Higgsfield CLI and the vendored Impeccable skill |
 | `/larv-feature-how-it-works` | Add an in-app `/guide` or `/how-it-works` feature page |
 | `/larv-feature-feedback` | Add authenticated in-app feedback with persistence, admin triage, optional screenshots/context, and email delivery |
 | `/larv-feature-onboarding-helper` | Add onboarding/helper UX backed by a full user-flow inventory |
@@ -367,6 +369,27 @@ The most important implementation artifacts are:
 | `attio-venture-html-effectiveness/` | Attio Venture, B2B SaaS, venture, portfolio, advisory, and general CRM-style workflows |
 
 The redesign commands use these galleries as concrete implementation references, not as decorative inspiration. When a production app is redesigned, the agent inventories the real screens, applies the selected design system, runs builds/tests, restarts the sandbox, and records visual parity evidence.
+
+## Impeccable + Higgsfield design directions
+
+`/larv:redesign-impeccable-higgsfield [page|role|workflow]` redesigns an existing Laravel app; Phase 3 offers the same round as design mode `impeccable-higgsfield`.
+
+1. Impeccable (vendored skill 4.3.1) deals three grounded directions from `PRODUCT.md`.
+2. Higgsfield renders one comp per direction with `nano_banana_pro` at 2k (about 2 credits each). Declined directions get no comp.
+3. `scripts/design-directions.sh` renders the options board and serves it on a public 9000-9499 port (probe before announce). You pick with `pick: <id>`.
+4. The pick becomes `DESIGN.md`; the redesign command then rebuilds every screen, Phase 3 builds one clickable prototype.
+
+| Setting | Default |
+|---|---|
+| `LARV_HIGGSFIELD_CREDIT_CAP` | `10` credits per round; above it larv asks first |
+| `LARV_HIGGSFIELD_MODEL` | `nano_banana_pro` |
+| `LARV_VM_HOST` | public host for board URLs; falls back to `hostname -I` |
+
+Setup: `/larv:design-setup` runs `scripts/design-setup.sh check|install`. It installs the SHA-256-pinned Higgsfield CLI 1.1.26 into `~/.local/share/larv/higgsfield/` and the Impeccable skill into `~/.claude/skills` and `~/.agents/skills`. Signing in is the one user step (`! ~/.local/share/larv/higgsfield/higgsfield auth login`); larv never runs `auth token`. When Higgsfield is unavailable the board uses zero-credit wireframe cards.
+
+Privacy: only screenshots of seeded or fictional data may be sent to Higgsfield as reference images, and `directions/refs/FICTIONAL-DATA-CONFIRMED` must exist before one is used.
+
+Works in Claude Code and Grok (both load larv's `.claude-plugin` commands and skills) and Codex (`codex-skills/`).
 
 ## Security
 
