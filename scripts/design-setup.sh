@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Readiness check and installer for the larv Impeccable + Higgsfield design round.
-# check exit codes: 0 ready, 3 zero-credit fallback only, 1 hard failure.
+# check exit codes: 0 ready, 3 degraded (Higgsfield not installed, signed out or low
+# credits; comps fall back to wireframes unless the balance covers the priced round), 1 hard failure.
 set -euo pipefail
 
 PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -19,7 +20,9 @@ usage() {
 Usage: design-setup.sh <command> [project-dir]
 
 Commands:
-  check [dir]   Report readiness. Exit 0 ready, 3 zero-credit fallback only, 1 hard failure
+  check [dir]   Report readiness. Exit 0 ready, 1 hard failure, 3 degraded (not installed,
+                signed out or credits below the cap; comps spend only if the balance
+                covers the priced round, otherwise wireframe cards)
   install       Install the pinned Higgsfield CLI and the vendored Impeccable skill (never signs in)
   help          Show this help
 EOF
